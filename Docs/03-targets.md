@@ -9,13 +9,13 @@
 | VS Code | 두 색 테마를 선언한 `.vsix`를 **Install from VSIX**로 설치하고 Color Theme에서 선택 | 색 테마는 글꼴을 설정하지 않는다. 편집기 글꼴·크기·줄 높이는 별도 `settings.json` 조각을 사용자가 병합한다. |
 | Helix | 두 `.toml`을 Helix 설정 디렉터리의 `themes`에 복사하고 `:theme lbrx_dark` 또는 `:theme lbrx_light`로 확인. 지속 설정은 `config.toml`의 `theme` | 글꼴·크기·간격은 호스트 터미널 소유. 구문 scope와 `ui.*`만 변환한다. |
 | Vim | `lbrx_dark.vim`, `lbrx_light.vim`을 사용자 runtimepath의 `colors`에 복사하고 `:colorscheme lbrx_dark` 등으로 선택. 지속 설정은 vimrc | 터미널 Vim을 기준으로 하며 글꼴은 상속한다. `termguicolors`용 RGB와 저색상 터미널용 `cterm` 근사값을 분리한다. |
-| Windows Terminal | 두 배색표가 든 JSON 조각을 기존 `settings.json`의 `schemes`에 이름 기준으로 병합하고 프로필의 `colorScheme`에서 선택 | 배색표와 프로필의 `font` 설정 조각을 분리한다. 글꼴 크기는 pt로 변환(기준 px × 72/96). 셀 높이는 지원 버전에서만 별도로 제안한다. |
+| Windows Terminal | 첫 구현 대상. 두 배색표를 기존 `settings.json`의 `schemes`에 이름 기준으로 병합하고 프로필의 `colorScheme`에서 선택. [적용 방법](06-windows-terminal.md) | 배색표와 프로필의 `font` 설정 조각을 분리한다. 글꼴 크기는 pt로 변환(기준 px × 72/96). 현재 셀 높이는 출력하지 않는다. |
 | macOS Terminal.app | 두 `.terminal` 프로필을 **설정 → 프로파일 → 가져오기**로 읽고 원하는 프로필을 기본값으로 지정한다. 같은 이름을 다시 가져올 때 중복을 확인한다. | ANSI·전경·배경·커서를 프로필에 담는다. 글꼴·크기·행 간격은 프로필의 텍스트 설정에서 맞추는 수치표를 제공한다. |
 
 **구현 순서와 승인 기준**
 
 1. 원본과 `check`부터 만든다. 누락된 ANSI 슬롯, 잘못된 역할 참조, 읽을 수 없는 선택 영역에서 모드와 원인까지 표시되는지 확인한다.
-2. Typora와 Windows Terminal을 먼저 연결한다. 다크 `pine` 하나를 바꿨을 때 CSS의 링크와 같은 키를 참조하는 터미널 색만 변하고 라이트 출력은 그대로여야 한다.
+2. 첫 앱은 Windows Terminal로 연결한다. 다크 `pine` 하나를 바꿨을 때 그 키를 참조하는 다크 배색표 필드만 변하고 라이트 출력은 그대로여야 한다. 두 배색표를 실제 앱에서 선택해 확인한다.
 3. 나머지 어댑터를 연결한다. 양쪽 모드의 산출물을 형식별로 파싱하고 실제 앱에서 가져온다. 특히 VSIX 설치와 macOS의 `.terminal` 색상 데이터는 JSON·plist 문법 검사만으로 승인하지 않는다.
 4. TUI에서 견본 수정 → 취소/저장 → 재생성을 확인한다. 같은 한글 문단·코드·경고 샘플을 일곱 앱에서 비교하고, 실제 사용자가 장문 작성 후 불편한 대비·크기·간격을 조정한 뒤 기본 팔레트를 확정한다.
 

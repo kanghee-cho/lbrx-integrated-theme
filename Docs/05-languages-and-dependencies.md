@@ -1,6 +1,6 @@
 # 사용 언어와 라이브러리 버전 관리
 
-**상태: 구현 전 도입 기준안.** 현재 저장소에는 설계 문서만 있으며 `Cargo.toml`, `Cargo.lock`, 실행 코드는 없다. 아래 버전은 최신 버전이나 설치·빌드가 검증된 조합이 아니라, 첫 구현에서 검증할 기준이다. 실제 도입 시 유지보수 상태·보안 공지·전이 의존성의 Rust 요구 버전을 확인하고 이 문서를 함께 갱신한다.
+**상태: CLI와 Windows Terminal 어댑터 구현.** [Cargo.toml](../Cargo.toml)의 `clap`, `serde`, `toml`, `serde_json`을 사용한다. 나머지 라이브러리는 아직 도입하지 않은 후보이며, 버전 요구식은 실제 도입 시 재검토한다.
 
 ## 사용 언어와 파일 형식
 
@@ -18,7 +18,7 @@ JavaScript·TypeScript·Python은 초기 구현 언어에 포함하지 않는다
 
 ## Rust 직접 의존성
 
-버전 열은 도입할 `Cargo.toml`의 버전 요구식이다. `~0.29.0`은 `0.29.x`, `~4.5.32`는 `4.5.32` 이상 `4.6.0` 미만, `1`은 `1.x`의 호환 업데이트를 허용한다. 실제 선택된 패치 버전과 전이 의존성은 첫 구현에서 생성할 `Cargo.lock`에 기록한다.
+버전 열은 `Cargo.toml`에 적용하거나 도입할 버전 요구식이다. `~0.29.0`은 `0.29.x`, `~4.5.32`는 `4.5.32` 이상 `4.6.0` 미만, `1`은 `1.x`의 호환 업데이트를 허용한다. 실제 패치 버전과 전이 의존성은 [Cargo.lock](../Cargo.lock)에서 확인한다.
 
 | 라이브러리 | 버전 요구식 | 필요한 기능 / 용도 | 도입 시점 |
 |---|---|---|---|
@@ -39,7 +39,7 @@ Ratatui `0.29.0`의 [공식 패키지 정의](https://docs.rs/crate/ratatui/0.29
 
 | 관리 대상 | 구현 시 기준 파일 | 관리 규칙 |
 |---|---|---|
-| 개발·CI 도구체인 | `rust-toolchain.toml` | 검증한 정확한 Rust 버전과 `rustfmt`, `clippy`를 기록한다. 초기 검증 후보는 `1.85.0`이며, 검증 전 고정 완료로 표시하지 않는다. |
+| 개발·CI 도구체인 | `rust-toolchain.toml` | `1.85.0`, `rustfmt`, `clippy`로 고정한다. |
 | 최소 Rust 버전·Edition | `Cargo.toml`의 `rust-version`, `edition` | 목표는 각각 `1.85`, `2024`. 고정 도구체인을 올려도 최소 버전은 별도로 검증한다. |
 | 직접 의존성·feature | `Cargo.toml` | 위 표와 일치시킨다. 기본 feature를 포함해 실제 필요한 기능을 확인한다. |
 | 실제 의존성 해석 결과 | `Cargo.lock` | CLI 애플리케이션이므로 저장소에 커밋한다. 문서에 전이 의존성을 복제하지 않는다. |
@@ -47,7 +47,7 @@ Ratatui `0.29.0`의 [공식 패키지 정의](https://docs.rs/crate/ratatui/0.29
 
 1. 의존성 도입·갱신 시 변경 이유, 필요한 feature, 최소 Rust 버전 영향을 확인한다. 호환 범위 밖 업데이트는 API와 생성물 차이까지 검토한다.
 2. `Cargo.toml`과 `Cargo.lock`을 함께 갱신하고 이 문서의 요구식·상태를 맞춘다. 단순히 최신 버전을 따라가기 위해 도구체인과 모든 의존성을 한꺼번에 올리지 않는다.
-3. 구현 후에는 `cargo check --locked`, `cargo test --locked`, `cargo clippy --locked --all-targets -- -D warnings`, `cargo fmt --check`를 통과시킨다. 최소 Rust 버전이 개발 도구체인과 다르면 그 최소 버전에서도 검사·테스트한다. 현재는 Cargo 패키지가 없으므로 실행 가능한 검증 명령이 아니다.
+3. 저장소 루트에서 `cargo check --locked`, `cargo test --locked`, `cargo clippy --locked --all-targets -- -D warnings`, `cargo fmt --check`를 통과시킨다. 최소 Rust 버전이 개발 도구체인과 다르면 그 최소 버전에서도 검사·테스트한다.
 4. 어댑터 관련 변경은 양쪽 모드 출력 재파싱과 해당 앱의 실제 가져오기를 확인한다. 의도하지 않은 테마 값 변경은 허용하지 않는다.
 
 ## 대상 앱과 외부 도구 버전
@@ -61,7 +61,7 @@ Ratatui `0.29.0`의 [공식 패키지 정의](https://docs.rs/crate/ratatui/0.29
 | VS Code | 미검증 | manifest의 `engines.vscode`, VSIX 설치, 별도 서체 설정 |
 | Helix | 미검증 | 테마 scope와 호스트 터미널 |
 | Vim | 미검증 | `termguicolors`, `cterm`, 호스트 터미널 |
-| Windows Terminal | 미검증 | 배색표, 프로필 글꼴·셀 높이의 버전별 지원 |
+| Windows Terminal | `1.25.3131.0` x64 Portable: 라이트·다크 프로필 스키마 검증 및 두 창 실행 확인 (2026-11-19) | 사용자가 미리보기 화면을 직접 확인하고 긍정적으로 평가함. 항목별 결과는 별도 기록하지 않음. |
 | macOS Terminal.app | 미검증 | macOS·Terminal.app 버전, 색상 데이터와 프로필 가져오기 |
 
 VSIX를 Rust에서 직접 생성하는 기준이므로 `@vscode/vsce`는 현재 필수 도구가 아니다. 구현 과정에서 외부 패키징 도구가 필요해지면 해당 도구와 Node.js 버전, 실행 환경을 별도로 명시한다. Pretendard·D2Coding은 사용자 선택 글꼴이며 번들 의존성이 아니다. 조판 비교 때는 실제 설치된 글꼴 버전도 함께 기록한다.
