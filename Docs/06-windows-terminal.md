@@ -32,3 +32,5 @@
 스크립트는 테마를 빌드하고 Portable의 `settings\settings.json`을 `LBRX Light (dev)`와 `LBRX Dark (dev)` 두 프로필로 다시 작성한 뒤, 위에 표시된 `WindowsTerminal.exe`로 선택한 프로필의 새 창을 엽니다. 두 프로필은 같은 Portable 복사본을 사용하며, 평소 사용하는 Windows Terminal 설정은 건드리지 않습니다. `-NoLaunch`를 지정하면 설정까지만 생성합니다. 두 모드에서 한글·영문 글꼴, 커서, 마우스 선택 영역, ANSI 16색 견본을 비교합니다. 기본 글꼴인 `D2Coding ligature`가 없다면 글꼴 대체 동작만 확인할 수 있습니다.
 
 참고: Microsoft Learn의 [배색표](https://learn.microsoft.com/windows/terminal/customize-settings/color-schemes)와 [프로필 모양](https://learn.microsoft.com/windows/terminal/customize-settings/profile-appearance).
+
+글꼴이 설치되지 않았다면 [테마 글꼴 확인과 설치](README.md#테마-글꼴-확인과-설치)를 참고합니다. Portable 미리보기도 현재 OS 사용자의 글꼴을 사용하며, 미리보기 자체는 글꼴을 설치하지 않습니다.

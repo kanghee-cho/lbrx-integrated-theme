@@ -1,7 +1,7 @@
 use crate::{
     model::Theme,
     resolve::{self, ResolvedTheme},
-    windows_terminal,
+    typora, windows_terminal,
 };
 use std::{
     fs::{self, File, Metadata},
@@ -14,11 +14,21 @@ const STAGING: &str = ".lbrx-build";
 const BACKUP: &str = ".lbrx-previous";
 const LOCK: &str = ".lbrx-build.lock";
 const TOKENS: &str = "resolved.toml";
+const ADAPTERS: &[(&str, &[&str])] = &[
+    (windows_terminal::DIRECTORY, &windows_terminal::FILES),
+    (typora::DIRECTORY, typora::FILES),
+];
+type AdapterOutput<'a> = (&'static str, &'a [(&'static str, String)]);
 
 pub fn build(theme: &Theme, parent: &Path) -> Result<(), String> {
     let resolved = resolve::resolve(theme)?;
     let contents = toml::to_string_pretty(&resolved).map_err(|e| e.to_string())?;
     let terminal_files = windows_terminal::render(&resolved)?;
+    let typora_files = typora::render(&resolved);
+    let adapters = [
+        (windows_terminal::DIRECTORY, terminal_files.as_slice()),
+        (typora::DIRECTORY, typora_files.as_slice()),
+    ];
     if !exists(parent)? {
         fs::create_dir(parent).map_err(|e| format!("{}: {e}", parent.display()))?;
     }
@@ -30,7 +40,7 @@ pub fn build(theme: &Theme, parent: &Path) -> Result<(), String> {
             lock_path.display()
         )
     })?;
-    let result = build_locked(parent, &resolved, &contents, &terminal_files);
+    let result = build_locked(parent, &resolved, &contents, &adapters);
     drop(lock);
     match fs::remove_file(&lock_path) {
         Ok(()) => result,
@@ -49,7 +59,7 @@ fn build_locked(
     parent: &Path,
     resolved: &ResolvedTheme,
     contents: &str,
-    terminal_files: &[(&str, String)],
+    adapters: &[AdapterOutput<'_>],
 ) -> Result<(), String> {
     let staging = parent.join(STAGING);
     fs::create_dir(&staging).map_err(|e| {
@@ -58,7 +68,7 @@ fn build_locked(
             staging.display()
         )
     })?;
-    let result = stage_and_publish(parent, resolved, contents, terminal_files);
+    let result = stage_and_publish(parent, resolved, contents, adapters);
     let cleanup = remove_generated_directory(&staging);
     match (result, cleanup) {
         (Ok(()), Ok(())) => Ok(()),
@@ -78,7 +88,7 @@ fn stage_and_publish(
     parent: &Path,
     resolved: &ResolvedTheme,
     contents: &str,
-    terminal_files: &[(&str, String)],
+    adapters: &[AdapterOutput<'_>],
 ) -> Result<(), String> {
     let staging = parent.join(STAGING);
     let path = staging.join(TOKENS);
@@ -88,14 +98,16 @@ fn stage_and_publish(
     if parsed != *resolved {
         return Err(format!("{}: 해석 결과와 출력이 다름", path.display()));
     }
-    let terminal = staging.join(windows_terminal::DIRECTORY);
-    fs::create_dir(&terminal).map_err(|e| format!("{}: {e}", terminal.display()))?;
-    for (name, contents) in terminal_files {
-        let path = terminal.join(name);
-        let written = write_staged(&path, contents)?;
-        if *name != windows_terminal::GUIDE {
-            serde_json::from_str::<serde_json::Value>(&written)
-                .map_err(|e| format!("{}: 출력 재파싱 실패: {e}", path.display()))?;
+    for (directory, files) in adapters {
+        let directory = staging.join(directory);
+        fs::create_dir(&directory).map_err(|e| format!("{}: {e}", directory.display()))?;
+        for (name, contents) in *files {
+            let path = directory.join(name);
+            let written = write_staged(&path, contents)?;
+            if name.ends_with(".json") {
+                serde_json::from_str::<serde_json::Value>(&written)
+                    .map_err(|e| format!("{}: 출력 재파싱 실패: {e}", path.display()))?;
+            }
         }
     }
     publish(parent)
@@ -184,11 +196,13 @@ fn require_generated_directory(path: &Path) -> Result<(), String> {
 
 fn remove_generated_directory(path: &Path) -> io::Result<()> {
     check_tree(path)?;
-    let terminal = path.join(windows_terminal::DIRECTORY);
-    for name in windows_terminal::FILES {
-        ignore_missing(fs::remove_file(terminal.join(name)))?;
+    for (directory, files) in ADAPTERS {
+        let directory = path.join(directory);
+        for name in *files {
+            ignore_missing(fs::remove_file(directory.join(name)))?;
+        }
+        ignore_missing(fs::remove_dir(&directory))?;
     }
-    ignore_missing(fs::remove_dir(&terminal))?;
     ignore_missing(fs::remove_file(path.join(TOKENS)))?;
     ignore_missing(fs::remove_dir(path))
 }
@@ -208,19 +222,19 @@ fn check_tree(path: &Path) -> io::Result<()> {
         if kind.is_file() && entry.file_name() == TOKENS {
             continue;
         }
-        if entry.file_name() == windows_terminal::DIRECTORY && plain_directory(&entry.metadata()?) {
-            for file in fs::read_dir(entry.path())? {
-                let file = file?;
-                if !file.file_type()?.is_file()
-                    || !windows_terminal::FILES
-                        .iter()
-                        .any(|name| file.file_name() == *name)
-                {
-                    return Err(unexpected(&file.path()));
-                }
-            }
-        } else {
+        let Some((_, allowed)) = ADAPTERS.iter().find(|(name, _)| entry.file_name() == *name)
+        else {
             return Err(unexpected(&entry.path()));
+        };
+        if !plain_directory(&entry.metadata()?) {
+            return Err(unexpected(&entry.path()));
+        }
+        for file in fs::read_dir(entry.path())? {
+            let file = file?;
+            if !file.file_type()?.is_file() || !allowed.iter().any(|name| file.file_name() == *name)
+            {
+                return Err(unexpected(&file.path()));
+            }
         }
     }
     Ok(())
@@ -319,7 +333,99 @@ mod tests {
             adapter_contents
         );
         assert_eq!(fs::read_dir(&workspace.0).unwrap().count(), 1);
-        assert_eq!(fs::read_dir(workspace.0.join(OUTPUT)).unwrap().count(), 2);
+        assert_eq!(fs::read_dir(workspace.0.join(OUTPUT)).unwrap().count(), 3);
+    }
+
+    #[test]
+    fn typora_preserves_font_priority_and_only_updates_changed_mode() {
+        let workspace = Workspace::new();
+        let mut theme = sample();
+        theme.typography.prose.families =
+            ["English Font", "Korean Font", "Japanese Font", "sans-serif"]
+                .map(String::from)
+                .into();
+        theme.typography.prose.line_height = 1.7;
+        theme.typography.mono.families = ["Code Font", "monospace"].map(String::from).into();
+        theme.typography.mono.size_px = 15.0;
+        let output = workspace.0.join(OUTPUT);
+        let typora = output.join(typora::DIRECTORY);
+        let terminal = output.join(windows_terminal::DIRECTORY);
+        build(&theme, &workspace.0).unwrap();
+        let light = fs::read_to_string(typora.join(typora::LIGHT)).unwrap();
+        let dark = fs::read_to_string(typora.join(typora::DARK)).unwrap();
+        for css in [&light, &dark] {
+            assert!(css.contains(r#"--lbrx-prose-family: "English Font", "Korean Font", "Japanese Font", sans-serif;"#));
+            assert!(css.contains("--lbrx-prose-leading: 1.7;"));
+            assert!(css.contains(r#"--lbrx-mono-family: "Code Font", monospace;"#));
+            assert!(css.contains("--lbrx-mono-size: 15px;"));
+        }
+        let windows = fs::read(terminal.join(windows_terminal::SCHEMES)).unwrap();
+        theme.dark.roles.insert("link".into(), "ink".into());
+        let expected = dark.replace(
+            &format!("--lbrx-link: {};", theme.dark.palette["pine"]),
+            &format!("--lbrx-link: {};", theme.dark.palette["ink"]),
+        );
+        assert_ne!(dark, expected);
+        build(&theme, &workspace.0).unwrap();
+        assert_eq!(
+            fs::read_to_string(typora.join(typora::LIGHT)).unwrap(),
+            light
+        );
+        assert_eq!(
+            fs::read_to_string(typora.join(typora::DARK)).unwrap(),
+            expected
+        );
+        assert_eq!(
+            fs::read(terminal.join(windows_terminal::SCHEMES)).unwrap(),
+            windows
+        );
+    }
+
+    #[test]
+    fn typora_preferences_styles_target_the_affected_pane_in_each_mode() {
+        let theme = sample();
+        let resolved = resolve::resolve(&theme).unwrap();
+        let [(_, light), (_, dark), _] = typora::render(&resolved);
+        let content = ".ty-preferences .pane-group > .pane:not(.sidebar) {";
+        assert!(!dark.contains(content));
+        assert!(!light.contains(".ty-preferences .sidebar"));
+        assert!(dark.contains(&format!(
+            "--lbrx-surface: {};",
+            resolved.dark.roles["surface"]
+        )));
+        for (css, selector, background, text) in [
+            (
+                &light,
+                content,
+                "var(--lbrx-background)",
+                "var(--lbrx-text)",
+            ),
+            (
+                &dark,
+                ".ty-preferences .sidebar {",
+                "var(--lbrx-surface)",
+                "var(--lbrx-text)",
+            ),
+            (
+                &dark,
+                ".ty-preferences .sidebar .nav-group-item:is(:hover, :active, .active) {",
+                "var(--lbrx-selection-background)",
+                "var(--lbrx-selection-text)",
+            ),
+        ] {
+            let (_, rest) = css.split_once(selector).unwrap();
+            let (declarations, _) = rest.split_once('}').unwrap();
+            assert!(
+                declarations
+                    .lines()
+                    .any(|line| line.trim() == format!("background-color: {background};"))
+            );
+            assert!(
+                declarations
+                    .lines()
+                    .any(|line| line.trim() == format!("color: {text};"))
+            );
+        }
     }
 
     #[test]

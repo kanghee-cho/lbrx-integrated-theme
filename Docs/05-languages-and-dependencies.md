@@ -1,6 +1,6 @@
 # 사용 언어와 라이브러리 버전 관리
 
-**상태: CLI와 Windows Terminal 어댑터 구현.** [Cargo.toml](../Cargo.toml)의 `clap`, `serde`, `toml`, `serde_json`을 사용한다. 나머지 라이브러리는 아직 도입하지 않은 후보이며, 버전 요구식은 실제 도입 시 재검토한다.
+**상태: CLI와 Windows Terminal·Typora 어댑터 구현.** [Cargo.toml](../Cargo.toml)의 `clap`, `serde`, `toml`, `serde_json`을 사용한다. 나머지 라이브러리는 아직 도입하지 않은 후보이며, 버전 요구식은 실제 도입 시 재검토한다.
 
 ## 사용 언어와 파일 형식
 
@@ -14,7 +14,7 @@
 | macOS 출력 | XML plist / 앱 전용 색상 데이터 | `.terminal` 프로필. plist 문법뿐 아니라 Terminal.app에서 실제로 가져오는지 확인한다. |
 | 안내·기준 샘플 | Markdown | 한국어 문서와 한글·영문 혼합 미리보기 샘플을 관리한다. |
 
-JavaScript·TypeScript·Python은 초기 구현 언어에 포함하지 않는다. VS Code용 산출물도 실행 코드 없는 색 테마 확장을 목표로 하므로 Node.js를 CLI 실행 필수 조건으로 두지 않는다. CSS·JSON·Vim script의 지원 범위는 언어 버전 숫자를 임의로 지정하지 않고 **대상 앱의 검증 버전**으로 관리한다.
+테마 생성 자체에는 JavaScript·TypeScript·Python이 필요하지 않다. 선택 기능인 [글꼴 도구](../scripts/theme-fonts.py)는 Python 3.11 이상과 표준 라이브러리를 사용하고, Linux에서는 Fontconfig의 `fc-list`와 `fc-cache`를 사용한다. VS Code용 산출물은 실행 코드 없는 색 테마 확장을 목표로 하므로 Node.js를 CLI 실행 필수 조건으로 두지 않는다. CSS·JSON·Vim script의 지원 범위는 **대상 앱의 검증 버전**으로 관리한다.
 
 ## Rust 직접 의존성
 
@@ -64,4 +64,4 @@ Ratatui `0.29.0`의 [공식 패키지 정의](https://docs.rs/crate/ratatui/0.29
 | Windows Terminal | `1.25.3131.0` x64 Portable: 라이트·다크 프로필 스키마 검증 및 두 창 실행 확인 (2026-11-19) | 사용자가 미리보기 화면을 직접 확인하고 긍정적으로 평가함. 항목별 결과는 별도 기록하지 않음. |
 | macOS Terminal.app | 미검증 | macOS·Terminal.app 버전, 색상 데이터와 프로필 가져오기 |
 
-VSIX를 Rust에서 직접 생성하는 기준이므로 `@vscode/vsce`는 현재 필수 도구가 아니다. 구현 과정에서 외부 패키징 도구가 필요해지면 해당 도구와 Node.js 버전, 실행 환경을 별도로 명시한다. Pretendard·D2Coding은 사용자 선택 글꼴이며 번들 의존성이 아니다. 조판 비교 때는 실제 설치된 글꼴 버전도 함께 기록한다.
+VSIX를 Rust에서 직접 생성하는 기준이므로 `@vscode/vsce`는 현재 필수 도구가 아니다. 구현 과정에서 외부 패키징 도구가 필요해지면 해당 도구와 Node.js 버전, 실행 환경을 별도로 명시한다. LINE Seed EN·KR·JP와 D2Coding ligature는 사용자 글꼴이며 번들 의존성이 아니다. 조판 비교 때는 실제 설치된 글꼴 버전도 함께 기록한다.

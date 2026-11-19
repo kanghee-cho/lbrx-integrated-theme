@@ -1,0 +1,66 @@
+
+body, content, #write {
+  background-color: var(--lbrx-background);
+  color: var(--lbrx-text);
+}
+
+#write {
+  font-family: var(--lbrx-prose-family);
+  font-size: var(--lbrx-prose-size);
+  line-height: var(--lbrx-prose-leading);
+}
+
+#write :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--lbrx-heading);
+}
+
+#write a {
+  color: var(--lbrx-link);
+  text-decoration: underline;
+}
+
+#write a:focus-visible {
+  outline: 2px solid var(--lbrx-focus);
+  outline-offset: 2px;
+}
+
+#write blockquote {
+  color: var(--lbrx-quote);
+  border-inline-start: 3px solid var(--lbrx-quote);
+  padding-inline-start: 0.9em;
+}
+
+#write :is(code, tt, kbd, pre, .md-fences, .CodeMirror, .CodeMirror pre) {
+  font-family: var(--lbrx-mono-family);
+  font-size: var(--lbrx-mono-size);
+  line-height: var(--lbrx-mono-leading);
+}
+
+#write :not(pre) > :is(code, tt, kbd) {
+  color: var(--lbrx-inline-code);
+}
+
+#write :is(.md-fences, .cm-s-inner, .cm-s-inner .CodeMirror-gutters) {
+  background-color: var(--lbrx-background);
+  color: var(--lbrx-text);
+}
+
+#write .md-fences {
+  border: 1px solid var(--lbrx-muted);
+  border-radius: 0.35em;
+  padding: 0.7em;
+}
+
+#write .cm-s-inner .CodeMirror-linenumber { color: var(--lbrx-muted); }
+#write .cm-s-inner .CodeMirror-cursor { border-color: var(--lbrx-focus); }
+#write .cm-s-inner .cm-comment { color: var(--lbrx-comment); }
+#write .cm-s-inner .cm-keyword { color: var(--lbrx-keyword); }
+#write .cm-s-inner :is(.cm-string, .cm-string-2) { color: var(--lbrx-string); }
+#write .cm-s-inner :is(.cm-def, .cm-builtin) { color: var(--lbrx-function); }
+#write .cm-s-inner :is(.cm-number, .cm-atom) { color: var(--lbrx-number); }
+#write .cm-s-inner .cm-error { color: var(--lbrx-error); }
+
+#write::selection, #write *::selection {
+  background-color: var(--lbrx-selection-background);
+  color: var(--lbrx-selection-text);
+}

@@ -1,7 +1,7 @@
 schema_version = 1
 
 [typography.prose]
-families = ["Pretendard", "sans-serif"]
+families = ["LINE Seed Sans", "LINE Seed Sans KR", "LINE Seed JP_TTF", "sans-serif"]
 size_px = 16
 line_height = 1.65
 

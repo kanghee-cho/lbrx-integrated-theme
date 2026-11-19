@@ -1,0 +1,7 @@
+
+.ty-preferences .pane-group > .pane:not(.sidebar) {
+  color-scheme: light;
+  background-color: var(--lbrx-background);
+  color: var(--lbrx-text);
+  --hint-color: var(--lbrx-muted);
+}

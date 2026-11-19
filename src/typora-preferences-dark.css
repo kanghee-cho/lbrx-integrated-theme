@@ -1,0 +1,23 @@
+
+.ty-preferences .sidebar {
+  background-color: var(--lbrx-surface);
+  color: var(--lbrx-text);
+}
+
+.ty-preferences .sidebar .nav-group-title {
+  color: var(--lbrx-muted);
+}
+
+.ty-preferences .sidebar .nav-group-item {
+  color: var(--lbrx-text);
+}
+
+.ty-preferences .sidebar .nav-group-item:is(:hover, :active, .active) {
+  background-color: var(--lbrx-selection-background);
+  color: var(--lbrx-selection-text);
+}
+
+.ty-preferences .sidebar .nav-group-item:focus-visible {
+  outline: 2px solid var(--lbrx-focus);
+  outline-offset: -2px;
+}

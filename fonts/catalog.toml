@@ -1,0 +1,90 @@
+schema_version = 1
+
+[fonts.line-seed-en]
+family = "LINE Seed Sans"
+version = "1.003"
+license = "OFL-1.1"
+
+[[fonts.line-seed-en.files]]
+filename = "LINESeedSans_Rg.ttf"
+sha256 = "b782a30ad91fff75e7118a061640b76111386399fb51adf91a8e9d3a7e760543"
+windows_name = "LINE Seed Sans Regular (TrueType)"
+
+[[fonts.line-seed-en.files]]
+filename = "LINESeedSans_Bd.ttf"
+sha256 = "4f04ffa5a048a9d257e89efb0544a50bc18107bf52536daaeb8ba0abe73777d9"
+windows_name = "LINE Seed Sans Bold (TrueType)"
+
+[[fonts.line-seed-en.files]]
+filename = "LINESeedSans_Th.ttf"
+sha256 = "636ad10222d7e0e900b25c3608ef2471b28f05f6336c1ac21d57ee6f9106385e"
+windows_name = "LINE Seed Sans Thin (TrueType)"
+
+[[fonts.line-seed-en.files]]
+filename = "LINESeedSans_XBd.ttf"
+sha256 = "391aefbcd46848a16ec8b6ad7aba360ce34f868ff2d47c0ace1172cce31720d3"
+windows_name = "LINE Seed Sans ExtraBold (TrueType)"
+
+[[fonts.line-seed-en.files]]
+filename = "LINESeedSans_He.ttf"
+sha256 = "b6ce171f758fcd7162c99b5caf42ec671bbf6f75d22e305087d3fd52be5e4e92"
+windows_name = "LINE Seed Sans Heavy (TrueType)"
+
+[fonts.line-seed-kr]
+family = "LINE Seed Sans KR"
+family_aliases = ["LINE Seed Sans KR Regular"]
+version = "1.000"
+license = "OFL-1.1"
+
+[[fonts.line-seed-kr.files]]
+filename = "LINESeedKR-Rg.ttf"
+sha256 = "52fdbf502f57c2652461eee99c8c71a9f85850f93ed411e5ed08e24327e33003"
+windows_name = "LINE Seed Sans KR Regular (TrueType)"
+
+[[fonts.line-seed-kr.files]]
+filename = "LINESeedKR-Bd.ttf"
+sha256 = "df6d817f60814528922a0e2911b76a1252db0697c2de78a7283ea7a3c8e70e21"
+windows_name = "LINE Seed Sans KR Bold (TrueType)"
+
+[[fonts.line-seed-kr.files]]
+filename = "LINESeedKR-Th.ttf"
+sha256 = "32d66aa59486bab9128681808392d1e46285b3776eae24afa4f6cfd95de0ca0d"
+windows_name = "LINE Seed Sans KR Thin (TrueType)"
+
+[fonts.line-seed-jp]
+family = "LINE Seed JP_TTF"
+family_aliases = ["LINE Seed JP_TTF Regular"]
+version = "Regular 1.003, Bold 1.010, ExtraBold 1.015, Thin 1.008"
+license = "OFL-1.1"
+
+[[fonts.line-seed-jp.files]]
+filename = "LINESeedJP_TTF_Rg.ttf"
+sha256 = "b959914027a4089f3bb1679d0825df8f0854f6b1b7c0d80398b2ce54a23af95f"
+windows_name = "LINE Seed JP_TTF Regular (TrueType)"
+
+[[fonts.line-seed-jp.files]]
+filename = "LINESeedJP_TTF_Bd.ttf"
+sha256 = "43a19af08559e8421586187ceada91c98190a9014ff3bdd4c16bd3c0edeb0b69"
+windows_name = "LINE Seed JP_TTF Bold (TrueType)"
+
+[[fonts.line-seed-jp.files]]
+filename = "LINESeedJP_TTF_Eb.ttf"
+sha256 = "84b22f61e24f4fa783c67b065fa69b68c95dc3c18821407a9f1d25d4d35e3680"
+windows_name = "LINE Seed JP_TTF ExtraBold (TrueType)"
+
+[[fonts.line-seed-jp.files]]
+filename = "LINESeedJP_TTF_Th.ttf"
+sha256 = "549184ac641a0605641bcd3a8f771db154403b5ac0407ab9a3f9feed4e76ebde"
+windows_name = "LINE Seed JP_TTF Thin (TrueType)"
+
+[fonts.d2coding-ligature]
+family = "D2Coding ligature"
+version = "1.4.0"
+url = "https://github.com/naver/d2-coding-font/releases/download/VER1.4.0/D2Coding-Ver1.4.0-20261003.zip"
+license = "OFL-1.1"
+license_member = "OFL.txt"
+
+[[fonts.d2coding-ligature.files]]
+filename = "D2Coding-Ver1.4.0-20261003-all.ttc"
+sha256 = "1d3ce697149412ae6f1c7b80970ebc8b5abd80e34ae539e5ccefd7f78e5b8419"
+windows_name = "D2Coding & D2Coding Bold & D2Coding ligature & D2Coding ligature Bold (TrueType)"

@@ -4,7 +4,7 @@
 
 | 대상 | 생성물과 수동 적용 | 서체·간격 경계 |
 |---|---|---|
-| Typora | 모드별 `lbrx-light.css`, `lbrx-dark.css`를 환경설정에서 연 테마 폴더에 복사하고 재시작 후 테마 메뉴에서 선택 | 본문·코드 CSS를 분리한다. 편집 UI 전체가 아닌 문서 영역을 기준으로 한다. |
+| Typora | 두 번째 구현 대상. 모드별 `lbrx-light.css`, `lbrx-dark.css`를 테마 폴더에 복사하고 재시작 후 테마 메뉴에서 선택. [적용 방법](07-typora.md) | 본문·코드 서체를 분리한다. 편집 UI 전체가 아닌 문서 영역을 기준으로 한다. |
 | Obsidian | `manifest.json`과 `theme.css`가 든 `LBRX` 폴더를 보관함의 `.obsidian\themes`에 복사한 뒤 외형에서 활성화. CSS가 `.theme-light`, `.theme-dark`를 구분 | 본문과 고정폭 CSS 변수를 매핑하고 읽기 뷰·라이브 프리뷰를 각각 확인한다. 사용자 서체 설정과 충돌하는 강제 규칙은 피한다. |
 | VS Code | 두 색 테마를 선언한 `.vsix`를 **Install from VSIX**로 설치하고 Color Theme에서 선택 | 색 테마는 글꼴을 설정하지 않는다. 편집기 글꼴·크기·줄 높이는 별도 `settings.json` 조각을 사용자가 병합한다. |
 | Helix | 두 `.toml`을 Helix 설정 디렉터리의 `themes`에 복사하고 `:theme lbrx_dark` 또는 `:theme lbrx_light`로 확인. 지속 설정은 `config.toml`의 `theme` | 글꼴·크기·간격은 호스트 터미널 소유. 구문 scope와 `ui.*`만 변환한다. |
@@ -13,6 +13,8 @@
 | macOS Terminal.app | 두 `.terminal` 프로필을 **설정 → 프로파일 → 가져오기**로 읽고 원하는 프로필을 기본값으로 지정한다. 같은 이름을 다시 가져올 때 중복을 확인한다. | ANSI·전경·배경·커서를 프로필에 담는다. 글꼴·크기·행 간격은 프로필의 텍스트 설정에서 맞추는 수치표를 제공한다. |
 
 **구현 순서와 승인 기준**
+
+Typora의 상세 구현 상태와 Obsidian으로 이어갈 공통 후보는 [옵션 체크리스트](08-typora-option-checklist.md)에서 같은 ID로 추적한다. 읽기 뷰와 라이브 프리뷰의 검증 결과는 따로 기록한다.
 
 1. 원본과 `check`부터 만든다. 누락된 ANSI 슬롯, 잘못된 역할 참조, 읽을 수 없는 선택 영역에서 모드와 원인까지 표시되는지 확인한다.
 2. 첫 앱은 Windows Terminal로 연결한다. 다크 `pine` 하나를 바꿨을 때 그 키를 참조하는 다크 배색표 필드만 변하고 라이트 출력은 그대로여야 한다. 두 배색표를 실제 앱에서 선택해 확인한다.
