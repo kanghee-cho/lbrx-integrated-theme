@@ -21,13 +21,27 @@ cargo run --locked -- build .\themes\lbrx.toml
 | 한 명령으로 생성, 수동 가져오기 | 생성기는 앱 설정에 쓰지 않는다. 사용자는 원하는 앱의 산출물만 가져간다. |
 
 1. [원본과 생성 구조](01-architecture.md) — 무엇을 어디서 바꾸며, 변경이 어떻게 일곱 앱에 전파되는가.
-2. [팔레트와 편집 경험](02-design-and-editor.md) — 색상·서체 시안, TUI 조작, 읽기 편한지 판단하는 기준.
+2. [팔레트와 편집 경험](02-design-and-editor.md) — 색상·서체 시안, TUI 조작, 언어 등록·토큰 연결·구문색 편집 설계.
 3. [앱별 적용 계약](03-targets.md) — 가져올 파일과 설정 위치, 상속·제한 사항, 구현 완료 조건.
 4. [옵션 표시와 확장 전략](04-option-strategy.md) — 공통값과 앱별 예외가 보이는 화면, 같은 샘플의 앱별 차이, 새 옵션의 도입·승격 기준.
 5. [사용 언어와 라이브러리 버전 관리](05-languages-and-dependencies.md) — 구현 언어·출력 형식, Rust 의존성 도입 기준, 버전 고정·갱신 절차와 대상 앱 검증 버전.
 6. [Windows Terminal 적용 방법](06-windows-terminal.md) — 기존 설정에 배색표를 추가하고, 글꼴은 선택 적용하는 방법.
 7. [Typora 적용 방법](07-typora.md) — CSS 복사, 모드 선택, 실제 화면 검증 방법.
-8. [Typora 옵션 체크리스트](08-typora-option-checklist.md) — 항목별 구현 상태, 실제 앱 검증 기록, Obsidian 읽기 뷰·라이브 프리뷰 연계.
+8. [Typora 옵션 대장](08-typora-options.md) — 공통 ID별 적용, 전용 기능과 검증 기록.
+9. [Obsidian 적용 가이드](09-obsidian.md) — 예정 패키지, 보관함별 설치·복구 및 뷰별 검증 절차.
+10. [Obsidian 옵션 대장](10-obsidian-options.md) — 읽기·라이브 프리뷰, 공식 변수와 Publish.
+11. [전체 앱 공통 옵션과 적용 범위](11-cross-app-options.md) — 8개 앱의 전달 방식, 공통 역할·호스트 경계, 문서 앱 공유 ID.
+
+**CSS를 사용하지 않는 앱의 적용 가이드와 옵션 대장**
+
+12. [Vim 적용 가이드](12-vim.md) · 13. [하이라이트 그룹별 옵션 대장](13-vim-options.md)
+14. [macOS Terminal.app 적용 가이드](14-macos-terminal.md) · 15. [프로파일·ANSI 옵션 대장](15-macos-terminal-options.md)
+16. [Helix 적용 가이드](16-helix.md) · 17. [스코프별 옵션 대장](17-helix-options.md)
+18. [VS Code 적용 가이드](18-vscode.md) · 19. [색 테마 옵션 대장](19-vscode-options.md)
+20. [iTerm2 적용 가이드](20-iterm2.md) · 21. [색 프리셋 옵션 대장](21-iterm2-options.md) — 기존 일곱 앱과 별도로 검토하는 추가 대상.
+22. [VS Code 언어별 구문 강조와 동반 CSS](22-vscode-language-highlighting.md) — 편집기 테마와 HTML 코드 블록이 같은 구문색을 쓰는 방법, 언어별 지원 대장.
+23. [Vim 언어별 코드 구문 강조](23-vim-language-highlighting.md) — 공통 역할과 Vim 그룹 매핑, 언어별 예외, RGB·cterm 검증.
+24. [Obsidian 언어별 코드 구문 강조](24-obsidian-language-highlighting.md) — 코드 펜스, 공통 역할과 CSS 변수 매핑, 언어별 읽기 뷰·라이브 프리뷰 검증.
 
 **향후 사용 흐름:** TUI에서 다크 모드의 청록 견본을 바꾸고 저장한 뒤 `lbrx-theme build`로 패키지를 다시 만든다. 사용자가 가져오기 전까지 앱 화면은 변하지 않는다. `edit`와 Windows Terminal·Typora 이외의 앱별 출력은 아직 제공하지 않는다.
 

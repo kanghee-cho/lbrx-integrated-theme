@@ -14,7 +14,9 @@
 
 **구현 순서와 승인 기준**
 
-Typora의 상세 구현 상태와 Obsidian으로 이어갈 공통 후보는 [옵션 체크리스트](08-typora-option-checklist.md)에서 같은 ID로 추적한다. 읽기 뷰와 라이브 프리뷰의 검증 결과는 따로 기록한다.
+추가 설계 대상인 [iTerm2](20-iterm2.md)는 macOS Terminal.app과 별도다. 프로파일 전체가 아니라 라이트·다크 `.itermcolors`만 가져오며, [프리셋 옵션](21-iterm2-options.md)과 프로파일의 수동 설정을 분리한다. VS Code의 상세 계약은 [적용 가이드](18-vscode.md)와 [옵션 대장](19-vscode-options.md)을 참고한다.
+
+[전체 앱 공통 기준](11-cross-app-options.md)에서 토큰별 적용 범위를 비교한다. Typora와 Obsidian은 [문서 앱 공유 ID](11-cross-app-options.md#shared)를 사용하되 읽기 뷰와 라이브 프리뷰의 검증 결과는 따로 기록한다.
 
 1. 원본과 `check`부터 만든다. 누락된 ANSI 슬롯, 잘못된 역할 참조, 읽을 수 없는 선택 영역에서 모드와 원인까지 표시되는지 확인한다.
 2. 첫 앱은 Windows Terminal로 연결한다. 다크 `pine` 하나를 바꿨을 때 그 키를 참조하는 다크 배색표 필드만 변하고 라이트 출력은 그대로여야 한다. 두 배색표를 실제 앱에서 선택해 확인한다.
