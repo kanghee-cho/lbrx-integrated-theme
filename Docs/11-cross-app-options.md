@@ -7,7 +7,7 @@
 | 대상·상세 문서 | 출력과 현재 생성 여부 | 공통값의 적용 경로 또는 한계 |
 |---|---|---|
 | [Typora](08-typora-options.md) | 모드별 CSS · 생성 | 문서 색·서체·코드 구문색을 직접 지정. 설정 창 일부는 앱 전용 |
-| [Obsidian](10-obsidian-options.md) | 테마 CSS + manifest · 예정 | 문서 역할을 읽기 뷰·라이브 프리뷰에 각각 연결. Publish는 별도 배포 |
+| [Obsidian](10-obsidian-options.md) | 테마 CSS + manifest · 최소 테마 생성 | 문서 역할을 읽기 뷰·라이브 프리뷰에 각각 연결. Publish는 별도 배포 |
 | [VS Code](19-vscode-options.md) | VSIX 색 테마 · 예정 | 작업 화면 색 ID·TextMate·semantic token에 연결. 서체는 별도 사용자 설정 |
 | [Vim](13-vim-options.md) | Vim 색 구성표 · 예정 | 하이라이트 그룹에 RGB 또는 `cterm` 근사값을 지정. 글꼴·셀 높이는 호스트 소유 |
 | [Helix](17-helix-options.md) | TOML 테마 · 예정 | 구문·UI 스코프에 색과 장식을 지정. 글꼴·셀 높이는 호스트 소유 |

@@ -1,5 +1,6 @@
 use crate::{
     model::Theme,
+    obsidian,
     resolve::{self, ResolvedTheme},
     typora, windows_terminal,
 };
@@ -17,6 +18,7 @@ const TOKENS: &str = "resolved.toml";
 const ADAPTERS: &[(&str, &[&str])] = &[
     (windows_terminal::DIRECTORY, &windows_terminal::FILES),
     (typora::DIRECTORY, typora::FILES),
+    (obsidian::DIRECTORY, obsidian::FILES),
 ];
 type AdapterOutput<'a> = (&'static str, &'a [(&'static str, String)]);
 
@@ -25,9 +27,11 @@ pub fn build(theme: &Theme, parent: &Path) -> Result<(), String> {
     let contents = toml::to_string_pretty(&resolved).map_err(|e| e.to_string())?;
     let terminal_files = windows_terminal::render(&resolved)?;
     let typora_files = typora::render(&resolved);
+    let obsidian_files = obsidian::render(&resolved);
     let adapters = [
         (windows_terminal::DIRECTORY, terminal_files.as_slice()),
         (typora::DIRECTORY, typora_files.as_slice()),
+        (obsidian::DIRECTORY, obsidian_files.as_slice()),
     ];
     if !exists(parent)? {
         fs::create_dir(parent).map_err(|e| format!("{}: {e}", parent.display()))?;
@@ -100,7 +104,7 @@ fn stage_and_publish(
     }
     for (directory, files) in adapters {
         let directory = staging.join(directory);
-        fs::create_dir(&directory).map_err(|e| format!("{}: {e}", directory.display()))?;
+        fs::create_dir_all(&directory).map_err(|e| format!("{}: {e}", directory.display()))?;
         for (name, contents) in *files {
             let path = directory.join(name);
             let written = write_staged(&path, contents)?;
@@ -197,11 +201,15 @@ fn require_generated_directory(path: &Path) -> Result<(), String> {
 fn remove_generated_directory(path: &Path) -> io::Result<()> {
     check_tree(path)?;
     for (directory, files) in ADAPTERS {
-        let directory = path.join(directory);
         for name in *files {
-            ignore_missing(fs::remove_file(directory.join(name)))?;
+            ignore_missing(fs::remove_file(path.join(directory).join(name)))?;
         }
-        ignore_missing(fs::remove_dir(&directory))?;
+        for dir in Path::new(directory)
+            .ancestors()
+            .take_while(|p| !p.as_os_str().is_empty())
+        {
+            ignore_missing(fs::remove_dir(path.join(dir)))?;
+        }
     }
     ignore_missing(fs::remove_file(path.join(TOKENS)))?;
     ignore_missing(fs::remove_dir(path))
@@ -216,25 +224,32 @@ fn check_tree(path: &Path) -> io::Result<()> {
     if !plain_directory(&metadata) {
         return Err(unexpected(path));
     }
+    let allowed: Vec<_> = std::iter::once(path.join(TOKENS))
+        .chain(
+            ADAPTERS
+                .iter()
+                .flat_map(|(dir, files)| files.iter().map(move |file| path.join(dir).join(file))),
+        )
+        .collect();
+    check_entries(path, &allowed)
+}
+
+fn check_entries(path: &Path, allowed: &[std::path::PathBuf]) -> io::Result<()> {
     for entry in fs::read_dir(path)? {
         let entry = entry?;
-        let kind = entry.file_type()?;
-        if kind.is_file() && entry.file_name() == TOKENS {
+        let child = entry.path();
+        let metadata = fs::symlink_metadata(&child)?;
+        if metadata.is_file() && allowed.contains(&child) {
             continue;
         }
-        let Some((_, allowed)) = ADAPTERS.iter().find(|(name, _)| entry.file_name() == *name)
-        else {
-            return Err(unexpected(&entry.path()));
-        };
-        if !plain_directory(&entry.metadata()?) {
-            return Err(unexpected(&entry.path()));
-        }
-        for file in fs::read_dir(entry.path())? {
-            let file = file?;
-            if !file.file_type()?.is_file() || !allowed.iter().any(|name| file.file_name() == *name)
-            {
-                return Err(unexpected(&file.path()));
-            }
+        if plain_directory(&metadata)
+            && allowed
+                .iter()
+                .any(|file| file != &child && file.starts_with(&child))
+        {
+            check_entries(&child, allowed)?;
+        } else {
+            return Err(unexpected(&child));
         }
     }
     Ok(())
@@ -333,7 +348,51 @@ mod tests {
             adapter_contents
         );
         assert_eq!(fs::read_dir(&workspace.0).unwrap().count(), 1);
-        assert_eq!(fs::read_dir(workspace.0.join(OUTPUT)).unwrap().count(), 3);
+        assert_eq!(fs::read_dir(workspace.0.join(OUTPUT)).unwrap().count(), 4);
+    }
+
+    #[test]
+    fn obsidian_package_maps_roles_and_keeps_dark_changes_isolated() {
+        let workspace = Workspace::new();
+        let mut theme = sample();
+        let dir = workspace.0.join(OUTPUT).join(obsidian::DIRECTORY);
+        build(&theme, &workspace.0).unwrap();
+        let manifest: serde_json::Value =
+            serde_json::from_slice(&fs::read(dir.join("manifest.json")).unwrap()).unwrap();
+        assert_eq!(manifest["name"], dir.file_name().unwrap().to_str().unwrap());
+        assert_eq!(manifest["version"], env!("CARGO_PKG_VERSION"));
+        let css = || fs::read_to_string(dir.join("theme.css")).unwrap();
+        let before = css();
+        let (light, dark) = before.split_once(".theme-dark {").unwrap();
+        for (block, mode) in [(light, &theme.light), (dark, &theme.dark)] {
+            for (var, role) in [
+                ("background-primary", "background"),
+                ("text-selection", "selection_background"),
+                ("code-function", "function"),
+                ("link-color", "link"),
+            ] {
+                assert!(block.contains(&format!("--{var}: {};", mode.palette[&mode.roles[role]])));
+            }
+        }
+        theme.dark.roles.insert("function".into(), "ink".into());
+        build(&theme, &workspace.0).unwrap();
+        assert_eq!(
+            css(),
+            format!(
+                "{light}.theme-dark {{{}",
+                dark.replace(
+                    &format!("--code-function: {};", theme.dark.palette["slate"]),
+                    &format!("--code-function: {};", theme.dark.palette["ink"])
+                )
+            )
+        );
+        fs::write(dir.join("note.md"), "keep").unwrap();
+        assert!(
+            build(&theme, &workspace.0)
+                .unwrap_err()
+                .contains("교체 거부")
+        );
+        assert_eq!(fs::read_to_string(dir.join("note.md")).unwrap(), "keep");
     }
 
     #[test]

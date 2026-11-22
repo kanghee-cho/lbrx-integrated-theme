@@ -1,5 +1,7 @@
 mod build;
+mod css;
 mod model;
+mod obsidian;
 mod resolve;
 mod typora;
 mod windows_terminal;
@@ -25,7 +27,7 @@ enum Command {
         #[arg(default_value = "themes/lbrx.toml")]
         path: PathBuf,
     },
-    /// 검증된 토큰과 Windows Terminal·Typora 테마를 dist\lbrx에 생성합니다.
+    /// 검증된 토큰과 Windows Terminal·Typora·Obsidian 테마를 dist\lbrx에 생성합니다.
     Build {
         #[arg(default_value = "themes/lbrx.toml")]
         path: PathBuf,
@@ -49,7 +51,9 @@ fn main() -> ExitCode {
             match command {
                 Command::Check { .. } => println!("{}: 테마 검사 통과", path.display()),
                 Command::Build { .. } => {
-                    println!("dist\\lbrx: 검증된 토큰 및 Windows Terminal·Typora 테마 생성 완료")
+                    println!(
+                        "dist\\lbrx: 검증된 토큰 및 Windows Terminal·Typora·Obsidian 테마 생성 완료"
+                    )
                 }
             }
             ExitCode::SUCCESS

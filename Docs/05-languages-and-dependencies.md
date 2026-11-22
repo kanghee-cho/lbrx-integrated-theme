@@ -57,7 +57,7 @@ Ratatui `0.29.0`의 [공식 패키지 정의](https://docs.rs/crate/ratatui/0.29
 | 대상 | 검증 버전 / 환경 | 특히 확인할 항목 |
 |---|---|---|
 | Typora | 미검증 | 문서 CSS, 본문·코드 서체 |
-| Obsidian | 미검증 | manifest의 `minAppVersion`, 읽기 뷰·라이브 프리뷰 |
+| Obsidian | 최소 테마 가독성 사용자 확인(2026-11-23), 앱 버전 미기록 | [확인 범위](10-obsidian-options.md#검증-기록). 최소 지원 버전 검증과는 별개 |
 | VS Code | 미검증 | manifest의 `engines.vscode`, VSIX 설치, 별도 서체 설정 |
 | Helix | 미검증 | 테마 scope와 호스트 터미널 |
 | Vim | 미검증 | `termguicolors`, `cterm`, 호스트 터미널 |

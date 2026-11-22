@@ -1,17 +1,17 @@
 # Obsidian에 LBRX 적용하기
 
-**상태: 설계 단계.** 현재 `cargo run --locked -- build`는 Obsidian 테마를 생성하지 않는다. 아래는 어댑터 구현 후 사용할 설치·복구 절차와 첫 릴리스의 승인 기준이다. 세부 매핑과 적용 상태는 [Obsidian 옵션 대장](10-obsidian-options.md)에서 추적한다.
+**상태: 최소 테마 생성 구현, 전체 가독성 사용자 확인.** 저장소 루트에서 `cargo run --locked -- build`를 실행한다. 세부 매핑과 확인 범위는 [Obsidian 옵션 대장](10-obsidian-options.md#검증-기록)에서 추적한다.
 
 ## 패키지와 수동 적용
 
 Typora는 모드별 CSS 두 개를 선택하지만, Obsidian에는 `LBRX` 테마 하나를 설치한다. 한 `theme.css` 안에서 `.theme-light`와 `.theme-dark`를 분리하고, 밝기 모드 선택은 앱에 맡긴다.
 
-| 예정 산출물 | 역할 |
+| 산출물 | 역할 |
 |---|---|
-| `dist\lbrx\obsidian\LBRX\manifest.json` | 테마 이름 `LBRX`(폴더명과 일치), 테마 버전, 제작자, 최소 앱 버전. 최소 버전은 지원 범위를 확인한 뒤 정한다. |
+| `dist\lbrx\obsidian\LBRX\manifest.json` | 이름 `LBRX`, 생성기 버전, 제작자, 최소 앱 버전. `1.10.6`은 공식 샘플 manifest의 기준이며 실측한 최소 버전은 아니다. |
 | `dist\lbrx\obsidian\LBRX\theme.css` | 공통 토큰을 Obsidian의 색·서체 변수에 매핑한다. 스니펫이나 커뮤니티 플러그인 설치를 전제로 하지 않는다. |
 
-1. 구현 후에는 **시험용 보관함**에서 먼저 확인한다. 기본 설정 폴더를 쓰는 경우 `<보관함>\.obsidian\themes\LBRX\`에 두 파일이 바로 들어가도록 `LBRX` 폴더를 복사한다. 설정 폴더 이름을 바꿨다면 그 위치를 사용한다.
+1. **시험용 보관함**에서 먼저 확인한다. 기본 설정 폴더를 쓰는 경우 `<보관함>\.obsidian\themes\LBRX\`에 두 파일이 바로 들어가도록 `LBRX` 폴더를 복사한다. 설정 폴더 이름을 바꿨다면 그 위치를 사용한다.
 2. **설정 → 테마/외형(Appearance) → 테마(Themes)**에서 `LBRX`를 선택한다. 목록에 없으면 `LBRX\LBRX`로 이중 복사하지 않았는지, 폴더명과 manifest 이름이 일치하는지 확인하고 앱을 다시 연다.
 3. 같은 보관함에서 기본 색상 모드를 라이트와 다크로 바꾼다. 업데이트할 때는 LBRX 패키지 파일만 교체한다. 원복은 기존 테마 또는 기본 테마를 다시 선택하면 된다. 보관함의 설정 JSON, 노트, 스니펫은 덮어쓰지 않는다.
 

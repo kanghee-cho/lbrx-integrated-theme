@@ -1,6 +1,6 @@
 # LBRX 통합 테마 설계
 
-**상태: 원본 검증 `check`와 Windows Terminal·Typora용 `build` 구현.** 목적은 일곱 앱을 똑같이 보이게 하는 것이 아니라, 한 곳에서 바꾼 디자인 의도가 각 앱에서 같은 의미로 보이게 하는 것이다.
+**상태: 원본 검증 `check`와 Windows Terminal·Typora·Obsidian용 `build` 구현.** 목적은 일곱 앱을 똑같이 보이게 하는 것이 아니라, 한 곳에서 바꾼 디자인 의도가 각 앱에서 같은 의미로 보이게 하는 것이다.
 
 저장소 루트에서 `cargo run --locked -- check`를 실행하면 [예제 테마](../themes/lbrx.toml)를 변경하지 않고 검사한다. 다른 파일은 `check` 뒤에 경로를 전달한다. 스키마 버전, 팔레트·역할 키 일치, HEX와 참조, ANSI 16색, 서체, 대비를 확인한다. 대비는 본문/기본 배경 7:1, 보조·문서·구문·상태 색/기본 배경 및 선택 글자/선택 배경 4.5:1, 포커스/기본 배경·표면 3:1을 기준으로 한다. ANSI는 슬롯과 참조를 검사하며 임의의 ANSI 조합에는 대비 기준을 적용하지 않는다. `cargo test --locked`로 테스트를 실행한다.
 
@@ -11,7 +11,7 @@ cargo run --locked -- build
 cargo run --locked -- build .\themes\lbrx.toml
 ```
 
-`build`는 같은 원본 검사를 거친 뒤 `dist\lbrx\resolved.toml`에 해석된 토큰을 쓴다. `dist\lbrx\windows-terminal`에는 배색표와 선택 적용용 글꼴 설정을, `dist\lbrx\typora`에는 라이트·다크 CSS를 생성한다. 사용자 설정은 수정하지 않는다. [Windows Terminal 적용 방법](06-windows-terminal.md), [Typora 적용 방법](07-typora.md), [출력 교체·복구 규칙](01-architecture.md)을 참고한다.
+`build`는 같은 원본 검사를 거친 뒤 `dist\lbrx\resolved.toml`에 해석된 토큰을 쓴다. `dist\lbrx\windows-terminal`에는 배색표와 선택 적용용 글꼴 설정을, `dist\lbrx\typora`에는 라이트·다크 CSS를 생성한다. `dist\lbrx\obsidian\LBRX`에는 Obsidian 테마를 생성한다. 사용자 설정은 수정하지 않는다. [Windows Terminal 적용 방법](06-windows-terminal.md), [Typora 적용 방법](07-typora.md), [출력 교체·복구 규칙](01-architecture.md)을 참고한다.
 
 | 확인한 요구사항 | 설계 결정 |
 |---|---|
@@ -28,7 +28,7 @@ cargo run --locked -- build .\themes\lbrx.toml
 6. [Windows Terminal 적용 방법](06-windows-terminal.md) — 기존 설정에 배색표를 추가하고, 글꼴은 선택 적용하는 방법.
 7. [Typora 적용 방법](07-typora.md) — CSS 복사, 모드 선택, 실제 화면 검증 방법.
 8. [Typora 옵션 대장](08-typora-options.md) — 공통 ID별 적용, 전용 기능과 검증 기록.
-9. [Obsidian 적용 가이드](09-obsidian.md) — 예정 패키지, 보관함별 설치·복구 및 뷰별 검증 절차.
+9. [Obsidian 적용 가이드](09-obsidian.md) — 생성 패키지, 보관함별 설치·복구 및 뷰별 검증 절차.
 10. [Obsidian 옵션 대장](10-obsidian-options.md) — 읽기·라이브 프리뷰, 공식 변수와 Publish.
 11. [전체 앱 공통 옵션과 적용 범위](11-cross-app-options.md) — 8개 앱의 전달 방식, 공통 역할·호스트 경계, 문서 앱 공유 ID.
 
@@ -43,7 +43,7 @@ cargo run --locked -- build .\themes\lbrx.toml
 23. [Vim 언어별 코드 구문 강조](23-vim-language-highlighting.md) — 공통 역할과 Vim 그룹 매핑, 언어별 예외, RGB·cterm 검증.
 24. [Obsidian 언어별 코드 구문 강조](24-obsidian-language-highlighting.md) — 코드 펜스, 공통 역할과 CSS 변수 매핑, 언어별 읽기 뷰·라이브 프리뷰 검증.
 
-**향후 사용 흐름:** TUI에서 다크 모드의 청록 견본을 바꾸고 저장한 뒤 `lbrx-theme build`로 패키지를 다시 만든다. 사용자가 가져오기 전까지 앱 화면은 변하지 않는다. `edit`와 Windows Terminal·Typora 이외의 앱별 출력은 아직 제공하지 않는다.
+**향후 사용 흐름:** TUI에서 다크 모드의 청록 견본을 바꾸고 저장한 뒤 `lbrx-theme build`로 패키지를 다시 만든다. 사용자가 가져오기 전까지 앱 화면은 변하지 않는다. `edit`와 Windows Terminal·Typora·Obsidian 이외의 앱별 출력은 아직 제공하지 않는다.
 
 ## 개발 환경과 다음 단계
 
