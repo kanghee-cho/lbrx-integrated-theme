@@ -2,3 +2,8 @@
 # 값에는 lbrx.toml의 라이트·다크 roles 이름을 사용한다.
 [tokens]
 # function = "accent" # 예시: Python 함수명을 기본 강조색으로 표시.
+"variable.parameter" = "syntax_parameter" # self·cls를 포함한 매개변수.
+attribute = "syntax_attribute" # 데코레이터.
+"string.escape" = "syntax_escape" # 문자열 접두사와 이스케이프.
+"function.macro" = "syntax_macro" # 구분 가능한 특수 메서드.
+punctuation = "syntax_punctuation" # f-string 치환 괄호 등.

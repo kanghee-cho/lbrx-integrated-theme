@@ -46,6 +46,48 @@ const LANGUAGE_GROUPS: &[(&str, &str, &str)] = &[
     ("powershell", "comment", "ps1Comment"),
     ("typescript", "number", "typescriptNumber"),
     ("typescript", "comment", "typescriptLineComment"),
+    ("rust", "function.macro", "rustMacro"),
+    ("rust", "attribute", "rustLifetime rustLabel rustAttribute"),
+    ("rust", "keyword.declaration", "rustMutability rustStorage"),
+    ("rust", "punctuation", "rustModPathSep"),
+    ("python", "attribute", "pythonDecorator pythonDottedName"),
+    ("python", "string.escape", "pythonEscape"),
+    ("powershell", "variable", "ps1Variable"),
+    ("powershell", "variable.parameter", "ps1Switch"),
+    ("json", "property", "jsonKeyword jsonQuote"),
+    ("json", "constant.builtin", "jsonBoolean jsonNull"),
+    ("jsonc", "property", "jsoncKeyword"),
+    ("yaml", "property", "yamlBlockMappingKey yamlFlowMappingKey"),
+    ("yaml", "attribute", "yamlAnchor yamlAlias"),
+    ("yaml", "punctuation", "yamlDocumentStart yamlDocumentEnd"),
+    ("toml", "type", "tomlTable tomlTableArray"),
+    ("toml", "property", "tomlKey"),
+    (
+        "toml",
+        "constant.builtin",
+        "tomlBoolean tomlDate tomlDateTime tomlTime",
+    ),
+];
+
+pub(crate) fn has_language_groups(lang: &str, theme: &ResolvedTheme) -> bool {
+    LANGUAGE_GROUPS
+        .iter()
+        .any(|&(id, token, _)| id == lang && theme.has_token_override(lang, token))
+}
+
+const SYNTAX_GROUPS: &[(&str, &str)] = &[
+    ("Conditional", "keyword.control"),
+    ("Repeat", "keyword.control"),
+    ("Statement", "keyword.control"),
+    ("StorageClass", "keyword.declaration"),
+    ("Structure", "keyword.declaration"),
+    ("Typedef", "keyword.declaration"),
+    ("SpecialChar", "string.escape"),
+    ("Boolean", "constant.builtin"),
+    ("Type", "type"),
+    ("Identifier", "variable"),
+    ("Operator", "operator"),
+    ("Delimiter", "punctuation"),
 ];
 
 pub fn render(theme: &ResolvedTheme) -> [(&'static str, String); 3] {
@@ -82,21 +124,39 @@ fn colorscheme(theme: &ResolvedTheme, background: &str, mode: &ResolvedMode) -> 
         let guifg = theme.editor_color(mode, "vim", group, guifg);
         let guibg = bg.map_or("NONE", |role| mode.roles[role].as_str());
         let (ctermfg, ctermbg) = (cterm(guifg), cterm(guibg));
+        let style = if matches!(
+            group,
+            "Comment" | "Keyword" | "String" | "Function" | "Number" | "Error"
+        ) {
+            vim_style(theme, "", fg)
+        } else {
+            "NONE"
+        };
         writeln!(
             script,
-            "highlight {group} guifg={guifg} guibg={guibg} ctermfg={ctermfg} ctermbg={ctermbg} gui=NONE cterm=NONE"
+            "highlight {group} guifg={guifg} guibg={guibg} ctermfg={ctermfg} ctermbg={ctermbg} gui={style} cterm={style}"
         )
         .unwrap();
     }
-    script.push_str("highlight! link Conditional Keyword\nhighlight! link Repeat Keyword\nhighlight! link Float Number\n");
+    script.push_str("highlight! link Float Number\n");
+    for &(group, token) in SYNTAX_GROUPS {
+        let hex = theme.token(mode, "", token);
+        let style = vim_style(theme, "", token);
+        writeln!(
+            script,
+            "highlight {group} guifg={hex} ctermfg={} gui={style} cterm={style}",
+            cterm(hex)
+        )
+        .unwrap();
+    }
     for &(lang, token, groups) in LANGUAGE_GROUPS {
-        let (role, source) = theme.token_role(lang, token);
-        if source == crate::resolve::ColorSource::Language {
-            let hex = &mode.roles[role];
+        if theme.has_token_override(lang, token) {
+            let hex = theme.token(mode, lang, token);
+            let style = vim_style(theme, lang, token);
             for group in groups.split_whitespace() {
                 writeln!(
                     script,
-                    "highlight {group} guifg={hex} ctermfg={}",
+                    "highlight {group} guifg={hex} ctermfg={} gui={style} cterm={style}",
                     cterm(hex)
                 )
                 .unwrap();
@@ -104,6 +164,13 @@ fn colorscheme(theme: &ResolvedTheme, background: &str, mode: &ResolvedMode) -> 
         }
     }
     script
+}
+
+fn vim_style(theme: &ResolvedTheme, lang: &str, token: &str) -> &'static str {
+    match theme.token_style(lang, token).name() {
+        "normal" => "NONE",
+        value => value,
+    }
 }
 
 fn xterm_index(rgb: [u8; 3]) -> u8 {

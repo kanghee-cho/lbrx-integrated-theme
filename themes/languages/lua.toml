@@ -1,0 +1,5 @@
+# Lua: nil과 내장 불리언을 리터럴로, 테이블 필드를 속성으로 표시한다.
+[tokens]
+"constant.builtin" = "syntax_builtin" # nil·true·false.
+property = "syntax_property" # 문법이 구분하는 테이블 필드.
+string = "string" # 긴 대괄호 문자열 포함.

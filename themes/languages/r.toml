@@ -1,0 +1,5 @@
+# R: 결측 리터럴과 패키지 경계를 런타임 이름과 구분한다.
+[tokens]
+"constant.builtin" = "syntax_builtin" # NA·NULL·TRUE·FALSE 등.
+operator = "syntax_operator" # 문법이 분류한 파이프·할당 연산자.
+punctuation = "syntax_punctuation" # 패키지 구분 기호.

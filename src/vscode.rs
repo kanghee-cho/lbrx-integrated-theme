@@ -34,6 +34,200 @@ const TOKENS: &[(&str, &str)] = &[
     ("entity.name.function", "function"),
     ("constant.numeric", "number"),
     ("invalid.illegal", "error"),
+    ("keyword.control", "keyword.control"),
+    ("storage.type", "keyword.declaration"),
+    ("storage.modifier", "keyword.declaration"),
+    ("constant.character.escape", "string.escape"),
+    ("string.regexp", "string.escape"),
+    ("constant.language", "constant.builtin"),
+    ("entity.name.function.macro", "function.macro"),
+    ("support.function", "function"),
+    ("entity.name.type", "type"),
+    ("support.type", "type"),
+    ("variable.other", "variable"),
+    ("variable.parameter", "variable.parameter"),
+    ("variable.other.property", "property"),
+    ("support.type.property-name", "property"),
+    ("keyword.operator", "operator"),
+    ("entity.other.attribute-name", "attribute"),
+    ("punctuation", "punctuation"),
+];
+const NATIVE_SCOPES: &[(&str, &str, &str)] = &[
+    ("rust", "entity.name.type.macro.rust", "function.macro"),
+    ("rust", "entity.name.type.lifetime.rust", "attribute"),
+    ("rust", "punctuation.definition.lifetime.rust", "attribute"),
+    ("rust", "meta.attribute.rust", "attribute"),
+    ("rust", "punctuation.definition.attribute.rust", "attribute"),
+    ("rust", "punctuation.brackets.attribute.rust", "attribute"),
+    ("rust", "meta.attribute.rust entity.name.type", "type"),
+    ("rust", "keyword.operator.namespace.rust", "punctuation"),
+    ("rust", "storage.modifier.mut.rust", "keyword.declaration"),
+    (
+        "python",
+        "entity.name.function.decorator.python",
+        "attribute",
+    ),
+    (
+        "python",
+        "punctuation.definition.decorator.python",
+        "attribute",
+    ),
+    ("python", "storage.type.string.python", "string.escape"),
+    ("python", "storage.type.format.python", "string.escape"),
+    ("python", "support.function.magic.python", "function.macro"),
+    (
+        "powershell",
+        "support.variable.automatic.powershell",
+        "constant.builtin",
+    ),
+    ("powershell", "support.function.powershell", "function"),
+    (
+        "powershell",
+        "variable.parameter.powershell",
+        "variable.parameter",
+    ),
+    ("typescript", "support.type.primitive", "type"),
+    ("typescript", "storage.type.interface", "type"),
+    ("typescript", "storage.type.type", "type"),
+    ("typescript", "entity.name.tag.tsx", "keyword.declaration"),
+    ("typescript", "support.class.component.tsx", "function"),
+    (
+        "typescript",
+        "punctuation.definition.template-expression",
+        "string.escape",
+    ),
+    ("json", "punctuation.support.type.property-name", "property"),
+    (
+        "jsonc",
+        "punctuation.support.type.property-name",
+        "property",
+    ),
+    ("yaml", "entity.name.tag.yaml", "property"),
+    ("yaml", "variable.other.anchor.yaml", "attribute"),
+    ("yaml", "variable.other.alias.yaml", "attribute"),
+    ("yaml", "punctuation.definition.anchor.yaml", "attribute"),
+    ("yaml", "punctuation.definition.alias.yaml", "attribute"),
+    ("yaml", "constant.language.merge.yaml", "keyword.control"),
+    (
+        "yaml",
+        "keyword.control.flow.block-scalar",
+        "keyword.declaration",
+    ),
+    (
+        "yaml",
+        "storage.modifier.chomping-indicator.yaml",
+        "keyword.declaration",
+    ),
+    ("toml", "entity.name.section", "type"),
+    (
+        "javascript",
+        "punctuation.definition.template-expression",
+        "string.escape",
+    ),
+    ("javascript", "support.class.component", "function"),
+    ("javascript", "entity.name.tag", "keyword.declaration"),
+    ("html", "entity.name.tag.html", "keyword.declaration"),
+    ("html", "constant.character.entity", "string.escape"),
+    ("css", "support.type.vendored.property-name", "property"),
+    ("css", "keyword.control.at-rule", "keyword.declaration"),
+    ("sql", "keyword.other.DML", "keyword.control"),
+    ("sql", "keyword.other.DDL", "keyword.declaration"),
+    ("java", "storage.type.primitive.java", "type"),
+    ("java", "storage.type.annotation.java", "attribute"),
+    (
+        "java",
+        "punctuation.definition.annotation.java",
+        "attribute",
+    ),
+    ("csharp", "keyword.preprocessor", "attribute"),
+    ("c", "entity.name.function.preprocessor", "function.macro"),
+    ("cpp", "entity.name.function.preprocessor", "function.macro"),
+    ("shell", "variable.parameter.positional", "constant.builtin"),
+    ("shell", "variable.other.normal.shell", "variable"),
+    ("go", "storage.type", "type"),
+    ("markdown", "markup.heading.markdown", "keyword.declaration"),
+    ("markdown", "markup.inline.raw", "string"),
+    (
+        "dockerfile",
+        "keyword.control.dockerfile",
+        "keyword.declaration",
+    ),
+    ("xml", "entity.name.tag.xml", "keyword.declaration"),
+    ("xml", "constant.character.entity", "string.escape"),
+    ("log", "log.error", "error"),
+    ("log", "log.warning", "attribute"),
+    ("log", "log.date", "number"),
+    ("yaml", "entity.other.document", "punctuation"),
+    ("yaml", "string.unquoted.block.yaml", "string"),
+    (
+        "powershell",
+        "punctuation.section.embedded.substatement",
+        "string.escape",
+    ),
+    ("php", "support.attribute", "attribute"),
+    ("ruby", "constant.language.symbol.hashkey.ruby", "property"),
+    ("swift", "storage.modifier.attribute.swift", "attribute"),
+    (
+        "swift",
+        "punctuation.definition.attribute.swift",
+        "attribute",
+    ),
+    ("dart", "storage.type.annotation.dart", "attribute"),
+    ("lua", "entity.other.attribute.lua", "attribute"),
+    ("julia", "support.function.macro.julia", "function.macro"),
+];
+
+pub(crate) fn grammar_roots(lang: &str) -> &'static [&'static str] {
+    match lang {
+        "typescript" => &["source.ts", "source.tsx"],
+        "rust" => &["source.rust"],
+        "python" => &["source.python"],
+        "powershell" => &["source.powershell"],
+        "toml" => &["source.toml"],
+        "json" => &["source.json"],
+        "jsonc" => &["source.json.comments"],
+        "yaml" => &["source.yaml"],
+        "javascript" => &["source.js", "source.js.jsx"],
+        "html" => &["text.html.basic", "text.html.derivative"],
+        "css" => &["source.css"],
+        "sql" => &["source.sql"],
+        "java" => &["source.java"],
+        "csharp" => &["source.cs"],
+        "c" => &["source.c"],
+        "cpp" => &["source.cpp"],
+        "shell" => &["source.shell"],
+        "go" => &["source.go"],
+        "markdown" => &["text.html.markdown"],
+        "dockerfile" => &["source.dockerfile"],
+        "xml" => &["text.xml"],
+        "log" => &["text.log"],
+        "php" => &["source.php", "text.html.php"],
+        "ruby" => &["source.ruby"],
+        "swift" => &["source.swift"],
+        "dart" => &["source.dart"],
+        "lua" => &["source.lua"],
+        "r" => &["source.r"],
+        "julia" => &["source.julia"],
+        _ => &[],
+    }
+}
+
+const SEMANTIC: &[(&str, &str)] = &[
+    ("function", "function"),
+    ("method", "function"),
+    ("number", "number"),
+    ("macro", "function.macro"),
+    ("type", "type"),
+    ("class", "type"),
+    ("enum", "type"),
+    ("interface", "type"),
+    ("struct", "type"),
+    ("typeParameter", "type"),
+    ("parameter", "variable.parameter"),
+    ("property", "property"),
+    ("decorator", "attribute"),
+    ("regexp", "string.escape"),
+    ("comment", "comment"),
 ];
 const COLORS: &[(&str, &str)] = &[
     ("focusBorder", "focus"),
@@ -163,31 +357,56 @@ fn color_theme(theme: &ResolvedTheme, name: &str, kind: &str, mode: &ResolvedMod
     for (name, color) in ANSI_COLORS.into_iter().zip(&mode.ansi) {
         colors.insert(format!("terminal.ansi{name}"), json!(color));
     }
-    let mut token_colors: Vec<_> = TOKENS.iter()
-        .map(|&(scope, role)| json!({ "scope": scope, "settings": { "foreground": theme.token(mode, "", role) } }))
+    let settings = |lang, token| {
+        let style = theme.token_style(lang, token);
+        json!({"foreground": theme.token(mode, lang, token),
+               "fontStyle": if style.name() == "normal" { "" } else { style.name() }})
+    };
+    let semantic_style = |lang, token| {
+        let style = theme.token_style(lang, token);
+        let color = theme.token(mode, lang, token);
+        if style.name() == "normal" {
+            json!(color)
+        } else {
+            json!({"foreground": color, "fontStyle": style.name()})
+        }
+    };
+    let mut token_colors: Vec<_> = TOKENS
+        .iter()
+        .map(|&(scope, token)| json!({ "scope": scope, "settings": settings("", token) }))
         .collect();
-    let mut semantic = json!({"function": theme.token(mode, "", "function"), "number": theme.token(mode, "", "number")});
-    for (lang, tokens) in &theme.layers.languages {
-        let grammar = match lang.as_str() {
-            "typescript" => Some("source.ts"),
-            "rust" => Some("source.rust"),
-            "python" => Some("source.python"),
-            "powershell" => Some("source.powershell"),
-            "toml" => Some("source.toml"),
-            _ => None,
-        };
+    let mut semantic = Map::new();
+    for &(selector, token) in SEMANTIC {
+        semantic.insert(selector.into(), semantic_style("", token));
+    }
+    for lang in theme.layers.languages.keys() {
+        let grammar = grammar_roots(lang);
         for &(scope, role) in TOKENS {
-            if !tokens.contains_key(role) {
+            if !theme.has_token_override(lang, role) {
                 continue;
             }
-            let fg = theme.token(mode, lang, role);
-            if let Some(parent) = grammar {
+            for parent in grammar {
                 token_colors.push(
-                    json!({"scope": format!("{parent} {scope}"), "settings": {"foreground": fg}}),
+                    json!({"scope": format!("{parent} {scope}"), "settings": settings(lang, role)}),
                 );
             }
-            if role != "error" {
-                semantic[format!("{role}:{lang}")] = json!(fg);
+        }
+        for &(_, scope, token) in NATIVE_SCOPES.iter().filter(|&&(id, _, _)| id == lang) {
+            for parent in grammar {
+                token_colors.push(json!({"scope": format!("{parent} {scope}"), "settings": settings(lang, token)}));
+            }
+        }
+        let ids: &[&str] = match lang.as_str() {
+            "typescript" => &["typescript", "typescriptreact"],
+            "javascript" => &["javascript", "javascriptreact"],
+            "shell" => &["shellscript"],
+            _ => &[lang],
+        };
+        for &(selector, token) in SEMANTIC {
+            if theme.has_token_override(lang, token) {
+                for id in ids {
+                    semantic.insert(format!("{selector}:{id}"), semantic_style(lang, token));
+                }
             }
         }
     }
@@ -214,31 +433,64 @@ fn code_css(theme: &ResolvedTheme) -> String {
             mode.roles["background"], mode.roles["text"]
         )
         .unwrap();
-        for &(_, role) in TOKENS {
+        for &role in crate::layers::TOKENS {
+            let slug = role.replace('.', "-");
             writeln!(
                 css,
-                "  --lbrx-code-{role}: {};",
-                theme.token(mode, "", role)
+                "  --lbrx-code-{slug}: {};",
+                theme.token(mode, "", role),
+            )
+            .unwrap();
+            let style = theme.token_style("", role);
+            let weight = if style.name() == "bold" {
+                "bold"
+            } else {
+                "normal"
+            };
+            let italic = if style.name() == "italic" {
+                "italic"
+            } else {
+                "normal"
+            };
+            writeln!(
+                css,
+                "  --lbrx-code-{slug}-weight: {weight};\n  --lbrx-code-{slug}-style: {italic};"
             )
             .unwrap();
         }
         css.push_str("}\n");
         let container = selector.split(", ").next().unwrap();
-        for (lang, tokens) in &theme.layers.languages {
-            for token in tokens.keys() {
+        for lang in theme.layers.languages.keys() {
+            for &token in crate::layers::TOKENS
+                .iter()
+                .filter(|&&token| theme.has_token_override(lang, token))
+            {
+                let slug = token.replace('.', "-");
+                let style = theme.token_style(lang, token);
+                let weight = if style.name() == "bold" {
+                    "bold"
+                } else {
+                    "normal"
+                };
+                let italic = if style.name() == "italic" {
+                    "italic"
+                } else {
+                    "normal"
+                };
                 writeln!(
                     css,
-                    "{container} .language-{lang} {{ --lbrx-code-{token}: {}; }}",
+                    "{container} .language-{lang}, {container}.language-{lang} {{ --lbrx-code-{slug}: {}; --lbrx-code-{slug}-weight: {weight}; --lbrx-code-{slug}-style: {italic}; }}",
                     theme.token(mode, lang, token)
                 )
                 .unwrap();
             }
         }
     }
-    for &(_, role) in TOKENS {
+    for &role in crate::layers::TOKENS {
+        let slug = role.replace('.', "-");
         writeln!(
             css,
-            ".lbrx-code .tok-{role} {{ color: var(--lbrx-code-{role}); }}"
+            ".lbrx-code .tok-{slug} {{ color: var(--lbrx-code-{slug}); font-weight: var(--lbrx-code-{slug}-weight); font-style: var(--lbrx-code-{slug}-style); }}"
         )
         .unwrap();
     }

@@ -1,0 +1,6 @@
+# HTML: 태그·속성명·속성 값을 구분한다. 임베디드 코드는 해당 문법의 토큰을 유지한다.
+[tokens]
+"keyword.declaration" = "syntax_declaration" # 태그 이름.
+attribute = "syntax_attribute" # 속성 이름.
+string = "string" # 인용된 속성 값.
+"string.escape" = "syntax_escape" # 문자 엔티티.

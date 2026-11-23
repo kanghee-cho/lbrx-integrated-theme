@@ -88,16 +88,56 @@ impl App {
             Self::Obsidian => obsidian::render(theme).into(),
             Self::Iterm2 => iterm2::render(theme)?.into(),
             Self::Vim => vim::render(theme).into(),
-            Self::VsCode => return Ok((self, vscode::render(theme)?.into())),
+            Self::VsCode => {
+                let mut files = vscode::render(theme)?;
+                if let Some((_, text)) = files.iter_mut().find(|(name, _)| *name == GUIDE) {
+                    text.extend_from_slice(self.language_guide(theme).as_bytes());
+                }
+                return Ok((self, files.into()));
+            }
             Self::Helix => helix::render(theme).into(),
         };
         Ok((
             self,
             files
                 .into_iter()
-                .map(|(name, text)| (name, text.into_bytes()))
+                .map(|(name, mut text)| {
+                    if name == GUIDE {
+                        text.push_str(&self.language_guide(theme));
+                    }
+                    (name, text.into_bytes())
+                })
                 .collect(),
         ))
+    }
+
+    fn language_guide(self, theme: &ResolvedTheme) -> String {
+        if matches!(self, Self::WindowsTerminal | Self::Iterm2) || theme.layers.languages.is_empty()
+        {
+            return String::new();
+        }
+        let mut text = String::from(
+            "\n\n## 구문 강조 설정 목록\n\n이 목록은 빌드에 입력된 언어 TOML과 적용 경로를 나타냅니다. 테마는 문법을 설치하지 않으며, 실제 분류는 앱과 설치된 문법에 따릅니다.\n\n| 설정 ID | 적용 경로 |\n|---|---|\n",
+        );
+        for id in theme.language_ids() {
+            let route = if id == "text" {
+                "일반 전경색, 별도 구문 없음"
+            } else {
+                match self {
+                    Self::VsCode if !vscode::grammar_roots(id).is_empty() => "언어별 TextMate 규칙",
+                    Self::VsCode if id == "bash" => "`shell` 공유 문법",
+                    Self::VsCode => "공통 scope만 적용 가능; 문법 확장 필요 시 별도 설치",
+                    Self::Vim if vim::has_language_groups(id, theme) => "언어별 Vim 문법 그룹",
+                    Self::Vim => "공통 Vim 문법 그룹",
+                    Self::Helix => "공통 Tree-sitter 캡처; 언어별 색 재정의 미적용",
+                    Self::Typora => "코드 펜스 CodeMirror 클래스가 있는 경우만",
+                    Self::Obsidian => "읽기 뷰 Prism 클래스가 있는 경우만",
+                    Self::WindowsTerminal | Self::Iterm2 => unreachable!(),
+                }
+            };
+            text.push_str(&format!("| `{id}` | {route} |\n"));
+        }
+        text
     }
 }
 

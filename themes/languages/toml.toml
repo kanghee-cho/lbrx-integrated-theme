@@ -2,3 +2,8 @@
 # 값에는 lbrx.toml의 라이트·다크 roles 이름을 사용한다.
 [tokens]
 # string = "accent" # 예시: TOML 문자열을 기본 강조색으로 표시.
+type = "syntax_type" # 테이블 헤더.
+property = "syntax_property" # 할당 키 구성요소.
+punctuation = "syntax_punctuation" # 점 경로 구분자.
+"constant.builtin" = "syntax_builtin" # 불리언·날짜·시간 리터럴.
+"string.escape" = "syntax_escape" # 기본 문자열의 이스케이프.

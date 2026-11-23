@@ -69,13 +69,58 @@ pub fn render(theme: &ResolvedTheme) -> [(&'static str, String); 3] {
                 .unwrap();
             }
         }
-        for (lang, tokens) in &theme.layers.languages {
-            for token in tokens.keys() {
-                writeln!(css, ".theme-{class} .markdown-rendered code.language-{lang} .token.{token} {{ color: {}; }}",
-                    theme.token(mode, lang, token)).unwrap();
+        for &(token, classes) in PRISM_TOKENS {
+            for native in classes.split_whitespace() {
+                if !matches!(token, "number" | "error") {
+                    let color = match token {
+                        "comment" => "var(--code-comment)",
+                        "keyword" => "var(--code-keyword)",
+                        "string" => "var(--code-string)",
+                        "function" => "var(--code-function)",
+                        _ => theme.token(mode, "", token),
+                    };
+                    writeln!(css, ".theme-{class} .markdown-rendered pre code .token.{native} {{ color: {}; {} }}",
+                        color, theme.token_style("", token).css()).unwrap();
+                }
+                for lang in theme
+                    .language_ids()
+                    .filter(|lang| theme.has_token_override(lang, token))
+                {
+                    for label in std::iter::once(lang).chain(
+                        crate::layers::language_labels(lang)
+                            .iter()
+                            .copied()
+                            .filter(|&s| s != lang),
+                    ) {
+                        let code = if label == "c++" {
+                            "code[class~=\"language-c++\"]".to_owned()
+                        } else {
+                            format!("code.language-{label}")
+                        };
+                        writeln!(css, ".theme-{class} .markdown-rendered {code} .token.{native} {{ color: {}; {} }}",
+                            theme.token(mode, lang, token), theme.token_style(lang, token).css()).unwrap();
+                    }
+                }
             }
         }
     }
+
+    const PRISM_TOKENS: &[(&str, &str)] = &[
+        ("comment", "comment"),
+        ("keyword", "keyword"),
+        ("string", "string char"),
+        ("function", "function"),
+        ("number", "number"),
+        ("error", "error"),
+        ("constant.builtin", "boolean null"),
+        ("string.escape", "regex escape"),
+        ("type", "class-name"),
+        ("variable", "variable"),
+        ("property", "property literal-property"),
+        ("operator", "operator"),
+        ("attribute", "attr-name annotation decorator anchor alias"),
+        ("punctuation", "punctuation"),
+    ];
     css.push_str(concat!(
         ".markdown-rendered pre,\n",
         ".markdown-source-view.is-live-preview .HyperMD-codeblock {\n",

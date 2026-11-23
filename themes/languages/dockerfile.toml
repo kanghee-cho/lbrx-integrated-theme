@@ -1,0 +1,5 @@
+# Dockerfile: 명령 지시어와 RUN 내부 셸 구문을 분리한다.
+[tokens]
+"keyword.declaration" = "syntax_declaration" # FROM·RUN·COPY 등 지시어.
+variable = "text" # 문법이 인식한 환경 변수.
+string = "string" # 문자열 리터럴.

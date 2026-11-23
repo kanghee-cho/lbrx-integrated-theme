@@ -1,0 +1,6 @@
+# sh·shell·shellscript의 공통 설정. Bash를 별도 구분하는 렌더러는 bash.toml을 사용한다.
+[tokens]
+variable = "text" # 환경·일반 변수.
+"constant.builtin" = "syntax_builtin" # 특수/위치 매개변수.
+"string.escape" = "syntax_escape" # 실제 확장 구문. 작은따옴표 내부는 리터럴.
+"keyword.control" = "keyword" # 조건·반복 구문.

@@ -1,0 +1,6 @@
+# C++: 전처리기와 템플릿 타입을 구분하고 ::는 구분 기호로 처리한다.
+[tokens]
+"function.macro" = "syntax_macro" # 매크로 이름.
+attribute = "syntax_attribute" # 전처리기·언어 어트리뷰트.
+type = "syntax_type" # 클래스 및 템플릿 타입 매개변수.
+punctuation = "syntax_punctuation" # :: 등 경로·구조 구분.

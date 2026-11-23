@@ -42,12 +42,36 @@ fn colorscheme(theme: &ResolvedTheme, mode: &ResolvedMode) -> String {
         } else {
             color(role)
         };
-        writeln!(
-            out,
-            "\"{scope}\" = \"{}\"",
-            theme.editor_color(mode, DIRECTORY, scope, fg)
-        )
-        .unwrap();
+        let fg = theme.editor_color(mode, DIRECTORY, scope, fg);
+        let style = if scope == "comment" {
+            theme.token_style("", role).name()
+        } else {
+            "normal"
+        };
+        write_scope(&mut out, scope, fg, style);
+    }
+    for (scope, token) in [
+        ("keyword.control", "keyword.control"),
+        ("keyword.function", "keyword.declaration"),
+        ("keyword.storage", "keyword.declaration"),
+        ("string.regexp", "string.escape"),
+        ("constant.character.escape", "string.escape"),
+        ("constant.builtin", "constant.builtin"),
+        ("function.macro", "function.macro"),
+        ("type", "type"),
+        ("variable", "variable"),
+        ("variable.parameter", "variable.parameter"),
+        ("variable.other.member", "property"),
+        ("operator", "operator"),
+        ("attribute", "attribute"),
+        ("punctuation", "punctuation"),
+    ] {
+        write_scope(
+            &mut out,
+            scope,
+            theme.token(mode, "", token),
+            theme.token_style("", token).name(),
+        );
     }
     writeln!(
         out,
@@ -87,4 +111,16 @@ fn colorscheme(theme: &ResolvedTheme, mode: &ResolvedMode) -> String {
         .unwrap();
     }
     out
+}
+
+fn write_scope(out: &mut String, scope: &str, fg: &str, style: &str) {
+    if style == "normal" {
+        writeln!(out, "\"{scope}\" = \"{fg}\"").unwrap();
+    } else {
+        writeln!(
+            out,
+            "\"{scope}\" = {{ fg = \"{fg}\", modifiers = [\"{style}\"] }}"
+        )
+        .unwrap();
+    }
 }

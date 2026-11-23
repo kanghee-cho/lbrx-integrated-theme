@@ -2,3 +2,8 @@
 # 값에는 lbrx.toml의 라이트·다크 roles 이름을 사용한다.
 [tokens]
 # function = "link" # 예시: 함수 또는 cmdlet로 식별된 이름을 링크색으로 표시.
+function = "function" # 하이픈을 포함한 cmdlet 이름.
+variable = "text" # $와 드라이브·범위 접두사를 포함한 변수.
+"constant.builtin" = "syntax_builtin" # 문법이 구분하는 자동 변수.
+"variable.parameter" = "syntax_parameter" # 하이픈을 포함한 명령 파라미터.
+"string.escape" = "syntax_escape" # 큰따옴표 내부의 보간 경계.

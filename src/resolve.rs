@@ -85,6 +85,8 @@ impl ResolvedTheme {
             (role, ColorSource::Language)
         } else if let Some(role) = self.layers.common.get(token) {
             (role, ColorSource::Common)
+        } else if let Some(parent) = token_parent(token) {
+            self.token_role(lang, parent)
         } else {
             (token, ColorSource::Base)
         }
@@ -92,6 +94,29 @@ impl ResolvedTheme {
 
     pub fn token<'a>(&self, mode: &'a ResolvedMode, lang: &str, token: &str) -> &'a str {
         &mode.roles[self.token_role(lang, token).0]
+    }
+
+    pub fn token_style(&self, lang: &str, token: &str) -> crate::layers::TokenStyle {
+        self.layers
+            .language_styles
+            .get(lang)
+            .and_then(|styles| styles.get(token))
+            .or_else(|| self.layers.common_styles.get(token))
+            .copied()
+            .unwrap_or_default()
+    }
+
+    pub fn has_token_override(&self, lang: &str, token: &str) -> bool {
+        self.token_role(lang, token).1 == ColorSource::Language
+            || self
+                .layers
+                .language_styles
+                .get(lang)
+                .is_some_and(|styles| styles.contains_key(token))
+    }
+
+    pub fn language_ids(&self) -> impl Iterator<Item = &str> {
+        self.layers.languages.keys().map(String::as_str)
     }
 
     pub fn editor_role<'a>(&'a self, app: &str, key: &str) -> Option<&'a str> {
@@ -107,6 +132,18 @@ impl ResolvedTheme {
     ) -> &'a str {
         self.editor_role(app, key)
             .map_or(fallback, |role| &mode.roles[role])
+    }
+}
+
+fn token_parent(token: &str) -> Option<&'static str> {
+    match token {
+        "keyword.control" | "keyword.declaration" => Some("keyword"),
+        "string.escape" => Some("string"),
+        "function.macro" => Some("function"),
+        "variable.parameter" => Some("variable"),
+        "constant.builtin" | "type" | "variable" | "property" | "operator" | "attribute"
+        | "punctuation" => Some("text"),
+        _ => None,
     }
 }
 
@@ -191,7 +228,17 @@ pub fn check(theme: &Theme) -> Result<(), String> {
             .then(|| luminance_of(CODE_BLOCK_BACKGROUND));
         if let Some(bg) = code_bg {
             for token in std::iter::once("text").chain(crate::layers::TOKENS.iter().copied()) {
-                let role = theme.layers.common.get(token).map_or(token, String::as_str);
+                let mut fallback = token;
+                let role = loop {
+                    if let Some(role) = theme.layers.common.get(fallback) {
+                        break role.as_str();
+                    }
+                    if let Some(parent) = token_parent(fallback) {
+                        fallback = parent;
+                    } else {
+                        break fallback;
+                    }
+                };
                 check_contrast(
                     name,
                     token,
