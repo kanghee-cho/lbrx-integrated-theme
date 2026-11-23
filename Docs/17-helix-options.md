@@ -2,7 +2,7 @@
 
 [적용 가이드](16-helix.md) · [Vim 옵션 대장](13-vim-options.md) · [공통 원본](../themes/lbrx.toml)
 
-**범위:** [Helix 25.07 공식 테마 규격](https://github.com/helix-editor/helix/blob/25.07/book/src/themes.md)에 열거된 구문·문서·UI·진단 스코프. 언어별 임의 캡처와 커뮤니티 쿼리는 별도다. `공통`은 기존 테마 역할, `합일 후보`는 Vim 등 다른 앱과 같은 의미로 승격할 수 있는 값, `전용`은 Helix에서 따로 매핑할 값이다. `[x]`는 두 모드에서 표시된 필드만 직접 생성, `[ ]`는 미생성이다. 상위 스코프의 상속 효과는 하위 스코프를 독립 구현한 것으로 체크하지 않는다.
+**범위:** [Helix 25.07 공식 테마 규격](https://github.com/helix-editor/helix/blob/25.07/book/src/themes.md)의 구문·문서·UI·진단 스코프. `공통`, `합일 후보`, `Helix 전용`은 [helix.toml](../themes/editors/helix.toml)의 `[styles]`에서 선택 설정할 수 있다. `[x]`는 기본 생성, `[x] 선택 생성`은 설정할 때만 직접 생성이다. 상위 스코프에서 색을 상속하는 것과 직접 생성은 구분한다. Helix 전용 예시는 모두 기본 비활성이다.
 
 | 스코프마다 조절할 필드 | 허용 값·경계 |
 |---|---|
@@ -18,180 +18,180 @@
 
 | 스코프 | 분류 | 원본 또는 합일 대상 | Helix 생성 |
 |---|---|---|---|
-| `attribute` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `type` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `type.builtin` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `type.parameter` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `type.enum` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `type.enum.variant` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `constructor` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `constant` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `constant.builtin` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `constant.builtin.boolean` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `constant.character` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `constant.character.escape` | 합일 후보 | 문법·문서 표현 | [ ] |
+| `attribute` | 공통 | `attribute` 토큰의 색·스타일 | [x] |
+| `type` | 공통 | `type` 토큰의 색·스타일 | [x] |
+| `type.builtin` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `type.parameter` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `type.enum` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `type.enum.variant` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `constructor` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `constant` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `constant.builtin` | 공통 | `constant.builtin` 토큰의 색·스타일 | [x] |
+| `constant.builtin.boolean` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `constant.character` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `constant.character.escape` | 공통 | `string.escape` 토큰의 색·스타일 | [x] |
 | `constant.numeric` | 공통 | `fg`: number | [x] |
-| `constant.numeric.integer` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `constant.numeric.float` | 합일 후보 | 문법·문서 표현 | [ ] |
+| `constant.numeric.integer` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `constant.numeric.float` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
 | `string` | 공통 | `fg`: string | [x] |
-| `string.regexp` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `string.special` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `string.special.path` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `string.special.url` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `string.special.symbol` | 합일 후보 | 문법·문서 표현 | [ ] |
+| `string.regexp` | 공통 | `string.escape` 토큰의 색·스타일 | [x] |
+| `string.special` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `string.special.path` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `string.special.url` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `string.special.symbol` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
 | `comment` | 공통 | `fg`: comment | [x] |
-| `comment.line` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `comment.line.documentation` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `comment.block` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `comment.block.documentation` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `comment.unused` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `variable` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `variable.builtin` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `variable.parameter` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `variable.other` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `variable.other.member` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `variable.other.member.private` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `label` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `punctuation` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `punctuation.delimiter` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `punctuation.bracket` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `punctuation.special` | 합일 후보 | 문법·문서 표현 | [ ] |
+| `comment.line` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `comment.line.documentation` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `comment.block` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `comment.block.documentation` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `comment.unused` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `variable` | 공통 | `variable` 토큰의 색·스타일 | [x] |
+| `variable.builtin` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `variable.parameter` | 공통 | `variable.parameter` 토큰의 색·스타일 | [x] |
+| `variable.other` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `variable.other.member` | 공통 | `property` 토큰의 색·스타일 | [x] |
+| `variable.other.member.private` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `label` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `punctuation` | 공통 | `punctuation` 토큰의 색·스타일 | [x] |
+| `punctuation.delimiter` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `punctuation.bracket` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `punctuation.special` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
 | `keyword` | 공통 | `fg`: keyword | [x] |
-| `keyword.control` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `keyword.control.conditional` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `keyword.control.repeat` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `keyword.control.import` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `keyword.control.return` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `keyword.control.exception` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `keyword.operator` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `keyword.directive` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `keyword.function` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `keyword.storage` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `keyword.storage.type` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `keyword.storage.modifier` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `operator` | 합일 후보 | 문법·문서 표현 | [ ] |
+| `keyword.control` | 공통 | `keyword.control` 토큰의 색·스타일 | [x] |
+| `keyword.control.conditional` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `keyword.control.repeat` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `keyword.control.import` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `keyword.control.return` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `keyword.control.exception` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `keyword.operator` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `keyword.directive` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `keyword.function` | 공통 | `keyword.declaration` 토큰의 색·스타일 | [x] |
+| `keyword.storage` | 공통 | `keyword.declaration` 토큰의 색·스타일 | [x] |
+| `keyword.storage.type` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `keyword.storage.modifier` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `operator` | 공통 | `operator` 토큰의 색·스타일 | [x] |
 | `function` | 공통 | `fg`: function | [x] |
-| `function.builtin` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `function.method` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `function.method.private` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `function.macro` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `function.special` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `tag` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `tag.builtin` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `namespace` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `special` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `markup` | 합일 후보 | 문법·문서 표현 | [ ] |
+| `function.builtin` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `function.method` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `function.method.private` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `function.macro` | 공통 | `function.macro` 토큰의 색·스타일 | [x] |
+| `function.special` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `tag` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `tag.builtin` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `namespace` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `special` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
 | `markup.heading` | 공통 | `fg`: heading | [x] |
-| `markup.heading.marker` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `markup.heading.1` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `markup.heading.2` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `markup.heading.3` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `markup.heading.4` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `markup.heading.5` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `markup.heading.6` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `markup.list` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `markup.list.unnumbered` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `markup.list.numbered` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `markup.list.checked` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `markup.list.unchecked` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `markup.bold` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `markup.italic` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `markup.strikethrough` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `markup.link` | 합일 후보 | 문법·문서 표현 | [ ] |
+| `markup.heading.marker` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.heading.1` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.heading.2` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.heading.3` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.heading.4` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.heading.5` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.heading.6` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.list` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.list.unnumbered` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.list.numbered` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.list.checked` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.list.unchecked` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.bold` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.italic` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.strikethrough` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.link` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
 | `markup.link.url` | 공통 | `fg`: link | [x] |
-| `markup.link.label` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `markup.link.text` | 합일 후보 | 문법·문서 표현 | [ ] |
+| `markup.link.label` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.link.text` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
 | `markup.quote` | 공통 | `fg`: quote | [x] |
-| `markup.raw` | 합일 후보 | 문법·문서 표현 | [ ] |
+| `markup.raw` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
 | `markup.raw.inline` | 공통 | `fg`: inline_code | [x] |
-| `markup.raw.block` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `diff` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `diff.plus` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `diff.plus.gutter` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `diff.minus` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `diff.minus.gutter` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `diff.delta` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `diff.delta.moved` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `diff.delta.conflict` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `diff.delta.gutter` | 합일 후보 | 문법·문서 표현 | [ ] |
-| `markup.normal` | 합일 후보 | 문법·문서 표현 | [ ] |
+| `markup.raw.block` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `diff` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `diff.plus` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `diff.plus.gutter` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `diff.minus` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `diff.minus.gutter` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `diff.delta` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `diff.delta.moved` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `diff.delta.conflict` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `diff.delta.gutter` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.normal` | 합일 후보 | `[styles]`에서 지정 | [x] 선택 생성 |
 
 ## UI·진단 스코프
 
 | 스코프 | 분류 | 원본 또는 합일 대상 | Helix 생성 |
 |---|---|---|---|
-| `markup.normal.completion` | Helix 전용 | — | [ ] |
-| `markup.normal.hover` | Helix 전용 | — | [ ] |
-| `markup.heading.completion` | Helix 전용 | — | [ ] |
-| `markup.heading.hover` | Helix 전용 | — | [ ] |
-| `markup.raw.inline.completion` | Helix 전용 | — | [ ] |
-| `markup.raw.inline.hover` | Helix 전용 | — | [ ] |
+| `markup.normal.completion` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.normal.hover` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.heading.completion` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.heading.hover` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.raw.inline.completion` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `markup.raw.inline.hover` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
 | `ui.background` | 공통 | `bg`: background | [x] |
-| `ui.background.separator` | Helix 전용 | — | [ ] |
+| `ui.background.separator` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
 | `ui.cursor` | 공통 | `fg`: background / `bg`: focus | [x] |
-| `ui.cursor.normal` | Helix 전용 | — | [ ] |
-| `ui.cursor.insert` | Helix 전용 | — | [ ] |
-| `ui.cursor.select` | Helix 전용 | — | [ ] |
-| `ui.cursor.match` | Helix 전용 | — | [ ] |
+| `ui.cursor.normal` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.cursor.insert` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.cursor.select` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.cursor.match` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
 | `ui.cursor.primary` | 공통 | `fg`: background / `bg`: focus | [x] |
-| `ui.cursor.primary.normal` | Helix 전용 | — | [ ] |
-| `ui.cursor.primary.insert` | Helix 전용 | — | [ ] |
-| `ui.cursor.primary.select` | Helix 전용 | — | [ ] |
-| `ui.debug.breakpoint` | Helix 전용 | — | [ ] |
-| `ui.debug.active` | Helix 전용 | — | [ ] |
-| `ui.gutter` | Helix 전용 | — | [ ] |
-| `ui.gutter.selected` | Helix 전용 | — | [ ] |
+| `ui.cursor.primary.normal` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.cursor.primary.insert` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.cursor.primary.select` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.debug.breakpoint` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.debug.active` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.gutter` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.gutter.selected` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
 | `ui.linenr` | 공통 | `fg`: muted | [x] |
 | `ui.linenr.selected` | 공통 | `fg`: text | [x] |
 | `ui.statusline` | 공통 | `fg`: text / `bg`: surface | [x] |
 | `ui.statusline.inactive` | 공통 | `fg`: muted / `bg`: surface | [x] |
-| `ui.statusline.normal` | Helix 전용 | — | [ ] |
-| `ui.statusline.insert` | Helix 전용 | — | [ ] |
-| `ui.statusline.select` | Helix 전용 | — | [ ] |
-| `ui.statusline.separator` | Helix 전용 | — | [ ] |
-| `ui.bufferline` | Helix 전용 | — | [ ] |
-| `ui.bufferline.active` | Helix 전용 | — | [ ] |
-| `ui.bufferline.background` | Helix 전용 | — | [ ] |
+| `ui.statusline.normal` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.statusline.insert` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.statusline.select` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.statusline.separator` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.bufferline` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.bufferline.active` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.bufferline.background` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
 | `ui.popup` | 공통 | `fg`: text / `bg`: surface | [x] |
-| `ui.popup.info` | Helix 전용 | — | [ ] |
-| `ui.picker.header` | Helix 전용 | — | [ ] |
-| `ui.picker.header.column` | Helix 전용 | — | [ ] |
-| `ui.picker.header.column.active` | Helix 전용 | — | [ ] |
-| `ui.window` | Helix 전용 | — | [ ] |
-| `ui.help` | Helix 전용 | — | [ ] |
+| `ui.popup.info` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.picker.header` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.picker.header.column` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.picker.header.column.active` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.window` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.help` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
 | `ui.text` | 공통 | `fg`: text | [x] |
-| `ui.text.focus` | Helix 전용 | — | [ ] |
-| `ui.text.inactive` | Helix 전용 | — | [ ] |
-| `ui.text.info` | Helix 전용 | — | [ ] |
-| `ui.text.directory` | Helix 전용 | — | [ ] |
-| `ui.virtual.ruler` | Helix 전용 | — | [ ] |
-| `ui.virtual.whitespace` | Helix 전용 | — | [ ] |
-| `ui.virtual.indent-guide` | Helix 전용 | — | [ ] |
-| `ui.virtual.inlay-hint` | Helix 전용 | — | [ ] |
-| `ui.virtual.inlay-hint.parameter` | Helix 전용 | — | [ ] |
-| `ui.virtual.inlay-hint.type` | Helix 전용 | — | [ ] |
-| `ui.virtual.wrap` | Helix 전용 | — | [ ] |
-| `ui.virtual.jump-label` | Helix 전용 | — | [ ] |
+| `ui.text.focus` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.text.inactive` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.text.info` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.text.directory` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.virtual.ruler` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.virtual.whitespace` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.virtual.indent-guide` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.virtual.inlay-hint` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.virtual.inlay-hint.parameter` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.virtual.inlay-hint.type` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.virtual.wrap` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.virtual.jump-label` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
 | `ui.menu` | 공통 | `fg`: text / `bg`: surface | [x] |
 | `ui.menu.selected` | 공통 | `fg`: selection_text / `bg`: selection_background | [x] |
-| `ui.menu.scroll` | Helix 전용 | — | [ ] |
+| `ui.menu.scroll` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
 | `ui.selection` | 공통 | `fg`: selection_text / `bg`: selection_background | [x] |
 | `ui.selection.primary` | 공통 | `fg`: selection_text / `bg`: selection_background | [x] |
-| `ui.highlight` | Helix 전용 | — | [ ] |
-| `ui.highlight.frameline` | Helix 전용 | — | [ ] |
-| `ui.cursorline.primary` | Helix 전용 | — | [ ] |
-| `ui.cursorline.secondary` | Helix 전용 | — | [ ] |
-| `ui.cursorcolumn.primary` | Helix 전용 | — | [ ] |
-| `ui.cursorcolumn.secondary` | Helix 전용 | — | [ ] |
+| `ui.highlight` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.highlight.frameline` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.cursorline.primary` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.cursorline.secondary` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.cursorcolumn.primary` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `ui.cursorcolumn.secondary` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
 | `warning` | 공통 | `fg`: warning | [x] |
 | `error` | 공통 | `fg`: error | [x] |
-| `info` | Helix 전용 | — | [ ] |
-| `hint` | Helix 전용 | — | [ ] |
-| `diagnostic` | Helix 전용 | — | [ ] |
-| `diagnostic.hint` | Helix 전용 | — | [ ] |
-| `diagnostic.info` | Helix 전용 | — | [ ] |
+| `info` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `hint` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `diagnostic` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `diagnostic.hint` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `diagnostic.info` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
 | `diagnostic.warning` | 공통 | `underline.color`: warning / `underline.style`: curl | [x] |
 | `diagnostic.error` | 공통 | `underline.color`: error / `underline.style`: curl | [x] |
-| `diagnostic.unnecessary` | Helix 전용 | — | [ ] |
-| `diagnostic.deprecated` | Helix 전용 | — | [ ] |
-| `tabstop` | Helix 전용 | — | [ ] |
+| `diagnostic.unnecessary` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `diagnostic.deprecated` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |
+| `tabstop` | Helix 전용 | `[styles]`에서 지정 | [x] 선택 생성 |

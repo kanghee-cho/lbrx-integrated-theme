@@ -100,7 +100,7 @@ impl App {
                 }
                 return Ok((self, files.into()));
             }
-            Self::Helix => helix::render(theme).into(),
+            Self::Helix => helix::render(theme)?.into(),
         };
         Ok((
             self,

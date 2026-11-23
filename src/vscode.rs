@@ -53,7 +53,8 @@ const TOKENS: &[(&str, &str)] = &[
     ("punctuation", "punctuation"),
 ];
 const NATIVE_SCOPES: &[(&str, &str, &str)] = &[
-    ("rust", "entity.name.type.macro.rust", "function.macro"),
+    ("rust", "entity.name.function.macro.rust", "function.macro"),
+    ("rust", "keyword.other.fn.rust", "keyword.declaration"),
     ("rust", "entity.name.type.lifetime.rust", "attribute"),
     ("rust", "punctuation.definition.lifetime.rust", "attribute"),
     ("rust", "meta.attribute.rust", "attribute"),
@@ -73,14 +74,54 @@ const NATIVE_SCOPES: &[(&str, &str, &str)] = &[
         "attribute",
     ),
     ("python", "storage.type.string.python", "string.escape"),
+    (
+        "python",
+        "entity.name.function.decorator.python punctuation.separator.period.python",
+        "attribute",
+    ),
     ("python", "storage.type.format.python", "string.escape"),
     ("python", "support.function.magic.python", "function.macro"),
+    (
+        "python",
+        "meta.fstring.python constant.character.format.placeholder.other.python",
+        "punctuation",
+    ),
+    (
+        "python",
+        "meta.member.access.python meta.attribute.python",
+        "property",
+    ),
+    (
+        "python",
+        "support.other.escape.special.regexp",
+        "string.escape",
+    ),
     (
         "powershell",
         "support.variable.automatic.powershell",
         "constant.builtin",
     ),
     ("powershell", "support.function.powershell", "function"),
+    (
+        "powershell",
+        "variable.other.readwrite.powershell punctuation.definition.variable.powershell",
+        "variable",
+    ),
+    (
+        "powershell",
+        "support.variable.automatic.powershell punctuation.definition.variable.powershell",
+        "constant.builtin",
+    ),
+    (
+        "powershell",
+        "constant.language.powershell punctuation.definition.variable.powershell",
+        "constant.builtin",
+    ),
+    (
+        "powershell",
+        "support.variable.drive.powershell",
+        "variable",
+    ),
     (
         "powershell",
         "variable.parameter.powershell",
@@ -91,6 +132,8 @@ const NATIVE_SCOPES: &[(&str, &str, &str)] = &[
     ("typescript", "storage.type.type", "type"),
     ("typescript", "entity.name.tag.tsx", "keyword.declaration"),
     ("typescript", "support.class.component.tsx", "function"),
+    ("typescript", "variable.object.property.tsx", "property"),
+    ("typescript", "variable.object.property.ts", "property"),
     (
         "typescript",
         "punctuation.definition.template-expression",
@@ -344,18 +387,114 @@ fn make_vsix(theme: &ResolvedTheme) -> Result<Vec<u8>, zip::result::ZipError> {
     Ok(zip.finish()?.into_inner())
 }
 
+const OPTIONAL_COLORS: &[(&str, Option<&str>)] = &[
+    ("tab.activeBackground", None),
+    ("tab.activeForeground", None),
+    ("tab.activeBorderTop", None),
+    ("tab.inactiveBackground", None),
+    ("tab.inactiveForeground", None),
+    ("list.activeSelectionBackground", None),
+    ("list.activeSelectionForeground", None),
+    ("list.inactiveSelectionBackground", None),
+    ("list.inactiveSelectionForeground", None),
+    ("list.hoverBackground", None),
+    ("sideBarSectionHeader.background", None),
+    ("sideBarSectionHeader.foreground", None),
+    ("statusBar.debuggingBackground", None),
+    ("statusBar.debuggingForeground", None),
+    ("statusBar.noFolderBackground", None),
+    ("statusBar.noFolderForeground", None),
+    ("editor.findMatchBackground", Some("59")),
+    ("editor.findMatchHighlightBackground", Some("33")),
+    ("editor.findMatchBorder", None),
+    ("diffEditor.insertedTextBackground", Some("4D")),
+    ("diffEditor.removedTextBackground", Some("4D")),
+    ("diffEditor.insertedLineBackground", Some("26")),
+    ("diffEditor.removedLineBackground", Some("26")),
+    ("editorSuggestWidget.background", None),
+    ("editorSuggestWidget.border", None),
+    ("editorSuggestWidget.foreground", None),
+    ("editorSuggestWidget.highlightForeground", None),
+    ("editorSuggestWidget.selectedBackground", None),
+    ("editorSuggestWidget.selectedForeground", None),
+    ("editorLineNumber.activeForeground", None),
+    ("editorLineNumber.dimmedForeground", None),
+    ("editorCursor.background", None),
+    ("editorError.foreground", None),
+    ("editorError.border", None),
+    ("editorError.background", Some("20")),
+    ("editorWarning.foreground", None),
+    ("editorWarning.border", None),
+    ("editorWarning.background", Some("20")),
+    ("diffEditor.insertedTextBorder", None),
+    ("diffEditor.removedTextBorder", None),
+    ("diffEditor.border", None),
+    ("diffEditor.diagonalFill", Some("40")),
+    ("diffEditor.unchangedRegionBackground", None),
+    ("diffEditor.unchangedRegionForeground", None),
+    ("diffEditor.unchangedRegionShadow", Some("26")),
+    ("diffEditor.unchangedCodeBackground", Some("26")),
+    ("diffEditor.move.border", None),
+    ("diffEditor.moveActive.border", None),
+    ("terminal.border", None),
+    ("terminal.inactiveSelectionBackground", Some("80")),
+    ("terminal.findMatchBackground", Some("59")),
+    ("terminal.findMatchBorder", None),
+    ("terminal.findMatchHighlightBackground", Some("33")),
+    ("terminal.findMatchHighlightBorder", None),
+    ("terminal.hoverHighlightBackground", Some("26")),
+    ("terminal.dropBackground", Some("40")),
+    ("terminal.tab.activeBorder", None),
+    ("terminal.initialHintForeground", None),
+];
+
+pub(crate) fn is_workbench_color(key: &str) -> bool {
+    // Keep the accepted IDs in sync with the checked-in, versioned color index.
+    include_str!("../Docs/19-vscode-options.md")
+        .split_once("## 공식 작업 화면 색 ID")
+        .expect("workbench color index")
+        .1
+        .lines()
+        .filter_map(|line| line.strip_prefix("| `")?.split_once("` |"))
+        .any(|(id, _)| id == key)
+}
+
+pub(crate) fn workbench_color_value(value: &str) -> Result<(&str, Option<u8>), &'static str> {
+    if let Some((role, percent)) = value.split_once('@') {
+        let percent = percent
+            .parse::<u8>()
+            .ok()
+            .filter(|&value| value <= 100)
+            .ok_or("불투명도는 0~100 사이 정수여야 합니다")?;
+        return Ok((role, Some(percent)));
+    }
+    Ok((value, None))
+}
+
 fn color_theme(theme: &ResolvedTheme, name: &str, kind: &str, mode: &ResolvedMode) -> Value {
     let mut colors: Map<String, Value> = COLORS
         .iter()
-        .map(|&(id, role)| {
-            (
-                id.into(),
-                json!(theme.editor_color(mode, DIRECTORY, id, &mode.roles[role])),
-            )
-        })
+        .map(|&(id, role)| (id.into(), json!(mode.roles[role])))
         .collect();
     for (name, color) in ANSI_COLORS.into_iter().zip(&mode.ansi) {
         colors.insert(format!("terminal.ansi{name}"), json!(color));
+    }
+    if let Some(overrides) = theme.layers.editors.get(DIRECTORY) {
+        for (id, value) in overrides {
+            let (role, percent) = workbench_color_value(value).expect("validated workbench color");
+            let hex = &mode.roles[role];
+            let color = if let Some(percent) = percent {
+                let alpha = (u16::from(percent) * 255 + 50) / 100;
+                format!("{hex}{alpha:02X}")
+            } else if let Some((_, Some(alpha))) =
+                OPTIONAL_COLORS.iter().find(|&&(key, _)| key == id)
+            {
+                format!("{hex}{alpha}")
+            } else {
+                hex.clone()
+            };
+            colors.insert(id.clone(), json!(color));
+        }
     }
     let settings = |lang, token| {
         let style = theme.token_style(lang, token);

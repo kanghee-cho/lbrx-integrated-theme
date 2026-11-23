@@ -3,3 +3,87 @@
 [colors]
 "editorCursor.foreground" = "focus" # 코드 편집기의 커서색.
 "sideBar.background" = "surface" # 탐색기 등이 있는 사이드바의 배경색.
+
+# 탭
+# "tab.activeBackground" = "background"
+# "tab.activeForeground" = "text"
+# "tab.activeBorderTop" = "focus"
+# "tab.inactiveBackground" = "surface"
+# "tab.inactiveForeground" = "muted"
+
+# 탐색기 및 목록
+# "list.activeSelectionBackground" = "selection_background"
+# "list.activeSelectionForeground" = "selection_text"
+# "list.inactiveSelectionBackground" = "surface"
+# "list.inactiveSelectionForeground" = "text"
+# "list.hoverBackground" = "selection_background"
+# "sideBarSectionHeader.background" = "surface"
+# "sideBarSectionHeader.foreground" = "muted"
+
+# 상태줄 (디버깅 / 열린 폴더 없음)
+# "statusBar.debuggingBackground" = "warning"
+# "statusBar.debuggingForeground" = "background"
+# "statusBar.noFolderBackground" = "surface"
+# "statusBar.noFolderForeground" = "text"
+
+# 검색 — 배경에는 생성기가 투명도를 덧붙인다.
+# "editor.findMatchBackground" = "warning"
+# "editor.findMatchHighlightBackground" = "focus"
+# "editor.findMatchBorder" = "warning"
+
+# Diff — 변경 텍스트는 줄 전체보다 진하게 표시한다.
+# "diffEditor.insertedTextBackground" = "success"
+# "diffEditor.removedTextBackground" = "error"
+# "diffEditor.insertedLineBackground" = "success"
+# "diffEditor.removedLineBackground" = "error"
+
+# 자동완성
+# "editorSuggestWidget.background" = "surface"
+# "editorSuggestWidget.border" = "focus"
+# "editorSuggestWidget.foreground" = "text"
+# "editorSuggestWidget.highlightForeground" = "focus"
+# "editorSuggestWidget.selectedBackground" = "selection_background"
+# "editorSuggestWidget.selectedForeground" = "selection_text"
+
+# 편집기 공통 역할: 줄 번호·커서·진단
+# "editorLineNumber.activeForeground" = "focus"
+# "editorLineNumber.dimmedForeground" = "muted"
+# "editorCursor.background" = "background"
+# "editorError.foreground" = "error"
+# "editorError.border" = "error"
+# "editorError.background" = "error"
+# "editorWarning.foreground" = "warning"
+# "editorWarning.border" = "warning"
+# "editorWarning.background" = "warning"
+
+# Diff 공통 역할: 경계·접힌 영역·이동된 코드
+# "diffEditor.insertedTextBorder" = "success"
+# "diffEditor.removedTextBorder" = "error"
+# "diffEditor.border" = "muted"
+# "diffEditor.diagonalFill" = "muted"
+# "diffEditor.unchangedRegionBackground" = "surface"
+# "diffEditor.unchangedRegionForeground" = "muted"
+# "diffEditor.unchangedRegionShadow" = "muted"
+# "diffEditor.unchangedCodeBackground" = "muted"
+# "diffEditor.move.border" = "muted"
+# "diffEditor.moveActive.border" = "focus"
+
+# 통합 터미널 공통 역할: 경계·선택·검색·탭
+# "terminal.border" = "muted"
+# "terminal.inactiveSelectionBackground" = "selection_background"
+# "terminal.findMatchBackground" = "warning"
+# "terminal.findMatchBorder" = "warning"
+# "terminal.findMatchHighlightBackground" = "focus"
+# "terminal.findMatchHighlightBorder" = "focus"
+# "terminal.hoverHighlightBackground" = "focus"
+# "terminal.dropBackground" = "focus"
+# "terminal.tab.activeBorder" = "focus"
+# "terminal.initialHintForeground" = "muted"
+
+# VS Code 전용 — Docs/19-vscode-options.md 색인에서 필요한 ID를 복사해 추가한다.
+# 값은 공통 역할 또는 "역할@불투명도" 형식(0~100의 정수). 미지정 항목은 기본값 유지.
+# "quickInput.background" = "surface"
+# "gitDecoration.modifiedResourceForeground" = "warning"
+# "editorBracketHighlight.foreground1" = "link"
+# "editorBracketHighlight.unexpectedBracket.foreground" = "error"
+# "editor.wordHighlightBackground" = "focus@20"

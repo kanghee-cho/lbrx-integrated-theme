@@ -2,3 +2,4 @@
 /dist/
 /.dev/
 /fonts/assets/
+node_modules

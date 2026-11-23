@@ -240,6 +240,8 @@ pub struct Layers {
     pub language_styles: BTreeMap<String, TokenStyles>,
     pub editors: BTreeMap<String, Mapping>,
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub helix_styles: BTreeMap<String, HelixStyle>,
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub vim_highlights: BTreeMap<String, VimHighlight>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub typora_layout: Option<TyporaLayout>,
@@ -851,6 +853,91 @@ struct EditorFile {
     colors: Mapping,
 }
 
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct HelixStyle {
+    pub fg: Option<String>,
+    pub bg: Option<String>,
+    pub underline: Option<HelixUnderline>,
+    pub modifiers: Option<Vec<HelixModifier>>,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct HelixUnderline {
+    pub color: Option<String>,
+    pub style: Option<HelixUnderlineStyle>,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum HelixUnderlineStyle {
+    Line,
+    Curl,
+    Dashed,
+    Dotted,
+    DoubleLine,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum HelixModifier {
+    Bold,
+    Dim,
+    Italic,
+    SlowBlink,
+    RapidBlink,
+    Reversed,
+    Hidden,
+    CrossedOut,
+}
+
+#[derive(Default, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+struct HelixFile {
+    colors: Mapping,
+    styles: BTreeMap<String, HelixStyle>,
+}
+
+impl HelixFile {
+    fn validate(&self, file: &Path, theme: &Theme) -> Result<(), String> {
+        for (scope, style) in &self.styles {
+            let key = format!("styles.{scope}");
+            if !crate::helix::is_supported_scope(scope) {
+                return Err(format!(
+                    "{}: 지원하지 않는 Helix 스코프 '{key}'",
+                    file.display()
+                ));
+            }
+            if *style == HelixStyle::default() {
+                return Err(format!(
+                    "{}: {key}: 하나 이상의 속성을 지정하세요",
+                    file.display()
+                ));
+            }
+            if style.underline.as_ref() == Some(&HelixUnderline::default()) {
+                return Err(format!(
+                    "{}: {key}.underline: color 또는 style을 지정하세요",
+                    file.display()
+                ));
+            }
+            for (field, role) in [
+                ("fg", style.fg.as_deref()),
+                ("bg", style.bg.as_deref()),
+                (
+                    "underline.color",
+                    style.underline.as_ref().and_then(|u| u.color.as_deref()),
+                ),
+            ] {
+                if let Some(role) = role.filter(|&role| role != "default") {
+                    validate_role(file, &format!("{key}.{field}"), role, theme)?;
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 const VIM_HIGHLIGHT_GROUPS: &[&str] = &[
     "ColorColumn",
     "Conceal",
@@ -1110,6 +1197,11 @@ pub fn load(path: &Path) -> Result<Theme, String> {
                     theme.layers.typora_diagrams = config.diagrams;
                     theme.layers.typora_print = config.print;
                     config.colors
+                } else if id == "helix" {
+                    let config = read::<HelixFile>(&file)?;
+                    config.validate(&file, &theme)?;
+                    theme.layers.helix_styles = config.styles;
+                    config.colors
                 } else if id == "vim" {
                     let config = read::<VimFile>(&file)?;
                     config.validate(&file, &theme)?;
@@ -1121,9 +1213,19 @@ pub fn load(path: &Path) -> Result<Theme, String> {
                 (colors, *keys)
             };
             for (key, role) in &map {
-                if !allowed.contains(&key.as_str()) {
+                let workbench = !language && id == "vscode";
+                if !(allowed.contains(&key.as_str())
+                    || workbench && crate::vscode::is_workbench_color(key))
+                {
                     return Err(format!("{}: 지원하지 않는 키 '{key}'", file.display()));
                 }
+                let role = if workbench {
+                    crate::vscode::workbench_color_value(role)
+                        .map_err(|err| format!("{}: {key}: {err}", file.display()))?
+                        .0
+                } else {
+                    role
+                };
                 validate_role(&file, key, role, &theme)?;
             }
             if !language {
@@ -1146,6 +1248,224 @@ mod tests {
         resolve,
     };
     use std::io::Read;
+
+    #[test]
+    fn helix_styles_override_only_selected_fields_and_inherit_generated_parent() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("theme.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("helix.toml");
+        let render =
+            || crate::helix::render(&resolve::resolve(&load(&path).unwrap()).unwrap()).unwrap();
+        fs::write(&config, "[colors]\n\"ui.linenr.selected\" = \"text\"").unwrap();
+        let baseline = render();
+        fs::write(&config, include_str!("../themes/editors/helix.toml")).unwrap();
+        assert_eq!(render()[..2], baseline[..2]);
+
+        fs::write(
+            &config,
+            r#"
+[colors]
+"ui.linenr.selected" = "text"
+[styles]
+"type" = { fg = "syntax_type", modifiers = ["bold"] }
+"type.builtin" = { bg = "default", modifiers = [] }
+"diagnostic.warning" = { underline = { style = "line" } }
+"ui.linenr.selected" = { fg = "focus" }
+"diff.plus.gutter" = { fg = "success" }
+"markup.heading.1" = { modifiers = ["bold"] }
+"#,
+        )
+        .unwrap();
+        let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+        let files = crate::helix::render(&theme).unwrap();
+        for (index, mode) in [&theme.light, &theme.dark].into_iter().enumerate() {
+            let output: toml::Table = toml::from_str(&files[index].1).unwrap();
+            let base: toml::Table = toml::from_str(&baseline[index].1).unwrap();
+            let builtin = &output["type.builtin"];
+            assert_eq!(
+                builtin["fg"].as_str(),
+                Some(mode.roles["syntax_type"].as_str())
+            );
+            assert_eq!(builtin["bg"].as_str(), Some("default"));
+            assert!(builtin["modifiers"].as_array().unwrap().is_empty());
+            let underline = &output["diagnostic.warning"]["underline"];
+            assert_eq!(underline["style"].as_str(), Some("line"));
+            assert_eq!(
+                underline["color"],
+                base["diagnostic.warning"]["underline"]["color"]
+            );
+            assert_eq!(
+                output["ui.linenr.selected"]["fg"].as_str(),
+                Some(mode.roles["focus"].as_str())
+            );
+            assert_eq!(
+                output["diff.plus.gutter"]["fg"].as_str(),
+                Some(mode.roles["success"].as_str())
+            );
+            assert_eq!(output["markup.heading.1"]["fg"], base["markup.heading"]);
+            assert_eq!(output["ui.selection"], base["ui.selection"]);
+            assert!(!output.contains_key("ui.cursor.match"));
+        }
+    }
+
+    #[test]
+    fn helix_styles_reject_unknown_scopes_roles_and_styles() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("theme.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("helix.toml");
+        for (setting, expected) in [
+            (
+                "\"ui.cursor.unknown\" = { fg = 'focus' }",
+                "ui.cursor.unknown",
+            ),
+            ("\"type.unknown\" = { fg = 'focus' }", "type.unknown"),
+            ("type = { fg = 'missing' }", "styles.type.fg"),
+            ("type = { underline = { style = 'wave' } }", "wave"),
+            ("type = { modifiers = ['regular'] }", "regular"),
+            ("type = { underline = {} }", "styles.type.underline"),
+        ] {
+            fs::write(&config, format!("[styles]\n{setting}")).unwrap();
+            let err = load(&path).err().expect("invalid Helix style was accepted");
+            assert!(
+                err.contains("helix.toml") && err.contains(expected),
+                "{err}"
+            );
+        }
+    }
+
+    #[test]
+    fn helix_exclusive_examples_generate_each_scope_in_both_modes() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("theme.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("helix.toml");
+        let source = include_str!("../themes/editors/helix.toml");
+        let settings = source
+            .lines()
+            .skip_while(|line| *line != "# Helix 전용 예시")
+            .filter_map(|line| {
+                line.strip_prefix("# ")
+                    .filter(|entry| entry.starts_with('"'))
+            })
+            .collect::<Vec<_>>()
+            .join("\n");
+        fs::write(&config, source).unwrap();
+        let baseline =
+            crate::helix::render(&resolve::resolve(&load(&path).unwrap()).unwrap()).unwrap();
+        fs::write(&config, format!("{source}\n{settings}\n")).unwrap();
+        let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+        let files = crate::helix::render(&theme).unwrap();
+        let ledger = include_str!("../Docs/17-helix-options.md");
+        for (index, mode) in [&theme.light, &theme.dark].into_iter().enumerate() {
+            let output: toml::Table = toml::from_str(&files[index].1).unwrap();
+            let base: toml::Table = toml::from_str(&baseline[index].1).unwrap();
+            for (scope, _) in ledger
+                .lines()
+                .filter_map(|line| line.strip_prefix("| `")?.split_once("` | Helix 전용 | "))
+            {
+                assert!(output.contains_key(scope), "missing scope: {scope}");
+                assert!(!base.contains_key(scope), "not opt-in: {scope}");
+            }
+            assert_eq!(
+                output["ui.cursor.primary.insert"]["fg"].as_str(),
+                Some(mode.roles["background"].as_str())
+            );
+            assert_eq!(
+                output["ui.cursor.primary.insert"]["bg"].as_str(),
+                Some(mode.roles["success"].as_str())
+            );
+            assert_eq!(
+                output["diagnostic.hint"]["underline"]["color"].as_str(),
+                Some(mode.roles["muted"].as_str())
+            );
+            assert_eq!(
+                output["diagnostic.warning"]["underline"]["style"].as_str(),
+                Some("curl")
+            );
+        }
+    }
+
+    #[test]
+    fn vscode_workbench_colors_are_opt_in_and_preserve_overlay_alpha() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("theme.toml");
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        let config = editors.join("vscode.toml");
+        let output = tmp.path().join("dist");
+        fs::write(
+            &config,
+            "[colors]\n\"tab.activeBackground\" = \"surface\"\n\
+             \"editor.findMatchHighlightBackground\" = \"focus\"\n\
+             \"diffEditor.removedTextBackground\" = \"error\"\n\
+             \"editorLineNumber.activeForeground\" = \"focus\"\n\
+             \"terminal.inactiveSelectionBackground\" = \"selection_background\"\n\
+             \"quickInput.background\" = \"surface\"\n\
+             \"editor.wordHighlightBackground\" = \"focus@20\"\n\
+             \"editor.findMatchBackground\" = \"warning@50\"",
+        )
+        .unwrap();
+        let theme = load(&path).unwrap();
+        let resolved = resolve::resolve(&theme).unwrap();
+        build::build(&theme, &output, &[App::VsCode]).unwrap();
+        let file =
+            fs::File::open(App::VsCode.output_path(&output).join(crate::vscode::VSIX)).unwrap();
+        let mut zip = zip::ZipArchive::new(file).unwrap();
+        for (name, mode) in [("light", &resolved.light), ("dark", &resolved.dark)] {
+            let parsed: serde_json::Value = serde_json::from_reader(
+                zip.by_name(&format!("extension/themes/lbrx-{name}.json"))
+                    .unwrap(),
+            )
+            .unwrap();
+            let colors = parsed["colors"].as_object().unwrap();
+            assert_eq!(colors["tab.activeBackground"], mode.roles["surface"]);
+            assert_eq!(
+                colors["editor.findMatchHighlightBackground"],
+                format!("{}33", mode.roles["focus"])
+            );
+            assert_eq!(
+                colors["diffEditor.removedTextBackground"],
+                format!("{}4D", mode.roles["error"])
+            );
+            assert_eq!(
+                colors["editorLineNumber.activeForeground"],
+                mode.roles["focus"]
+            );
+            assert_eq!(
+                colors["terminal.inactiveSelectionBackground"],
+                format!("{}80", mode.roles["selection_background"])
+            );
+            assert_eq!(colors["quickInput.background"], mode.roles["surface"]);
+            assert_eq!(
+                colors["editor.wordHighlightBackground"],
+                format!("{}33", mode.roles["focus"])
+            );
+            assert_eq!(
+                colors["editor.findMatchBackground"],
+                format!("{}80", mode.roles["warning"])
+            );
+            assert!(!colors.contains_key("tab.inactiveBackground"));
+        }
+        for (key, role) in [
+            ("tab.activeBackground", "missing"),
+            ("tab.unknownBackground", "surface"),
+            ("editor.wordHighlightBackground", "focus@101"),
+            ("editor.wordHighlightBackground", "missing@20"),
+        ] {
+            fs::write(&config, format!("[colors]\n\"{key}\" = \"{role}\"")).unwrap();
+            let err = load(&path).err().expect("invalid override was accepted");
+            assert!(err.contains("vscode.toml") && err.contains(key), "{err}");
+        }
+    }
 
     #[test]
     fn mac_terminal_overrides_stay_app_specific_and_archive_mode_colors() {

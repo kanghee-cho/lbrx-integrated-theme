@@ -4,18 +4,30 @@ use std::fmt::Write as _;
 pub const DIRECTORY: &str = "helix";
 pub const FILES: &[&str] = &["lbrx_light.toml", "lbrx_dark.toml", crate::build::GUIDE];
 
-pub fn render(theme: &ResolvedTheme) -> [(&'static str, String); 3] {
-    [
-        (FILES[0], colorscheme(theme, &theme.light)),
-        (FILES[1], colorscheme(theme, &theme.dark)),
+pub(crate) fn is_supported_scope(scope: &str) -> bool {
+    include_str!("../Docs/17-helix-options.md")
+        .lines()
+        .filter_map(|line| line.strip_prefix("| `")?.split_once("` | "))
+        .any(|(name, rest)| {
+            name == scope
+                && (rest.starts_with("공통 | ")
+                    || rest.starts_with("합일 후보 | ")
+                    || rest.starts_with("Helix 전용 | "))
+        })
+}
+
+pub fn render(theme: &ResolvedTheme) -> Result<[(&'static str, String); 3], String> {
+    Ok([
+        (FILES[0], colorscheme(theme, &theme.light)?),
+        (FILES[1], colorscheme(theme, &theme.dark)?),
         (
             crate::build::GUIDE,
             include_str!("../Docs/16-helix.md").into(),
         ),
-    ]
+    ])
 }
 
-fn colorscheme(theme: &ResolvedTheme, mode: &ResolvedMode) -> String {
+fn colorscheme(theme: &ResolvedTheme, mode: &ResolvedMode) -> Result<String, String> {
     let color = |role: &str| &mode.roles[role];
     let mut out = String::from("# LBRX - generated from the theme source.\n");
     for (scope, role) in [
@@ -110,7 +122,71 @@ fn colorscheme(theme: &ResolvedTheme, mode: &ResolvedMode) -> String {
         )
         .unwrap();
     }
-    out
+    if theme.layers.helix_styles.is_empty() {
+        return Ok(out);
+    }
+    apply_styles(&out, theme, mode).map_err(|err| format!("Helix 스타일 생성 실패: {err}"))
+}
+
+fn apply_styles(
+    base: &str,
+    theme: &ResolvedTheme,
+    mode: &ResolvedMode,
+) -> Result<String, Box<dyn std::error::Error>> {
+    use toml::{Table, Value};
+
+    let mut scopes: Table = toml::from_str(base)?;
+    let color = |role: &str| {
+        Value::String(if role == "default" {
+            role.to_owned()
+        } else {
+            mode.roles[role].clone()
+        })
+    };
+    for (scope, style) in &theme.layers.helix_styles {
+        let mut name = scope.as_str();
+        let mut entry = loop {
+            if let Some(value) = scopes.get(name) {
+                break match value {
+                    Value::String(fg) => {
+                        Table::from_iter([("fg".into(), Value::String(fg.clone()))])
+                    }
+                    Value::Table(fields) => fields.clone(),
+                    _ => return Err(format!("잘못된 스코프 '{name}'").into()),
+                };
+            }
+            let Some((parent, _)) = name.rsplit_once('.') else {
+                break Table::new();
+            };
+            name = parent;
+        };
+        for (field, role) in [("fg", &style.fg), ("bg", &style.bg)] {
+            if let Some(role) = role {
+                entry.insert(field.into(), color(role));
+            }
+        }
+        if let Some(modifiers) = &style.modifiers {
+            entry.insert("modifiers".into(), Value::try_from(modifiers)?);
+        }
+        if let Some(underline) = &style.underline {
+            let mut fields = match entry.remove("underline") {
+                Some(Value::Table(fields)) => fields,
+                _ => Table::new(),
+            };
+            if let Some(role) = &underline.color {
+                fields.insert("color".into(), color(role));
+            }
+            if let Some(style) = &underline.style {
+                fields.insert("style".into(), Value::try_from(style)?);
+            }
+            entry.insert("underline".into(), Value::Table(fields));
+        }
+        scopes.insert(scope.clone(), Value::Table(entry));
+    }
+    Ok(format!(
+        "# LBRX - generated from the theme source.\n{}",
+        toml::to_string_pretty(&scopes)?
+    ))
 }
 
 fn write_scope(out: &mut String, scope: &str, fg: &str, style: &str) {
