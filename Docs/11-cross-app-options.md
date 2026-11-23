@@ -12,7 +12,7 @@
 | [Vim](13-vim-options.md) | Vim 색 구성표 · 생성 | 기본 화면·공통 구문 그룹에 RGB와 256색 `cterm` 근사값을 지정. 글꼴·셀 높이는 호스트 소유 |
 | [Helix](17-helix-options.md) | TOML 테마 · 생성 구현 | 구문·UI·진단 스코프에 색과 장식을 지정. 글꼴·셀 높이는 호스트 소유 |
 | [Windows Terminal](06-windows-terminal.md) | 배색표 JSON + 글꼴 조각 · 생성 | 전경·배경·커서·선택 배경·ANSI 16색. 글꼴은 첫 패밀리와 pt 크기만 선택 적용 |
-| [macOS Terminal.app](15-macos-terminal-options.md) | `.terminal` 프로파일 · 예정 | 프로파일에 터미널 배색을 매핑. 글꼴·간격은 사용자 설정 안내 |
+| [macOS Terminal.app](15-macos-terminal-options.md) | `.terminal` 프로파일 · 생성 | 프로파일에 터미널 배색을 매핑. 글꼴·간격은 사용자 설정 안내 |
 | [iTerm2](21-iterm2-options.md) | `.itermcolors` 프리셋 · 생성 | 기존 프로파일의 배색만 변경. 선택 글자색 사용 여부와 글꼴·간격은 프로파일에서 설정 |
 
 ## 공통 옵션을 고르는 기준

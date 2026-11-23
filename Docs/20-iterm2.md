@@ -1,10 +1,12 @@
 # iTerm2에 LBRX 적용하기
 
-**색 프리셋 생성 구현.** Apple 기본 [Terminal.app](14-macos-terminal.md)의 `.terminal`은 프로파일이고, iTerm2의 `.itermcolors`는 **기존 프로파일에 적용하는 색 프리셋**이다. 서로 호환되지 않으며, Terminal.app 출력은 아직 미구현이다.
+**색 프리셋 생성 구현.** Apple 기본 Terminal.app의 `.terminal`은 프로파일이고, iTerm2의 `.itermcolors`는 **기존 프로파일에 적용하는 색 프리셋**이다. 서로 호환되지 않는다.
 
 ```text
 cargo run --locked -- build --app iterm2
 ```
+
+저장소의 `themes/editors/iterm2.toml`에서 `[colors]` 항목으로 공통 역할을 재지정할 수 있다. 커서 위 글자색·굵은 글자색·링크색·커서 가이드 색은 주석을 해제할 때만 프리셋에 기록한다. 해당 기능의 활성화와 가이드 알파는 iTerm2 프로파일에서 별도로 설정한다.
 
 ## 설치·복구
 

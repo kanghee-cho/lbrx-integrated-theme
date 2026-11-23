@@ -6,29 +6,31 @@
 
 | 설정할 값 | 분류 / 원본 또는 단위 | Windows Terminal 대응 | Mac 생성 |
 |---|---|---|---|
-| 일반 글자색 | 공통 `terminal_foreground` | `foreground` 생성 | [ ] |
-| 배경색 | 공통 `terminal_background` | `background` 생성 | [ ] |
-| 커서색 | 공통 `terminal_cursor` | `cursorColor` 생성 | [ ] |
-| 선택 배경 | 공통 `selection_background` | `selectionBackground` 생성 | [ ] |
-| 굵은 글자색 | 합일 후보. 일반 글자색과 독립 | 별도 출력 없음 | [ ] |
+| 일반 글자색 | 공통 `terminal_foreground` | `foreground` 생성 | [x] |
+| 배경색 | 공통 `terminal_background` | `background` 생성 | [x] |
+| 커서색 | 공통 `terminal_cursor` | `cursorColor` 생성 | [x] |
+| 선택 배경 | 공통 `selection_background` | `selectionBackground` 생성 | [x] |
+| 굵은 글자색 | 일반 글자색과 독립 | 별도 출력 없음 | 선택 생성 |
 | 고정폭 글꼴 | 공통 `typography.mono.families`의 첫 패밀리 | `font.face` 조각 생성 | 수동 |
 | 글꼴 크기 | 공통 `typography.mono.size_px` → pt 참고값 | `font.size` 조각 생성 | 수동 |
 | 행 간격 / 문자 간격 | 합일 후보 / Mac 전용. 별도 수치로 취급 | 출력 없음 | 수동 |
 
 ### ANSI 팔레트
 
+기본 색상 재지정과 굵은 글자색은 [macos-terminal.toml](../themes/editors/macos-terminal.toml)에서 지정한다. `[x]`는 파일 생성 검증이며 Mac 앱에서의 가져오기 검증은 아니다.
+
 일반색과 밝은색은 독립 슬롯이다. 아래 각 칸의 체크는 Mac 출력 기준이며 WT 필드는 이미 생성된다. ANSI를 쓰지 않고 프로그램이 직접 지정한 RGB까지 바꾸지는 않는다.
 
 | 일반 슬롯 / WT 필드 | Mac | 밝은 슬롯 / WT 필드 | Mac |
 |---|---|---|---|
-| 0 검정 `black` | [ ] | 8 밝은 검정 `brightBlack` | [ ] |
-| 1 빨강 `red` | [ ] | 9 밝은 빨강 `brightRed` | [ ] |
-| 2 초록 `green` | [ ] | 10 밝은 초록 `brightGreen` | [ ] |
-| 3 노랑 `yellow` | [ ] | 11 밝은 노랑 `brightYellow` | [ ] |
-| 4 파랑 `blue` | [ ] | 12 밝은 파랑 `brightBlue` | [ ] |
-| 5 마젠타 `purple` | [ ] | 13 밝은 마젠타 `brightPurple` | [ ] |
-| 6 시안 `cyan` | [ ] | 14 밝은 시안 `brightCyan` | [ ] |
-| 7 흰색 `white` | [ ] | 15 밝은 흰색 `brightWhite` | [ ] |
+| 0 검정 `black` | [x] | 8 밝은 검정 `brightBlack` | [x] |
+| 1 빨강 `red` | [x] | 9 밝은 빨강 `brightRed` | [x] |
+| 2 초록 `green` | [x] | 10 밝은 초록 `brightGreen` | [x] |
+| 3 노랑 `yellow` | [x] | 11 밝은 노랑 `brightYellow` | [x] |
+| 4 파랑 `blue` | [x] | 12 밝은 파랑 `brightBlue` | [x] |
+| 5 마젠타 `purple` | [x] | 13 밝은 마젠타 `brightPurple` | [x] |
+| 6 시안 `cyan` | [x] | 14 밝은 시안 `brightCyan` | [x] |
+| 7 흰색 `white` | [x] | 15 밝은 흰색 `brightWhite` | [x] |
 
 ### 프로파일에서 따로 조절할 값
 

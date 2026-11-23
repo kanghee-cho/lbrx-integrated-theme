@@ -11,7 +11,7 @@
 | Vim | `lbrx_dark.vim`, `lbrx_light.vim`을 사용자 runtimepath의 `colors`에 복사하고 `:colorscheme lbrx_dark` 등으로 선택. 지속 설정은 vimrc | 터미널 Vim을 기준으로 하며 글꼴은 상속한다. `termguicolors`용 RGB와 저색상 터미널용 `cterm` 근사값을 분리한다. |
 | Windows Terminal | 두 배색표를 기존 `settings.json`의 `schemes`에 이름 기준으로 병합하고 프로필의 `colorScheme`에서 선택. [적용 방법](06-windows-terminal.md) | 배색표와 프로필의 `font` 설정 조각을 분리한다. 글꼴 크기는 pt로 변환(기준 px × 72/96). 현재 셀 높이는 출력하지 않는다. |
 | iTerm2 | [라이트·다크 `.itermcolors` 프리셋](20-iterm2.md)을 기존 프로필에 가져와 선택한다. | 글꼴과 프로필 설정은 수동이다. |
-| macOS Terminal.app | **미구현.** [.terminal 프로필 설계](14-macos-terminal.md)를 참고한다. iTerm2 프리셋과 호환되지 않는다. | 글꼴·크기·행 간격은 프로필의 텍스트 설정 범위다. |
+| macOS Terminal.app | [라이트·다크 `.terminal` 프로파일](14-macos-terminal.md)을 가져와 새 창에서 선택. iTerm2 프리셋과 호환되지 않는다. | 글꼴·크기·행 간격은 프로필에서 수동 설정한다. |
 
 **검증 기준**
 

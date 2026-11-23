@@ -6,11 +6,14 @@
 
 | 원본 역할 | 생성 그룹 | 매핑 범위 |
 |---|---|---|
-| `comment` | `Comment` | 주석. 문자열 안의 주석 기호까지 칠하지 않는다. |
-| `keyword` | `Keyword`, `Conditional`, `Repeat` | 키워드·조건·반복. 모든 `Statement` 하위 그룹을 키워드로 간주하지 않는다. |
-| `string` | `String` | 문자열 본문. 보간식은 문법이 식별한 안쪽 그룹을 따른다. |
-| `function` | `Function` | 함수명으로 식별된 토큰. 선언이 잡혀도 모든 호출까지 식별된다는 뜻은 아니다. |
+| `comment` | `Comment`, `SpecialComment` | 주석. 문자열 안의 주석 기호까지 칠하지 않는다. |
+| `keyword` / `keyword.control` | `Keyword` / `Statement`, `Conditional`, `Repeat`, `Label`, `Exception` | 일반 키워드와 제어 흐름을 분리한다. |
+| `keyword.declaration` / `attribute` | `Define`, `StorageClass`, `Structure`, `Typedef` / `PreProc`, `Include`, `PreCondit`, `Special`, `Tag` | 선언과 메타 구문을 분리한다. |
+| `string` / `string.escape` | `String`, `Character` / `SpecialChar` | 문자열과 문자 리터럴, 별도로 식별되는 이스케이프. |
+| `function` / `function.macro` | `Function`, `Debug`(링크) / `Macro` | 함수명이나 매크로로 식별된 토큰. 선언이 잡혀도 모든 호출까지 식별된다는 뜻은 아니다. |
 | `number` | `Number`, `Float` | 정수·실수. 타입 이름이나 숫자가 들어간 식별자는 제외한다. |
+| `constant.builtin` | `Constant`, `Boolean` | 세부 분류가 없는 상수에도 공통 상수 역할을 사용한다. |
+| `type` / `variable` / `operator` / `punctuation` | `Type` / `Identifier` / `Operator` / `Delimiter` | 문법이 해당 그룹으로 분류한 경우에만 적용된다. |
 | `error` | `Error` | 문법 파일이 오류로 표시한 토큰. `ErrorMsg`나 LSP 진단은 별도다. |
 
 예를 들어 Python의 `def format_title():`에서 문법이 함수명을 `pythonFunction`으로 식별하고 `Function`에 연결한다면, 언어 전용 규칙은 필요 없다. 라이트 테마에서 아래처럼 표준 그룹만 지정하면 된다.
@@ -24,15 +27,15 @@ highlight Function guifg=#43617B
 
 ## 언어별 지원 대장
 
-`filetype`은 Vim 이름을 사용한다(`ps1`의 원본 파일 ID는 `powershell`). 매핑에는 `pythonFunction`, `rustFuncCall`, `ps1Cmdlet`, `tomlInteger`, `typescriptNumber` 등이 있다. 아래 `[ ]`는 열거된 세부 토큰 전체에 대한 검증이 완료되지 않았다는 뜻이며 `—`는 화면 미검증이다. 매핑하지 않은 그룹에는 전용 규칙을 출력하지 않는다.
+[언어 설정 폴더](../themes/languages/)에는 공통 `common.toml`을 제외하고 **39개 ID**가 있다. 이는 Vim 내장·플러그인 문법 전체의 수가 아니다. 다음은 저장소 기본 TOML로 빌드한 결과이며, 전체 ID와 적용 경로는 매 빌드의 Vim 설치 안내 `dist/lbrx/vim/colors/README.md`에 자동으로 표시된다.
 
-| Vim `filetype` | 비교할 토큰 | 언어 전용 RGB | 언어 전용 cterm | 라이트 / 다크 실측 |
-|---|---|---|---|---|
-| `rust` | `fn` 뒤 선언명, 함수 호출, `println!` 매크로 | [ ] | [ ] | — / — |
-| `python` | `def` 뒤 선언명, 호출, f-string 안쪽 표현식 | [ ] | [ ] | — / — |
-| `ps1` | PowerShell cmdlet, `-Path` 매개변수, 큰따옴표 안의 변수 | [ ] | [ ] | — / — |
-| `toml` | 테이블명·키와 문자열·숫자 값. 함수 역할은 해당 없음 | [ ] | [ ] | — / — |
-| `typescript` | 함수 선언·호출과 타입 이름. JavaScript 버퍼에 예외가 번지지 않는지 비교 | [ ] | [ ] | — / — |
+| 적용 경로 | 개수 | 언어 ID |
+|---|---:|---|
+| 언어 전용 규칙 생성 | 7 | `json`, `jsonc`, `powershell`, `python`, `rust`, `toml`, `yaml` |
+| 공통 그룹 사용 | 31 | `bash`, `c`, `common-lisp`, `cpp`, `csharp`, `css`, `csv`, `dart`, `dockerfile`, `go`, `graphql`, `hcl`, `html`, `java`, `javascript`, `julia`, `kotlin`, `log`, `lua`, `markdown`, `mdx`, `php`, `r`, `regex`, `ruby`, `shell`, `sql`, `swift`, `typescript`, `xml`, `zig` |
+| 일반 전경색 | 1 | `text` |
+
+전용 규칙은 **해당 언어 TOML에 활성 재정의가 있고 어댑터가 그 토큰을 Vim 그룹에 연결할 때만** RGB·256색으로 생성된다. 예를 들어 `typescript`의 Vim 연결은 숫자와 주석에만 있고, 기본 TOML에서는 두 토큰을 재정의하지 않아 전용 규칙이 나오지 않는다. 공통 그룹은 Vim에 해당 문법이 설치되어 있고 그 문법이 표준 그룹으로 연결할 때 적용된다. 두 경로 모두 실제 화면에서 모든 토큰이 검증됐다는 뜻은 아니다.
 
 ## 예외를 추가하기 전에 확인할 것
 

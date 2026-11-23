@@ -6,14 +6,17 @@
 
 | 프리셋 키 | 분류 / 공통 원본 또는 후보 | 다른 터미널과의 관계 | 생성 |
 |---|---|---|---|
-| `Foreground Color` | 공통 `terminal_foreground` | WT `foreground` 생성, Terminal.app 예정 | [x] |
-| `Background Color` | 공통 `terminal_background` | WT `background` 생성, Terminal.app 예정 | [x] |
-| `Cursor Color` | 공통 `terminal_cursor` | WT `cursorColor` 생성, Terminal.app 예정 | [x] |
-| `Selection Color` | 공통 `selection_background` | WT `selectionBackground` 생성, Terminal.app 예정 | [x] |
+| `Foreground Color` | 공통 `terminal_foreground` | WT `foreground`, Terminal.app `TextColor` | [x] |
+| `Background Color` | 공통 `terminal_background` | WT `background`, Terminal.app `BackgroundColor` | [x] |
+| `Cursor Color` | 공통 `terminal_cursor` | WT `cursorColor`, Terminal.app `CursorColor` | [x] |
+| `Selection Color` | 공통 `selection_background` | WT `selectionBackground`, Terminal.app `SelectionColor` | [x] |
 | `Selected Text Color` | 공통 `selection_text` | WT 현재 미출력. iTerm2에서 사용하려면 프로파일 옵션 확인 | [x] |
-| `Cursor Text Color` | iTerm2 전용 후보 | 커서 자체와 커서 위 글자를 따로 지정 | [ ] |
-| `Bold Color` | 합일 후보 | Terminal.app의 굵은 글자색과 비교. 활성화 옵션과 색 값은 별개 | [ ] |
-| `Link Color` | 공통 `link` 후보 | 터미널 링크 표시용. 쉘이 출력한 임의 글자색이 아님 | [ ] |
+| `Cursor Text Color` | iTerm2 전용 | 커서 자체와 커서 위 글자를 따로 지정 | 선택 생성 |
+| `Bold Color` | 공통 역할 참조 | Terminal.app에도 별도 색이 있음. 활성화 옵션과 색 값은 별개 | 선택 생성 |
+| `Link Color` | 공통 `link` | 터미널 링크 표시용. 쉘이 출력한 임의 글자색이 아님 | 선택 생성 |
+| `Cursor Guide Color` | iTerm2 전용 | 색상 값만 출력. 표시 여부와 알파는 앱에서 조정 | 선택 생성 |
+
+선택 생성 항목은 [iterm2.toml](../themes/editors/iterm2.toml)의 `[colors]`에서 활성화한다. 생략하면 기본 21개 키만 생성한다.
 
 | 공통 ANSI 슬롯 → iTerm2 키 | 일반색 생성 | 밝은 슬롯 → iTerm2 키 | 밝은색 생성 |
 |---|---|---|---|

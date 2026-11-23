@@ -1,5 +1,5 @@
 use crate::{
-    helix, iterm2,
+    helix, iterm2, macos_terminal,
     model::Theme,
     obsidian,
     resolve::{self, ResolvedTheme},
@@ -22,6 +22,7 @@ type AdapterOutput = (App, Vec<(&'static str, Vec<u8>)>);
 #[derive(Clone, Copy, PartialEq, Eq, clap::ValueEnum)]
 pub enum App {
     WindowsTerminal,
+    MacosTerminal,
     Typora,
     Obsidian,
     #[value(name = "iterm2")]
@@ -33,8 +34,9 @@ pub enum App {
 }
 
 impl App {
-    pub const ALL: [Self; 7] = [
+    pub const ALL: [Self; 8] = [
         Self::WindowsTerminal,
+        Self::MacosTerminal,
         Self::Typora,
         Self::Obsidian,
         Self::Iterm2,
@@ -46,6 +48,7 @@ impl App {
     pub fn label(self) -> &'static str {
         match self {
             Self::WindowsTerminal => "Windows Terminal",
+            Self::MacosTerminal => "macOS Terminal.app",
             Self::Typora => "Typora",
             Self::Obsidian => "Obsidian",
             Self::Iterm2 => "iTerm2",
@@ -72,6 +75,7 @@ impl App {
     fn output(self) -> (&'static str, &'static [&'static str]) {
         match self {
             Self::WindowsTerminal => (windows_terminal::DIRECTORY, &windows_terminal::FILES),
+            Self::MacosTerminal => (macos_terminal::DIRECTORY, &macos_terminal::FILES),
             Self::Typora => (typora::DIRECTORY, typora::FILES),
             Self::Obsidian => (obsidian::DIRECTORY, obsidian::FILES),
             Self::Iterm2 => (iterm2::DIRECTORY, &iterm2::FILES),
@@ -84,6 +88,7 @@ impl App {
     fn render(self, theme: &ResolvedTheme) -> Result<AdapterOutput, String> {
         let files: Vec<(&str, String)> = match self {
             Self::WindowsTerminal => windows_terminal::render(theme)?.into(),
+            Self::MacosTerminal => macos_terminal::render(theme)?.into(),
             Self::Typora => typora::render(theme).into(),
             Self::Obsidian => obsidian::render(theme).into(),
             Self::Iterm2 => iterm2::render(theme)?.into(),
@@ -112,7 +117,10 @@ impl App {
     }
 
     fn language_guide(self, theme: &ResolvedTheme) -> String {
-        if matches!(self, Self::WindowsTerminal | Self::Iterm2) || theme.layers.languages.is_empty()
+        if matches!(
+            self,
+            Self::WindowsTerminal | Self::MacosTerminal | Self::Iterm2
+        ) || theme.layers.languages.is_empty()
         {
             return String::new();
         }
@@ -132,7 +140,7 @@ impl App {
                     Self::Helix => "공통 Tree-sitter 캡처; 언어별 색 재정의 미적용",
                     Self::Typora => "코드 펜스 CodeMirror 클래스가 있는 경우만",
                     Self::Obsidian => "읽기 뷰 Prism 클래스가 있는 경우만",
-                    Self::WindowsTerminal | Self::Iterm2 => unreachable!(),
+                    Self::WindowsTerminal | Self::MacosTerminal | Self::Iterm2 => unreachable!(),
                 }
             };
             text.push_str(&format!("| `{id}` | {route} |\n"));
@@ -609,6 +617,10 @@ mod tests {
     fn vim_build_keeps_light_bytes_when_a_dark_code_role_changes() {
         let workspace = Workspace::new();
         let mut theme = sample();
+        theme
+            .layers
+            .common
+            .insert("function.macro".into(), "syntax_macro".into());
         let dir = App::Vim.output_path(&workspace.0);
         super::build(&theme, &workspace.0, &[App::Vim]).unwrap();
         let light = fs::read(dir.join(vim::FILES[0])).unwrap();
@@ -632,6 +644,39 @@ mod tests {
                 .1
                 .starts_with("highlight Function guifg=#DCE6DB guibg=NONE ctermfg=253 ")
         );
+    }
+
+    #[test]
+    fn vim_share_syntax_and_ui_roles_without_overriding_ignore() {
+        let theme = resolve::resolve(&sample()).unwrap();
+        let output = vim::render(&theme);
+        for ((_, script), mode) in output.iter().zip([&theme.light, &theme.dark]) {
+            let group = |name| {
+                let prefix = format!("highlight {name} ");
+                script
+                    .lines()
+                    .find_map(|line| line.strip_prefix(&prefix))
+                    .unwrap()
+            };
+            let macro_color = theme.token(mode, "", "function.macro");
+            assert!(group("Macro").starts_with(&format!("guifg={macro_color} ctermfg=")));
+            let menu = group("PmenuKindSel");
+            assert!(menu.starts_with(&format!(
+                "guifg={} guibg={} ctermfg=",
+                mode.roles["selection_text"], mode.roles["selection_background"]
+            )));
+            assert!(menu.ends_with(" gui=bold cterm=bold"));
+            assert!(group("DiffAdd").starts_with("guifg=NONE "));
+            assert!(group("DiffChange").starts_with("guifg=NONE "));
+            assert_ne!(group("DiffAdd"), group("DiffChange"));
+            assert!(group("Underlined").ends_with(" gui=underline cterm=underline"));
+            assert!(script.contains("highlight! link Debug Function\n"));
+            assert!(
+                !script
+                    .lines()
+                    .any(|line| line.split_whitespace().any(|word| word == "Ignore"))
+            );
+        }
     }
 
     #[test]

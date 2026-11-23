@@ -1,6 +1,6 @@
 # 사용 언어와 라이브러리 버전 관리
 
-**상태: CLI 및 7개 앱 어댑터 구현.** 실제 의존성은 [Cargo.toml](../Cargo.toml)을 기준으로 삼는다. 어댑터 후보 라이브러리는 실제 도입 시 재검토한다.
+**상태: CLI 및 8개 앱 어댑터 구현.** 실제 의존성은 [Cargo.toml](../Cargo.toml)을 기준으로 삼는다. 어댑터 후보 라이브러리는 실제 도입 시 재검토한다.
 
 ## 사용 언어와 파일 형식
 
@@ -11,7 +11,7 @@
 | 문서형 앱 출력 | CSS | Typora와 Obsidian 테마. 대상 앱에서 확인한 선택자·속성만 사용한다. 별도 Sass·PostCSS 빌드는 두지 않는다. |
 | 구조화된 출력 | JSON / TOML | VS Code 테마·manifest, Windows Terminal 설정 조각은 JSON, Helix 테마는 TOML로 생성한다. |
 | Vim 출력 | Vim script | 터미널 Vim 색상 정의만 생성한다. Vim9 전용 문법이나 Neovim Lua를 전제로 하지 않는다. |
-| macOS 터미널 출력 | XML plist | iTerm2 `.itermcolors` 색 프리셋을 생성한다. Terminal.app의 `.terminal` 프로필은 별도 설계이며 아직 미구현이다. |
+| macOS 터미널 출력 | plist | iTerm2 `.itermcolors` 색 프리셋과 Terminal.app `.terminal` 프로파일을 각각 생성한다. 후자는 색을 바이너리 NSColor 아카이브로 포함한다. |
 | 안내·기준 샘플 | Markdown | 한국어 문서와 한글·영문 혼합 미리보기 샘플을 관리한다. |
 
 테마 생성 자체에는 JavaScript·TypeScript·Python이 필요하지 않다. 선택 기능인 [글꼴 도구](../scripts/theme-fonts.py)는 Python 3.11 이상과 표준 라이브러리를 사용하고, Linux에서는 Fontconfig의 `fc-list`와 `fc-cache`를 사용한다. VS Code용 산출물은 실행 코드 없는 색 테마 확장을 목표로 하므로 Node.js를 CLI 실행 필수 조건으로 두지 않는다. CSS·JSON·Vim script의 지원 범위는 **대상 앱의 검증 버전**으로 관리한다.

@@ -1,6 +1,8 @@
 # LBRX 통합 테마 설계
 
-**상태: 원본 검증 `check`, Windows Terminal·Typora·Obsidian·iTerm2·Vim·VS Code·Helix 선택 빌드 구현.** TOML을 직접 수정하고 앱별 테마와 설치 안내를 생성한다.
+**상태: 원본 검증 `check`, Windows Terminal·macOS Terminal.app·Typora·Obsidian·iTerm2·Vim·VS Code·Helix 선택 빌드 구현.** TOML을 직접 수정하고 앱별 테마와 설치 안내를 생성한다.
+
+**테마 작업 완료:** [Typora](07-typora.md)는 사용자 적용 테스트를 통과했다. [Windows Terminal](06-windows-terminal.md)은 라이트·다크 배색표와 선택 적용용 글꼴 설정을 제공하는 범위로 완료 처리했다. [Vim](12-vim.md)은 라이트·다크 색 구성표, 공통 구문 그룹 및 일부 언어 전용 매핑, 선택 적용 가능한 Vim 전용 옵션을 제공하는 범위로 완료 처리했다. Vim 9.2에서 색 구성표 로딩은 확인했으며, 실제 터미널 화면은 미검증이다.
 
 언어 공통·언어별 구문색과 앱별 색상 옵션을 수정하려면 [설정 파일과 우선순위](02-design-and-editor.md#언어별-구문색과-앱-전용-옵션)를 참고한다.
 
@@ -22,7 +24,7 @@ cargo run --locked -- build .\themes\lbrx.toml
 | 글꼴·크기·줄 간격도 관리 | 본문과 고정폭 글꼴을 분리한다. 앱이 지원하지 않는 값은 억지로 변환하지 않는다. |
 | 한 명령으로 생성, 수동 가져오기 | 생성기는 앱 설정에 쓰지 않는다. 사용자는 원하는 앱의 산출물만 가져간다. |
 
-1. [원본과 생성 구조](01-architecture.md) — 무엇을 어디서 바꾸며, 변경이 어떻게 일곱 앱에 전파되는가.
+1. [원본과 생성 구조](01-architecture.md) — 무엇을 어디서 바꾸며, 변경이 어떻게 앱별 출력에 전파되는가.
 2. [팔레트와 편집 경험](02-design-and-editor.md) — 색상·서체, 빌드 방법, 언어 등록·토큰 연결·구문색 설정.
 3. [앱별 적용 계약](03-targets.md) — 가져올 파일과 설정 위치, 상속·제한 사항, 구현 완료 조건.
 4. [옵션 표시와 확장 전략](04-option-strategy.md) — 공통값과 앱별 예외가 보이는 화면, 같은 샘플의 앱별 차이, 새 옵션의 도입·승격 기준.
@@ -50,7 +52,7 @@ cargo run --locked -- build .\themes\lbrx.toml
 ## 개발 환경과 다음 단계
 
 - **현재 배색:** 라이트·다크에서 문자열은 기존 청록색을 쓴다. 올리브색은 비교 시안이며 기본값에 반영하지 않았다. Typora와 Obsidian은 [독립 코드 블록 배경](02-design-and-editor.md#문서-속-코드-블록-배경)을 쓰고, VS Code·Vim·Helix의 편집기 배경은 그대로다.
-- **다음 확인:** Typora·Obsidian 실제 화면에서 코드 블록의 라이트·다크 배경을 확인하고, 앱별 언어 토큰이 기대한 색으로 표시되는지 기록한다. Helix 화면과 macOS의 iTerm2 프리셋 가져오기도 확인 대상이다. macOS Terminal.app 어댑터는 아직 미구현이다.
+- **다음 확인:** Obsidian과 Helix 실제 화면, Mac에서 iTerm2 프리셋과 Terminal.app 프로파일의 가져오기·표시를 검증한다.
 
 ### 테마 글꼴 확인과 설치
 

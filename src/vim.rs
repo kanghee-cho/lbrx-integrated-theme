@@ -22,6 +22,43 @@ const GROUPS: &[(&str, &str, Option<&str>)] = &[
     ("Error", "error", None),
 ];
 
+const SHARED_GROUPS: &[(&str, &str, &str, &str)] = &[
+    ("Cursor", "background", "focus", "NONE"),
+    ("DiffAdd", "NONE", "surface", "NONE"),
+    ("DiffChange", "NONE", "selection_background", "NONE"),
+    ("DiffDelete", "error", "surface", "NONE"),
+    ("DiffText", "background", "warning", "bold"),
+    ("SignColumn", "muted", "NONE", "NONE"),
+    ("CursorLineNr", "focus", "NONE", "bold"),
+    ("CursorLineFold", "muted", "surface", "NONE"),
+    ("CursorLineSign", "muted", "surface", "NONE"),
+    ("MatchParen", "focus", "NONE", "bold,underline"),
+    ("Pmenu", "text", "surface", "NONE"),
+    ("PmenuSel", "selection_text", "selection_background", "bold"),
+    ("PmenuKind", "focus", "surface", "NONE"),
+    (
+        "PmenuKindSel",
+        "selection_text",
+        "selection_background",
+        "bold",
+    ),
+    ("PmenuExtra", "muted", "surface", "NONE"),
+    (
+        "PmenuExtraSel",
+        "selection_text",
+        "selection_background",
+        "bold",
+    ),
+    ("PmenuSbar", "NONE", "selection_background", "NONE"),
+    ("PmenuThumb", "NONE", "focus", "NONE"),
+    ("CurSearch", "background", "focus", "bold"),
+    ("StatusLineNC", "muted", "surface", "NONE"),
+    ("StatusLineTerm", "text", "surface", "NONE"),
+    ("StatusLineTermNC", "muted", "surface", "NONE"),
+    ("Underlined", "link", "NONE", "underline"),
+    ("Todo", "warning", "NONE", "bold"),
+];
+
 const LANGUAGE_GROUPS: &[(&str, &str, &str)] = &[
     ("python", "function", "pythonFunction"),
     (
@@ -79,15 +116,27 @@ const SYNTAX_GROUPS: &[(&str, &str)] = &[
     ("Conditional", "keyword.control"),
     ("Repeat", "keyword.control"),
     ("Statement", "keyword.control"),
+    ("Label", "keyword.control"),
+    ("Exception", "keyword.control"),
     ("StorageClass", "keyword.declaration"),
     ("Structure", "keyword.declaration"),
     ("Typedef", "keyword.declaration"),
+    ("Define", "keyword.declaration"),
+    ("Character", "string"),
     ("SpecialChar", "string.escape"),
+    ("Constant", "constant.builtin"),
     ("Boolean", "constant.builtin"),
+    ("Macro", "function.macro"),
     ("Type", "type"),
     ("Identifier", "variable"),
     ("Operator", "operator"),
+    ("PreProc", "attribute"),
+    ("Include", "attribute"),
+    ("PreCondit", "attribute"),
+    ("Special", "attribute"),
+    ("Tag", "attribute"),
     ("Delimiter", "punctuation"),
+    ("SpecialComment", "comment"),
 ];
 
 pub fn render(theme: &ResolvedTheme) -> [(&'static str, String); 3] {
@@ -138,7 +187,24 @@ fn colorscheme(theme: &ResolvedTheme, background: &str, mode: &ResolvedMode) -> 
         )
         .unwrap();
     }
-    script.push_str("highlight! link Float Number\n");
+    let color = |role: &str| {
+        if role == "NONE" {
+            "NONE"
+        } else {
+            mode.roles[role].as_str()
+        }
+    };
+    for &(group, fg, bg, style) in SHARED_GROUPS {
+        let (guifg, guibg) = (color(fg), color(bg));
+        writeln!(
+            script,
+            "highlight {group} guifg={guifg} guibg={guibg} ctermfg={} ctermbg={} gui={style} cterm={style}",
+            cterm(guifg),
+            cterm(guibg)
+        )
+        .unwrap();
+    }
+    script.push_str("highlight! link Float Number\nhighlight! link Debug Function\n");
     for &(group, token) in SYNTAX_GROUPS {
         let hex = theme.token(mode, "", token);
         let style = vim_style(theme, "", token);
@@ -162,6 +228,36 @@ fn colorscheme(theme: &ResolvedTheme, background: &str, mode: &ResolvedMode) -> 
                 .unwrap();
             }
         }
+    }
+    for (group, highlight) in &theme.layers.vim_highlights {
+        write!(script, "highlight {group}").unwrap();
+        for (role, gui, term) in [
+            (&highlight.fg, "guifg", "ctermfg"),
+            (&highlight.bg, "guibg", "ctermbg"),
+            (&highlight.sp, "guisp", "ctermul"),
+        ] {
+            if let Some(role) = role {
+                let hex = if role == "none" {
+                    "NONE"
+                } else {
+                    &mode.roles[role]
+                };
+                write!(script, " {gui}={hex} {term}={}", cterm(hex)).unwrap();
+            }
+        }
+        if let Some(styles) = &highlight.styles {
+            let styles = if styles.is_empty() {
+                "NONE".into()
+            } else {
+                styles
+                    .iter()
+                    .map(|style| style.name())
+                    .collect::<Vec<_>>()
+                    .join(",")
+            };
+            write!(script, " gui={styles} cterm={styles}").unwrap();
+        }
+        script.push('\n');
     }
     script
 }

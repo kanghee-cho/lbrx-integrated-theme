@@ -15,6 +15,23 @@ const ROLES: [(&str, &str); 5] = [
     ("Selection Color", "selection_background"),
     ("Selected Text Color", "selection_text"),
 ];
+const OPTIONAL_COLORS: &[&str] = &[
+    "Cursor Text Color",
+    "Bold Color",
+    "Link Color",
+    "Cursor Guide Color",
+];
+pub const COLOR_KEYS: &[&str] = &[
+    "Foreground Color",
+    "Background Color",
+    "Cursor Color",
+    "Selection Color",
+    "Selected Text Color",
+    "Cursor Text Color",
+    "Bold Color",
+    "Link Color",
+    "Cursor Guide Color",
+];
 
 pub fn render(theme: &ResolvedTheme) -> Result<[(&'static str, String); 3], String> {
     Ok([
@@ -34,6 +51,11 @@ fn encode(theme: &ResolvedTheme, mode: &ResolvedMode, filename: &str) -> Result<
             name.into(),
             color(theme.editor_color(mode, DIRECTORY, name, &mode.roles[role])),
         );
+    }
+    for &name in OPTIONAL_COLORS {
+        if let Some(role) = theme.editor_role(DIRECTORY, name) {
+            colors.insert(name.into(), color(&mode.roles[role]));
+        }
     }
     for (slot, hex) in mode.ansi.iter().enumerate() {
         colors.insert(format!("Ansi {slot} Color"), color(hex));

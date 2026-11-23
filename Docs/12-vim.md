@@ -12,6 +12,20 @@ cargo run --locked -- build --app vim
 2. `:echo get(g:, 'colors_name', 'default')`로 기존 이름을 기록한다. 현재 세션에서 `:colorscheme lbrx_dark` 또는 `:colorscheme lbrx_light`로 시험한다. 원하는 경우에만 자신의 vimrc에 `colorscheme lbrx_dark`처럼 한 줄을 추가한다.
 3. 갱신하려면 두 파일만 교체한 뒤 `:colorscheme`에 이름을 다시 주어 읽힌다. 되돌릴 때는 기록한 테마(없으면 `:colorscheme default`)를 선택하고 추가한 vimrc 줄을 복원한다.
 
+## Vim 전용 옵션
+
+저장소의 `themes/editors/vim.toml`에서 `[highlights]` 아래 원하는 행만 주석 해제하고 다시 빌드한다. 예를 들어 세로 가이드와 맞춤법 오류의 표시를 지정하려면 다음 두 줄을 활성화한다.
+
+```toml
+[highlights]
+ColorColumn = { bg = "surface" }
+SpellBad = { sp = "error", styles = ["undercurl"] }
+```
+
+`fg`는 전경, `bg`는 배경, `sp`는 밑줄 등의 특수색이다. 값은 공통 역할 이름이며 라이트·다크에서 각각 해석한다. `"none"`은 해당 색을 해제하고, `styles = []`는 스타일을 해제한다. 생략한 그룹은 기존 동작 그대로이고, 설정한 그룹에는 명시한 필드만 출력한다. Vim에서 기본 링크였던 그룹을 직접 지정하면 링크 대신 독립 그룹이 된다.
+
+테마는 `colorcolumn`, `spell`, `statusline` 같은 Vim 옵션을 켜지 않는다. `User1`–`User9`는 기존 상태줄 포맷에서 `%1*`–`%9*`로 참조해야 표시된다. 밑줄 색·모양과 커서 표시의 지원 범위는 터미널에 따라 달라진다. 기존 `[colors]` 설정은 그대로 쓸 수 있다.
+
 ## 색상과 검증 경계
 
 RGB를 지원하는 터미널에서 Vim의 `termguicolors`가 켜져 있으면 `guifg`·`guibg`를 쓴다. 꺼져 있으면 xterm 256색의 16–255번에서 가장 가까운 `ctermfg`·`ctermbg`로 근사한다. 16색 전용 터미널은 지원하지 않으며, 실제 발색은 호스트 팔레트에 따라 달라진다. 테마는 `termguicolors` 설정이나 호스트 글꼴을 바꾸지 않는다.

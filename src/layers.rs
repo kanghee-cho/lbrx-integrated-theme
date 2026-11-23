@@ -204,7 +204,8 @@ pub const TYPORA_SIDEBAR_COLORS: &[(&str, &str, &str)] = &[
 ];
 const EDITORS: &[(&str, &[&str])] = &[
     ("windows-terminal", &["cursorColor", "selectionBackground"]),
-    ("iterm2", &["Cursor Color", "Selected Text Color"]),
+    ("iterm2", crate::iterm2::COLOR_KEYS),
+    ("macos-terminal", crate::macos_terminal::COLOR_KEYS),
     ("vscode", &["editorCursor.foreground", "sideBar.background"]),
     ("vim", &["LineNr", "Comment"]),
     ("helix", &["ui.linenr", "ui.linenr.selected"]),
@@ -238,6 +239,8 @@ pub struct Layers {
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub language_styles: BTreeMap<String, TokenStyles>,
     pub editors: BTreeMap<String, Mapping>,
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub vim_highlights: BTreeMap<String, VimHighlight>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub typora_layout: Option<TyporaLayout>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -848,6 +851,117 @@ struct EditorFile {
     colors: Mapping,
 }
 
+const VIM_HIGHLIGHT_GROUPS: &[&str] = &[
+    "ColorColumn",
+    "Conceal",
+    "lCursor",
+    "CursorIM",
+    "CursorColumn",
+    "EndOfBuffer",
+    "VertSplit",
+    "Folded",
+    "FoldColumn",
+    "LineNrAbove",
+    "LineNrBelow",
+    "NonText",
+    "SpecialKey",
+    "Terminal",
+    "VisualNOS",
+    "Directory",
+    "QuickFixLine",
+    "TabLine",
+    "TabLineFill",
+    "TabLineSel",
+    "WildMenu",
+    "MessageWindow",
+    "ModeMsg",
+    "MoreMsg",
+    "PopupNotification",
+    "Question",
+    "Title",
+    "SpellBad",
+    "SpellCap",
+    "SpellLocal",
+    "SpellRare",
+    "User1",
+    "User2",
+    "User3",
+    "User4",
+    "User5",
+    "User6",
+    "User7",
+    "User8",
+    "User9",
+];
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct VimHighlight {
+    pub fg: Option<String>,
+    pub bg: Option<String>,
+    pub sp: Option<String>,
+    pub styles: Option<Vec<VimHighlightStyle>>,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum VimHighlightStyle {
+    Bold,
+    Italic,
+    Underline,
+    Undercurl,
+    Reverse,
+    Strikethrough,
+}
+
+impl VimHighlightStyle {
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Bold => "bold",
+            Self::Italic => "italic",
+            Self::Underline => "underline",
+            Self::Undercurl => "undercurl",
+            Self::Reverse => "reverse",
+            Self::Strikethrough => "strikethrough",
+        }
+    }
+}
+
+#[derive(Default, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+struct VimFile {
+    colors: Mapping,
+    highlights: BTreeMap<String, VimHighlight>,
+}
+
+impl VimFile {
+    fn validate(&self, file: &Path, theme: &Theme) -> Result<(), String> {
+        for (group, highlight) in &self.highlights {
+            let key = format!("highlights.{group}");
+            if !VIM_HIGHLIGHT_GROUPS.contains(&group.as_str()) {
+                return Err(format!("{}: 지원하지 않는 키 '{key}'", file.display()));
+            }
+            let colors = [
+                ("fg", &highlight.fg),
+                ("bg", &highlight.bg),
+                ("sp", &highlight.sp),
+            ];
+            if colors.iter().all(|(_, role)| role.is_none()) && highlight.styles.is_none() {
+                return Err(format!(
+                    "{}: {key}: 하나 이상의 속성을 지정하세요",
+                    file.display()
+                ));
+            }
+            for (field, role) in colors {
+                if let Some(role) = role.as_deref().filter(|role| *role != "none") {
+                    validate_role(file, &format!("{key}.{field}"), role, theme)?;
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct TyporaFile {
@@ -996,6 +1110,11 @@ pub fn load(path: &Path) -> Result<Theme, String> {
                     theme.layers.typora_diagrams = config.diagrams;
                     theme.layers.typora_print = config.print;
                     config.colors
+                } else if id == "vim" {
+                    let config = read::<VimFile>(&file)?;
+                    config.validate(&file, &theme)?;
+                    theme.layers.vim_highlights = config.highlights;
+                    config.colors
                 } else {
                     read::<EditorFile>(&file)?.colors
                 };
@@ -1027,6 +1146,153 @@ mod tests {
         resolve,
     };
     use std::io::Read;
+
+    #[test]
+    fn mac_terminal_overrides_stay_app_specific_and_archive_mode_colors() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("theme.toml");
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(
+            editors.join("iterm2.toml"),
+            "[colors]\n'Link Color' = 'link'\n'Bold Color' = 'text'",
+        )
+        .unwrap();
+        fs::write(
+            editors.join("macos-terminal.toml"),
+            "[colors]\nTextColor = 'muted'\nTextBoldColor = 'focus'",
+        )
+        .unwrap();
+        let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+        let iterm = crate::iterm2::render(&theme).unwrap();
+        let terminal = crate::macos_terminal::render(&theme).unwrap();
+        let parse = |xml: &str| {
+            plist::Value::from_reader_xml(xml.as_bytes())
+                .unwrap()
+                .into_dictionary()
+                .unwrap()
+        };
+        for (index, mode) in [&theme.light, &theme.dark].into_iter().enumerate() {
+            let colors = parse(&iterm[index].1);
+            let link = colors["Link Color"].as_dictionary().unwrap();
+            let [r, _, _] = resolve::parse_rgb(&mode.roles["link"]).unwrap();
+            assert_eq!(link["Red Component"].as_real(), Some(f64::from(r) / 255.0));
+            assert!(colors.contains_key("Bold Color"));
+            assert!(!colors.contains_key("Cursor Text Color"));
+
+            let profile = parse(&terminal[index].1);
+            assert_eq!(profile["type"].as_string(), Some("Window Settings"));
+            assert_eq!(profile.len(), 24);
+            assert_eq!(
+                profile.keys().filter(|key| key.starts_with("ANSI")).count(),
+                16
+            );
+            assert!(!profile.contains_key("Link Color"));
+            for (key, hex) in [
+                ("TextColor", &mode.roles["muted"]),
+                ("TextBoldColor", &mode.roles["focus"]),
+                ("ANSIBrightMagentaColor", &mode.ansi[13]),
+            ] {
+                let archive = plist::Value::from_reader(std::io::Cursor::new(
+                    profile[key].as_data().unwrap(),
+                ))
+                .unwrap();
+                let graph = archive.as_dictionary().unwrap();
+                assert_eq!(graph["$archiver"].as_string(), Some("NSKeyedArchiver"));
+                let root = graph["$top"].as_dictionary().unwrap()["root"]
+                    .as_uid()
+                    .unwrap();
+                assert_eq!(root.get(), 1);
+                let object = graph["$objects"].as_array().unwrap()[1]
+                    .as_dictionary()
+                    .unwrap();
+                let rgb = std::str::from_utf8(object["NSRGB"].as_data().unwrap()).unwrap();
+                let channels: Vec<_> = rgb
+                    .trim_end_matches('\0')
+                    .split_whitespace()
+                    .map(|part| part.parse::<f64>().unwrap())
+                    .collect();
+                assert_eq!(
+                    channels,
+                    resolve::parse_rgb(hex)
+                        .unwrap()
+                        .map(|c| f64::from(c) / 255.0)
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn vim_highlights_are_opt_in_and_use_mode_roles() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path();
+        let path = root.join("theme.toml");
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::create_dir(root.join("editors")).unwrap();
+        let vim_path = root.join("editors/vim.toml");
+        let render = || crate::vim::render(&resolve::resolve(&load(&path).unwrap()).unwrap());
+        fs::write(&vim_path, "[colors]\nLineNr = 'muted'").unwrap();
+        let before = render();
+        let template = include_str!("../themes/editors/vim.toml");
+        fs::write(&vim_path, template).unwrap();
+        assert_eq!(render(), before);
+
+        let enabled = template
+            .lines()
+            .map(|line| {
+                line.strip_prefix("# ")
+                    .filter(|line| line.contains(" = {"))
+                    .unwrap_or(line)
+            })
+            .collect::<Vec<_>>()
+            .join("\n");
+        fs::write(&vim_path, enabled).unwrap();
+        let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+        for ((_, script), mode) in crate::vim::render(&theme)
+            .iter()
+            .zip([&theme.light, &theme.dark])
+        {
+            assert!(script.contains(&format!(
+                "highlight ColorColumn guibg={} ctermbg=",
+                mode.roles["surface"]
+            )));
+            assert!(script.lines().any(|line| {
+                line.starts_with(&format!(
+                    "highlight SpellBad guisp={} ctermul=",
+                    mode.roles["error"]
+                )) && line.ends_with(" gui=undercurl cterm=undercurl")
+            }));
+            assert!(
+                script.contains("highlight Conceal guifg=")
+                    && script.contains("guibg=NONE ctermbg=NONE")
+            );
+            assert!(script.contains("highlight User9 "));
+        }
+    }
+
+    #[test]
+    fn vim_highlights_reject_unknown_groups_fields_styles_and_roles() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path();
+        let path = root.join("theme.toml");
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::create_dir(root.join("editors")).unwrap();
+        let vim_path = root.join("editors/vim.toml");
+        for (line, expected) in [
+            ("Menu = { fg = 'text' }", "highlights.Menu"),
+            ("Folded = { background = 'surface' }", "background"),
+            ("SpellBad = { styles = ['unknown'] }", "unknown"),
+            ("SpellBad = { sp = 'missing' }", "highlights.SpellBad.sp"),
+            ("User1 = {}", "highlights.User1"),
+        ] {
+            fs::write(&vim_path, format!("[highlights]\n{line}")).unwrap();
+            let err = load(&path)
+                .err()
+                .expect("invalid Vim override was accepted");
+            assert!(err.contains("vim.toml") && err.contains(expected), "{err}");
+        }
+    }
 
     #[test]
     fn sparse_languages_override_only_matching_outputs_and_editors_are_isolated() {
