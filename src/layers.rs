@@ -3,6 +3,13 @@ use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use std::{collections::BTreeMap, fs, path::Path};
 
 pub type Mapping = BTreeMap<String, String>;
+pub const TYPORA_ALERT_ROLES: [(&str, &str); 5] = [
+    ("note", "function"),
+    ("tip", "success"),
+    ("important", "keyword"),
+    ("warning", "warning"),
+    ("caution", "error"),
+];
 pub const TOKENS: &[&str] = &[
     "comment", "keyword", "string", "function", "number", "error",
 ];
@@ -14,7 +21,15 @@ const EDITORS: &[(&str, &[&str])] = &[
     ("helix", &["ui.linenr", "ui.linenr.selected"]),
     (
         "typora",
-        &["--lbrx-quote", "--lbrx-link", "--lbrx-footnote-reference"],
+        &[
+            "--lbrx-quote",
+            "--lbrx-link",
+            "--lbrx-footnote-reference",
+            "--blur-text-color",
+            "--lbrx-live-edit-marker",
+            "--lbrx-live-edit-link-text",
+            "--lbrx-live-edit-link-url",
+        ],
     ),
     ("obsidian", &["--link-external-color", "--text-muted"]),
 ];
@@ -55,6 +70,23 @@ pub struct Layers {
 #[serde(deny_unknown_fields)]
 pub struct TyporaAlerts {
     pub shaded_background: bool,
+    #[serde(default, skip_serializing_if = "Mapping::is_empty")]
+    pub colors: Mapping,
+}
+
+impl TyporaAlerts {
+    fn validate(&self, path: &Path, theme: &Theme) -> Result<(), String> {
+        for (kind, role) in &self.colors {
+            if !TYPORA_ALERT_ROLES.iter().any(|(key, _)| key == kind) {
+                return Err(format!(
+                    "{}: alerts.colors.{kind}: 지원하지 않는 알림 유형",
+                    path.display()
+                ));
+            }
+            validate_role(path, &format!("alerts.colors.{kind}"), role, theme)?;
+        }
+        Ok(())
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
@@ -70,12 +102,34 @@ pub struct TyporaMath {
 pub struct TyporaImages {
     pub caption_size_percent: std::num::NonZeroU16,
     pub caption_gap_px: u16,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub alignment: Option<TyporaImageAlignment>,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum TyporaImageAlignment {
+    Start,
+    Center,
+    End,
+}
+
+impl TyporaImageAlignment {
+    pub const fn margins(self) -> &'static str {
+        match self {
+            Self::Start => "0 auto",
+            Self::Center => "auto",
+            Self::End => "auto 0",
+        }
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct TyporaTaskLists {
     pub strike_completed: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub checkbox_color: Option<String>,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
@@ -83,6 +137,45 @@ pub struct TyporaTaskLists {
 pub struct TyporaLists {
     pub indent_px: std::num::NonZeroU16,
     pub item_gap_px: u16,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub markers: Option<TyporaListMarkers>,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct TyporaListMarkers {
+    level_1: Option<TyporaListMarker>,
+    level_2: Option<TyporaListMarker>,
+    level_3: Option<TyporaListMarker>,
+}
+
+impl TyporaListMarkers {
+    pub fn styles(&self) -> [&'static str; 3] {
+        [
+            self.level_1.unwrap_or(TyporaListMarker::Disc),
+            self.level_2.unwrap_or(TyporaListMarker::Circle),
+            self.level_3.unwrap_or(TyporaListMarker::Square),
+        ]
+        .map(TyporaListMarker::css_value)
+    }
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+enum TyporaListMarker {
+    Disc,
+    Circle,
+    Square,
+}
+
+impl TyporaListMarker {
+    const fn css_value(self) -> &'static str {
+        match self {
+            Self::Disc => "disc",
+            Self::Circle => "circle",
+            Self::Square => "square",
+        }
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
@@ -250,6 +343,18 @@ fn read<T: DeserializeOwned>(path: &Path) -> Result<T, String> {
     toml::from_str(&text).map_err(|e| format!("{}: {e}", path.display()))
 }
 
+fn validate_role(path: &Path, key: &str, role: &str, theme: &Theme) -> Result<(), String> {
+    for (name, mode) in [("light", &theme.light), ("dark", &theme.dark)] {
+        if !mode.roles.contains_key(role) {
+            return Err(format!(
+                "{}: {key}: {name}.roles에 '{role}' 없음",
+                path.display()
+            ));
+        }
+    }
+    Ok(())
+}
+
 fn files(dir: &Path) -> Result<Vec<std::path::PathBuf>, String> {
     let entries = match fs::read_dir(dir) {
         Ok(entries) => entries,
@@ -295,6 +400,16 @@ pub fn load(path: &Path) -> Result<Theme, String> {
                     if let Some(headings) = &config.headings {
                         headings.validate(&file)?;
                     }
+                    if let Some(alerts) = &config.alerts {
+                        alerts.validate(&file, &theme)?;
+                    }
+                    if let Some(role) = config
+                        .task_lists
+                        .as_ref()
+                        .and_then(|tasks| tasks.checkbox_color.as_deref())
+                    {
+                        validate_role(&file, "task_lists.checkbox_color", role, &theme)?;
+                    }
                     theme.layers.typora_layout = config.layout;
                     theme.layers.typora_paragraph = config.paragraph;
                     theme.layers.typora_headings = config.headings;
@@ -317,14 +432,7 @@ pub fn load(path: &Path) -> Result<Theme, String> {
                 if !allowed.contains(&key.as_str()) {
                     return Err(format!("{}: 지원하지 않는 키 '{key}'", file.display()));
                 }
-                for (name, mode) in [("light", &theme.light), ("dark", &theme.dark)] {
-                    if !mode.roles.contains_key(role) {
-                        return Err(format!(
-                            "{}: {key}: {name}.roles에 '{role}' 없음",
-                            file.display()
-                        ));
-                    }
-                }
+                validate_role(&file, key, role, &theme)?;
             }
             if !language {
                 theme.layers.editors.insert(id.into(), map);
@@ -633,11 +741,9 @@ mod tests {
         fs::create_dir(&dir).unwrap();
         let render = || crate::typora::render(&resolve::resolve(&load(&path).unwrap()).unwrap());
         assert!(!render()[0].1.contains("list-style-type: square"));
-        fs::write(
-            dir.join("typora.toml"),
-            "[lists]\nindent_px=20\nitem_gap_px=2",
-        )
-        .unwrap();
+        let sidecar = dir.join("typora.toml");
+        let base = "[lists]\nindent_px=20\nitem_gap_px=2";
+        fs::write(&sidecar, base).unwrap();
         for (_, css) in render().iter().take(2) {
             assert!(css.contains("padding-inline-start: 20px"));
             assert!(css.contains("margin-block-start: 2px"));
@@ -649,6 +755,40 @@ mod tests {
                 assert!(rule.contains("ul") && rule.contains(".md-task-list-item"));
             }
         }
+        for (config, expected) in [
+            ("level_2 = 'disc'", ["disc", "disc", "square"]),
+            (
+                "level_1 = 'square'\nlevel_2 = 'disc'\nlevel_3 = 'circle'",
+                ["square", "disc", "circle"],
+            ),
+        ] {
+            fs::write(&sidecar, format!("{base}\n[lists.markers]\n{config}")).unwrap();
+            for (_, css) in render().iter().take(2) {
+                let rules: Vec<_> = css
+                    .lines()
+                    .filter(|line| line.contains("list-style-type:"))
+                    .collect();
+                assert_eq!(rules.len(), expected.len());
+                for ((rule, marker), ancestors) in rules.iter().zip(expected).zip(0..3) {
+                    assert!(
+                        rule.starts_with(&format!("#write {}ul", ":is(ol, ul) ".repeat(ancestors)))
+                    );
+                    assert!(rule.ends_with(&format!("{{ list-style-type: {marker}; }}")));
+                }
+            }
+        }
+        fs::write(
+            &sidecar,
+            format!("{base}\n[lists.markers]\nlevel_1 = 'triangle'"),
+        )
+        .unwrap();
+        let error = load(&path).err().unwrap();
+        assert!(
+            error.contains("typora.toml")
+                && error.contains("level_1")
+                && error.contains("triangle"),
+            "{error}"
+        );
     }
 
     #[test]
@@ -681,6 +821,40 @@ mod tests {
     }
 
     #[test]
+    fn typora_checkbox_color_changes_only_the_task_checkbox_accent() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("input.toml");
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let dir = tmp.path().join("editors");
+        fs::create_dir(&dir).unwrap();
+        let sidecar = dir.join("typora.toml");
+        let render = || crate::typora::render(&resolve::resolve(&load(&path).unwrap()).unwrap());
+        let base = "[task_lists]\nstrike_completed = true";
+        fs::write(&sidecar, base).unwrap();
+        let baseline = render();
+        fs::write(&sidecar, format!("{base}\ncheckbox_color = 'warning'")).unwrap();
+        for (((_, before), (_, after)), (default, custom)) in baseline
+            .iter()
+            .zip(render().iter())
+            .zip([("#246958", "#815919"), ("#84C7AC", "#D6B378")])
+        {
+            let original = format!("accent-color: {default};");
+            assert!(before.contains(&original));
+            assert_eq!(
+                *after,
+                before.replace(&original, &format!("accent-color: {custom};"))
+            );
+        }
+        fs::write(&sidecar, format!("{base}\ncheckbox_color = 'unknown'")).unwrap();
+        let error = load(&path).err().unwrap();
+        assert!(
+            error.contains("typora.toml")
+                && error.contains("task_lists.checkbox_color")
+                && error.contains("unknown")
+        );
+    }
+
+    #[test]
     fn typora_images_style_explicit_captions_only_when_configured() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
@@ -698,6 +872,21 @@ mod tests {
         .unwrap();
         for (_, css) in render().iter().take(2) {
             assert!(css.contains("figcaption {\n  margin-block-start: 10px;\n  font-size: 85%;"));
+            assert!(!css.contains("p > img:only-child"));
+        }
+        for (alignment, margins) in [("start", "0 auto"), ("center", "auto"), ("end", "auto 0")] {
+            fs::write(
+                dir.join("typora.toml"),
+                format!("[images]\ncaption_size_percent = 85\ncaption_gap_px = 10\nalignment = '{alignment}'"),
+            )
+            .unwrap();
+            for (_, css) in render().iter().take(2) {
+                assert!(css.contains(&format!(
+                    "p > img:only-child {{ margin-inline: {margins}; }}"
+                )));
+                assert!(css.contains(&format!("block-size: auto;\n  margin-inline: {margins};")));
+                assert!(css.contains("color: var(--lbrx-muted);\n  text-align: center;"));
+            }
         }
     }
 
@@ -760,6 +949,119 @@ mod tests {
                 assert!(!css.contains(".md-alert-text-container"));
             }
         }
+    }
+
+    #[test]
+    fn typora_alert_color_override_changes_only_the_named_alert() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("input.toml");
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let dir = tmp.path().join("editors");
+        fs::create_dir(&dir).unwrap();
+        let sidecar = dir.join("typora.toml");
+        let render = || crate::typora::render(&resolve::resolve(&load(&path).unwrap()).unwrap());
+        let base_config = "[alerts]\nshaded_background = true";
+        fs::write(&sidecar, base_config).unwrap();
+        let baseline = render();
+        fs::write(
+            &sidecar,
+            format!("{base_config}\n[alerts.colors]\nnote = 'accent'"),
+        )
+        .unwrap();
+        for (((_, base), (_, css)), (original, accent)) in baseline
+            .iter()
+            .zip(render().iter())
+            .zip([("#43617B", "#246958"), ("#97BBD6", "#84C7AC")])
+        {
+            let original_rule = format!(
+                "#write .md-alert.md-alert-note {{ border-left-color: {original}; }}\n\
+                 #write .md-alert .md-alert-text-note {{ color: {original}; }}"
+            );
+            assert!(base.contains(&original_rule));
+            assert_eq!(
+                *css,
+                base.replace(&original_rule, &original_rule.replace(original, accent))
+            );
+        }
+        for (kind, role, message) in [
+            ("unknown", "accent", "지원하지 않는 알림 유형"),
+            ("note", "missing", "light.roles"),
+        ] {
+            fs::write(
+                &sidecar,
+                format!("{base_config}\n[alerts.colors]\n{kind} = '{role}'"),
+            )
+            .unwrap();
+            let error = load(&path).err().unwrap();
+            assert!(error.contains("typora.toml"));
+            assert!(error.contains(&format!("alerts.colors.{kind}")) && error.contains(message));
+        }
+    }
+
+    #[test]
+    fn typora_focus_mode_only_emits_a_color_when_overridden() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("input.toml");
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let dir = tmp.path().join("editors");
+        fs::create_dir(&dir).unwrap();
+        let sidecar = dir.join("typora.toml");
+        let render = || crate::typora::render(&resolve::resolve(&load(&path).unwrap()).unwrap());
+        let baseline = render();
+        fs::write(&sidecar, "[colors]\n'--blur-text-color' = 'muted'").unwrap();
+        let custom = render();
+        for (((_, before), (_, after)), muted) in
+            baseline.iter().zip(&custom).zip(["#52655B", "#A3B5A9"])
+        {
+            assert!(!before.contains("--blur-text-color:"));
+            let declaration = format!("  --blur-text-color: {muted};\n");
+            assert!(after.contains(&declaration));
+            assert_eq!(*before, after.replacen(&declaration, "", 1));
+        }
+        fs::write(&sidecar, "[colors]\n'--blur-text-color' = 'unknown'").unwrap();
+        let error = load(&path).err().unwrap();
+        assert!(error.contains("typora.toml") && error.contains("--blur-text-color"));
+    }
+
+    #[test]
+    fn typora_live_edit_colors_are_optional_and_keep_url_separate_from_markers() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("input.toml");
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let dir = tmp.path().join("editors");
+        fs::create_dir(&dir).unwrap();
+        let sidecar = dir.join("typora.toml");
+        let render = || crate::typora::render(&resolve::resolve(&load(&path).unwrap()).unwrap());
+        let baseline = render();
+        assert!(!baseline[0].1.contains("[md-inline="));
+
+        fs::write(&sidecar, "[colors]\n'--lbrx-live-edit-marker' = 'muted'").unwrap();
+        for (_, css) in render().iter().take(2) {
+            assert!(css.contains(
+                "> .md-meta > :is(.md-url, .md-link-title) { color: var(--md-char-color, #BBB); }"
+            ));
+            assert!(!css.contains(" > a { color:"));
+        }
+
+        fs::write(
+            &sidecar,
+            "[colors]\n'--lbrx-live-edit-link-text' = 'accent'\n'--lbrx-live-edit-link-url' = 'function'",
+        )
+        .unwrap();
+        let [(_, light), (_, dark), _] = render();
+        for (css, text, url) in [(light, "#246958", "#43617B"), (dark, "#84C7AC", "#97BBD6")] {
+            assert!(css.contains(&format!("[md-inline=\"link\"]:is(.md-expand, .md-expand-on-selection) > a {{ color: {text}; }}")));
+            assert!(css.contains(&format!("[md-inline=\"link\"]:is(.md-expand, .md-expand-on-selection) > .md-meta > .md-url {{ color: {url}; }}")));
+            assert!(!css.contains("var(--md-char-color, #BBB)"));
+        }
+
+        fs::write(
+            &sidecar,
+            "[colors]\n'--lbrx-live-edit-link-url' = 'unknown'",
+        )
+        .unwrap();
+        let error = load(&path).err().unwrap();
+        assert!(error.contains("typora.toml") && error.contains("--lbrx-live-edit-link-url"));
     }
 
     #[test]

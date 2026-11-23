@@ -1,12 +1,12 @@
 # 사용 언어와 라이브러리 버전 관리
 
-**상태: CLI·TUI 및 Windows Terminal·Typora·Obsidian·iTerm2 어댑터 구현.** 실제 의존성은 [Cargo.toml](../Cargo.toml)을 기준으로 삼는다. 어댑터 후보 라이브러리는 실제 도입 시 재검토한다.
+**상태: CLI 및 7개 앱 어댑터 구현.** 실제 의존성은 [Cargo.toml](../Cargo.toml)을 기준으로 삼는다. 어댑터 후보 라이브러리는 실제 도입 시 재검토한다.
 
 ## 사용 언어와 파일 형식
 
 | 구분 | 언어 / 형식 | 사용 범위와 기준 |
 |---|---|---|
-| 프로그램 | Rust, Edition 2024 | CLI, TUI, 토큰 검증, 앱별 변환을 단일 Cargo 패키지로 구현한다. 최소 Rust 버전 목표는 `1.85.0`이다. |
+| 프로그램 | Rust, Edition 2024 | CLI, 토큰 검증, 앱별 변환을 단일 Cargo 패키지로 구현한다. 최소 Rust 버전 목표는 `1.85.0`이다. |
 | 테마 원본 | TOML | `themes\lbrx.toml`의 팔레트·역할·서체·옵션. 원본 계약은 `schema_version = 1`부터 시작하며 TOML 라이브러리 버전과 별개다. |
 | 문서형 앱 출력 | CSS | Typora와 Obsidian 테마. 대상 앱에서 확인한 선택자·속성만 사용한다. 별도 Sass·PostCSS 빌드는 두지 않는다. |
 | 구조화된 출력 | JSON / TOML | VS Code 테마·manifest, Windows Terminal 설정 조각은 JSON, Helix 테마는 TOML로 생성한다. |
@@ -24,15 +24,13 @@
 |---|---|---|---|
 | `serde` | `1` | `derive`: 테마 모델의 직렬화·역직렬화 | 원본 모델 |
 | `toml` | `~0.8` | TOML 원본 읽기와 생성된 Helix 테마 재파싱 | 원본 검사·빌드 검증 |
-| `clap` | `~4.5.32` | `derive`: `preview` / `check` / `build` 명령과 인자 검사 | CLI |
+| `clap` | `~4.5.32` | `derive`: `check` / `build` 명령과 인자 검사 | CLI |
 | `serde_json` | `1` | JSON 테마·manifest·설정 조각 생성과 출력 재파싱 | JSON 어댑터 |
-| `crossterm` | `~0.28.1` | 키 입력, raw mode, 대체 화면 진입·복구 | TUI |
-| `unicode-width` | `~0.2` | 한글 등 유니코드 문자열의 터미널 표시 폭 | TUI |
 | `tempfile` | `3` | 미리보기 다시 읽기 및 읽기 전용 동작을 검증하는 임시 테스트 원본 | 테스트 전용 |
 | `plist` | `~1.7` | iTerm2 `.itermcolors` XML 생성 및 재파싱 | iTerm2 어댑터 |
 | `zip` | `~2.4` | VSIX 컨테이너 작성 및 다시 읽기. 압축 기능 없이 저장한다. | VS Code 어댑터 |
 
-최소 TUI는 별도 위젯 프레임워크 없이 Crossterm으로 그린다. Rust Edition 2024는 [Rust 1.85.0에서 안정화](https://blog.rust-lang.org/2025/02/20/Rust-1.85.0/)되었다. 이것만으로 후보까지 포함한 의존성 전체의 최소 Rust 버전 호환성이 검증되었다고 보지는 않는다.
+Rust Edition 2024는 [Rust 1.85.0에서 안정화](https://blog.rust-lang.org/2025/02/20/Rust-1.85.0/)되었다. 이것만으로 후보까지 포함한 의존성 전체의 최소 Rust 버전 호환성이 검증되었다고 보지는 않는다.
 
 비동기 런타임, 웹 프레임워크, 템플릿 엔진은 초기 필수 의존성이 아니다. 테스트도 먼저 Rust 기본 테스트 기능을 사용하고, 별도 라이브러리는 구현에 필요할 때 용도와 버전을 이 표에 추가한다. 사용하지 않는 어댑터의 라이브러리를 미리 설치하지 않는다.
 

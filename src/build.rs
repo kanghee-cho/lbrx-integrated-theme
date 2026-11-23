@@ -12,6 +12,7 @@ use std::{
 };
 
 pub const OUTPUT: &str = "lbrx";
+pub const GUIDE: &str = "README.md";
 const STAGING: &str = ".lbrx-build";
 const BACKUP: &str = ".lbrx-previous";
 const LOCK: &str = ".lbrx-build.lock";
@@ -56,6 +57,10 @@ impl App {
 
     pub fn directory(self) -> &'static str {
         self.output().0
+    }
+
+    pub fn files(self) -> &'static [&'static str] {
+        self.output().1
     }
 
     pub fn output_path(self, parent: &Path) -> PathBuf {
@@ -568,7 +573,7 @@ mod tests {
         super::build(&theme, &workspace.0, &[App::Vim]).unwrap();
         let light = fs::read(dir.join(vim::FILES[0])).unwrap();
         let dark = fs::read_to_string(dir.join(vim::FILES[1])).unwrap();
-        assert_eq!(fs::read_dir(&dir).unwrap().count(), 2);
+        assert_eq!(fs::read_dir(&dir).unwrap().count(), vim::FILES.len());
         assert!(dark.contains("highlight! link Float Number\n"));
         theme.dark.roles.insert("function".into(), "paper".into());
         assert!(super::build(&theme, &workspace.0, &[App::Vim]).is_err());
@@ -596,7 +601,10 @@ mod tests {
         let directory = App::Iterm2.output_path(&workspace.0);
         let read = |index: usize| fs::read(directory.join(iterm2::FILES[index])).unwrap();
         super::build(&theme, &workspace.0, &[App::Iterm2]).unwrap();
-        assert_eq!(fs::read_dir(&directory).unwrap().count(), 2);
+        assert_eq!(
+            fs::read_dir(&directory).unwrap().count(),
+            iterm2::FILES.len()
+        );
         assert!(!App::WindowsTerminal.output_path(&workspace.0).exists());
         let light = read(0);
         let dark = read(1);
@@ -646,11 +654,31 @@ mod tests {
     }
 
     #[test]
+    fn build_bundles_install_guides_and_keeps_unselected_guides() {
+        let workspace = Workspace::new();
+        let theme = sample();
+        build(&theme, &workspace.0).unwrap();
+        let guides: Vec<_> = App::ALL
+            .iter()
+            .map(|app| {
+                let path = app.output_path(&workspace.0).join(GUIDE);
+                let text = fs::read_to_string(&path).unwrap();
+                assert!(text.contains(app.label()), "{}", path.display());
+                (path, text)
+            })
+            .collect();
+        super::build(&theme, &workspace.0, &[App::Typora]).unwrap();
+        for (path, text) in guides {
+            assert_eq!(fs::read_to_string(path).unwrap(), text);
+        }
+    }
+
+    #[test]
     fn document_selection_keeps_code_green_and_checks_prose_contrast() {
         let mut theme = sample();
         let resolved = resolve::resolve(&theme).unwrap();
         let typora = typora::render(&resolved);
-        let [_, (_, obsidian)] = obsidian::render(&resolved);
+        let [_, (_, obsidian), ..] = obsidian::render(&resolved);
         for ((_, css), expected) in typora.iter().zip(["#F3D3AB", "#60402A"]) {
             let css = css.replace("\r\n", "\n");
             let prose = format!("--lbrx-prose-selection-background: {expected};");
@@ -687,7 +715,7 @@ mod tests {
             assert!(css.contains(&format!("--lbrx-code-block-background: {hex};")));
             assert!(css.replace("\r\n", "\n").contains(".md-fences .CodeMirror-gutters) {\n  background-color: var(--lbrx-code-block-background);"));
         }
-        let [_, (_, css)] = obsidian::render(&resolved);
+        let [_, (_, css), ..] = obsidian::render(&resolved);
         assert!(css.contains("--code-background: #F3F4EC;"));
         assert!(css.contains("--code-background: #19231F;"));
         assert!(css.contains(".markdown-rendered pre,\n.markdown-source-view.is-live-preview .HyperMD-codeblock {\n  --code-background: var(--lbrx-code-block-background);"));

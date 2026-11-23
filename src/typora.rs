@@ -1,5 +1,6 @@
 use crate::{
     css::font_stack,
+    layers::{TYPORA_ALERT_ROLES, TyporaListMarkers},
     resolve::{ResolvedMode, ResolvedTheme},
 };
 use std::fmt::Write as _;
@@ -77,6 +78,9 @@ fn stylesheet(theme: &ResolvedTheme, mode: &ResolvedMode, dark: bool) -> String 
     {
         writeln!(css, "  --lbrx-surface: {};", mode.roles["surface"]).unwrap();
     }
+    if let Some(role) = theme.editor_role(DIRECTORY, "--blur-text-color") {
+        writeln!(css, "  --blur-text-color: {};", mode.roles[role]).unwrap();
+    }
     css.push_str("  --bg-color: var(--lbrx-background);\n  --text-color: var(--lbrx-text);\n");
     for (name, font) in [("prose", &typography.prose), ("mono", &typography.mono)] {
         let stack = font_stack(font);
@@ -86,6 +90,27 @@ fn stylesheet(theme: &ResolvedTheme, mode: &ResolvedMode, dark: bool) -> String 
     }
     css.push_str("}\n");
     css.push_str(include_str!("typora.css"));
+    let live_link = r#"#write [md-inline="link"]:is(.md-expand, .md-expand-on-selection)"#;
+    if let Some(role) = theme.editor_role(DIRECTORY, "--lbrx-live-edit-marker") {
+        writeln!(
+            css,
+            "#write [md-inline]:is(.md-expand, .md-expand-on-selection):is([md-inline=\"strong\"], [md-inline=\"em\"], [md-inline=\"del\"], [md-inline=\"highlight\"], [md-inline=\"link\"]) > .md-meta {{ color: {}; }}\n\
+             {live_link} > .md-meta > :is(.md-url, .md-link-title) {{ color: var(--md-char-color, #BBB); }}",
+            mode.roles[role]
+        )
+        .unwrap();
+    }
+    if let Some(role) = theme.editor_role(DIRECTORY, "--lbrx-live-edit-link-text") {
+        writeln!(css, "{live_link} > a {{ color: {}; }}", mode.roles[role]).unwrap();
+    }
+    if let Some(role) = theme.editor_role(DIRECTORY, "--lbrx-live-edit-link-url") {
+        writeln!(
+            css,
+            "{live_link} > .md-meta > .md-url {{ color: {}; }}",
+            mode.roles[role]
+        )
+        .unwrap();
+    }
     if let Some(layout) = &theme.layers.typora_layout {
         writeln!(
             css,
@@ -206,11 +231,12 @@ fn stylesheet(theme: &ResolvedTheme, mode: &ResolvedMode, dark: bool) -> String 
             lists.indent_px, lists.item_gap_px
         )
         .unwrap();
-        for (ancestors, marker) in [
-            ("", "disc"),
-            (":is(ol, ul) ", "circle"),
-            (":is(ol, ul) :is(ol, ul) ", "square"),
-        ] {
+        let defaults = TyporaListMarkers::default();
+        let markers = lists.markers.as_ref().unwrap_or(&defaults).styles();
+        for (ancestors, marker) in ["", ":is(ol, ul) ", ":is(ol, ul) :is(ol, ul) "]
+            .into_iter()
+            .zip(markers)
+        {
             writeln!(
                 css,
                 "#write {ancestors}ul{prose} > {item} {{ list-style-type: {marker}; }}"
@@ -231,20 +257,32 @@ fn stylesheet(theme: &ResolvedTheme, mode: &ResolvedMode, dark: bool) -> String 
             css,
             "{task} > {checkbox} {{ color-scheme: {scheme}; accent-color: {}; }}\n\
              {task}:has(> {checkbox}:checked) > p {{ color: var(--lbrx-muted);{strike} }}",
-            mode.roles["accent"]
+            mode.roles[tasks.checkbox_color.as_deref().unwrap_or("accent")]
         )
         .unwrap();
     }
     if let Some(images) = &theme.layers.typora_images {
+        let margins = images
+            .alignment
+            .map_or("auto", |alignment| alignment.margins());
         writeln!(
             css,
             "#write figure > img,\n\
              #write figure > :is(a, picture) > img,\n\
-             #write p > .md-image-multi-line:only-child:not(.md-img-error) > img {{\n  display: block;\n  max-inline-size: 100%;\n  block-size: auto;\n  margin-inline: auto;\n}}\n\
+             #write p > .md-image-multi-line:only-child:not(.md-img-error) > img {{\n  display: block;\n  max-inline-size: 100%;\n  block-size: auto;\n  margin-inline: {margins};\n}}\n\
              #write figure:has(> img, > :is(a, picture) > img) > figcaption {{\n  margin-block-start: {}px;\n  font-size: {}%;\n  color: var(--lbrx-muted);\n  text-align: center;\n}}",
             images.caption_gap_px, images.caption_size_percent
         )
         .unwrap();
+        if images.alignment.is_some() {
+            writeln!(
+                css,
+                "#write p > .md-image:only-child:not(.md-img-error) img,\n\
+                 #write p > img:only-child {{ margin-inline: {margins}; }}\n\
+                 #write.first-line-indent p > .md-image:only-child:not(.md-img-error) img {{ left: auto; }}"
+            )
+            .unwrap();
+        }
     }
     if let Some(math) = &theme.layers.typora_math {
         writeln!(
@@ -264,13 +302,8 @@ fn stylesheet(theme: &ResolvedTheme, mode: &ResolvedMode, dark: bool) -> String 
         if alerts.shaded_background {
             css.push_str("#write .md-alert { background-color: var(--lbrx-surface); }\n");
         }
-        for (kind, role) in [
-            ("note", "function"),
-            ("tip", "success"),
-            ("important", "keyword"),
-            ("warning", "warning"),
-            ("caution", "error"),
-        ] {
+        for (kind, default_role) in TYPORA_ALERT_ROLES {
+            let role = alerts.colors.get(kind).map_or(default_role, String::as_str);
             let color = &mode.roles[role];
             writeln!(
                 css,

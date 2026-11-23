@@ -4,7 +4,6 @@
 
 ```text
 cargo run --locked -- build --app vim
-cargo run --locked -- preview --app vim
 ```
 
 ## 설치·복구

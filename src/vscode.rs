@@ -13,7 +13,7 @@ pub const DIRECTORY: &str = "vscode";
 pub const VSIX: &str = "lbrx-theme.vsix";
 pub const CSS: &str = "lbrx-code.css";
 pub const SETTINGS: &str = "settings-font.json";
-pub const FILES: &[&str] = &[VSIX, CSS, SETTINGS];
+pub const FILES: &[&str] = &[VSIX, CSS, SETTINGS, crate::build::GUIDE];
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const ENGINE: &str = "^1.147.0";
 const PACKAGE: &str = "extension/package.json";
@@ -75,7 +75,7 @@ const ANSI_COLORS: [&str; 16] = [
     "BrightWhite",
 ];
 
-pub fn render(theme: &ResolvedTheme) -> Result<[(&'static str, Vec<u8>); 3], String> {
+pub fn render(theme: &ResolvedTheme) -> Result<[(&'static str, Vec<u8>); 4], String> {
     let archive = make_vsix(theme).map_err(|error| format!("VS Code VSIX: {error}"))?;
     let mono = &theme.typography.mono;
     let settings = json!({
@@ -89,6 +89,10 @@ pub fn render(theme: &ResolvedTheme) -> Result<[(&'static str, Vec<u8>); 3], Str
         (VSIX, archive),
         (CSS, code_css(theme).into_bytes()),
         (SETTINGS, json_bytes(&settings)),
+        (
+            crate::build::GUIDE,
+            include_bytes!("../Docs/18-vscode.md").to_vec(),
+        ),
     ])
 }
 
@@ -294,7 +298,7 @@ mod tests {
     fn vsix_exports_both_modes_and_keeps_dark_changes_isolated() {
         let mut theme =
             resolve(&toml::from_str(include_str!("../themes/lbrx.toml")).unwrap()).unwrap();
-        let [(.., vsix), (.., css), (.., settings)] = render(&theme).unwrap();
+        let [(.., vsix), (.., css), (.., settings), ..] = render(&theme).unwrap();
         validate(&vsix).unwrap();
         assert_eq!(vsix, render(&theme).unwrap()[0].1);
         let package = entry(&vsix, "extension/package.json");

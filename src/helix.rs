@@ -2,12 +2,16 @@ use crate::resolve::{ResolvedMode, ResolvedTheme};
 use std::fmt::Write as _;
 
 pub const DIRECTORY: &str = "helix";
-pub const FILES: &[&str; 2] = &["lbrx_light.toml", "lbrx_dark.toml"];
+pub const FILES: &[&str] = &["lbrx_light.toml", "lbrx_dark.toml", crate::build::GUIDE];
 
-pub fn render(theme: &ResolvedTheme) -> [(&'static str, String); 2] {
+pub fn render(theme: &ResolvedTheme) -> [(&'static str, String); 3] {
     [
         (FILES[0], colorscheme(theme, &theme.light)),
         (FILES[1], colorscheme(theme, &theme.dark)),
+        (
+            crate::build::GUIDE,
+            include_str!("../Docs/16-helix.md").into(),
+        ),
     ]
 }
 

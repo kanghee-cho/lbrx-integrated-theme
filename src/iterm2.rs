@@ -2,7 +2,11 @@ use crate::resolve::{ResolvedMode, ResolvedTheme, parse_rgb};
 use plist::{Dictionary, Value};
 
 pub const DIRECTORY: &str = "iterm2";
-pub const FILES: [&str; 2] = ["LBRX Light.itermcolors", "LBRX Dark.itermcolors"];
+pub const FILES: [&str; 3] = [
+    "LBRX Light.itermcolors",
+    "LBRX Dark.itermcolors",
+    crate::build::GUIDE,
+];
 
 const ROLES: [(&str, &str); 5] = [
     ("Foreground Color", "terminal_foreground"),
@@ -12,10 +16,14 @@ const ROLES: [(&str, &str); 5] = [
     ("Selected Text Color", "selection_text"),
 ];
 
-pub fn render(theme: &ResolvedTheme) -> Result<[(&'static str, String); 2], String> {
+pub fn render(theme: &ResolvedTheme) -> Result<[(&'static str, String); 3], String> {
     Ok([
         (FILES[0], encode(theme, &theme.light, FILES[0])?),
         (FILES[1], encode(theme, &theme.dark, FILES[1])?),
+        (
+            crate::build::GUIDE,
+            include_str!("../Docs/20-iterm2.md").into(),
+        ),
     ])
 }
 

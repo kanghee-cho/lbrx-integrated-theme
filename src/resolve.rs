@@ -76,7 +76,6 @@ impl ResolvedMode {
 pub enum ColorSource {
     Language,
     Common,
-    Editor,
     Base,
 }
 
@@ -409,10 +408,6 @@ fn check_contrast(
 
 fn luminance_ratio(fg: f64, bg: f64) -> f64 {
     (fg.max(bg) + 0.05) / (fg.min(bg) + 0.05)
-}
-
-pub(crate) fn contrast_ratio(fg: [u8; 3], bg: [u8; 3]) -> f64 {
-    luminance_ratio(luminance(fg), luminance(bg))
 }
 
 #[cfg(test)]

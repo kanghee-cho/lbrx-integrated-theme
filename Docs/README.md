@@ -1,6 +1,6 @@
 # LBRX 통합 테마 설계
 
-**상태: 읽기 전용 TUI `preview`, 원본 검증 `check`, Windows Terminal·Typora·Obsidian·iTerm2·Vim·VS Code·Helix 선택 빌드 구현.** 원본은 직접 편집하고, 각 앱에서 같은 디자인 의도로 보이도록 변환한다.
+**상태: 원본 검증 `check`, Windows Terminal·Typora·Obsidian·iTerm2·Vim·VS Code·Helix 선택 빌드 구현.** TOML을 직접 수정하고 앱별 테마와 설치 안내를 생성한다.
 
 언어 공통·언어별 구문색과 앱별 색상 옵션을 수정하려면 [설정 파일과 우선순위](02-design-and-editor.md#언어별-구문색과-앱-전용-옵션)를 참고한다.
 
@@ -8,24 +8,22 @@
 
 ```powershell
 cargo run --locked -- check
-cargo run --locked -- preview --app obsidian --app typora
 cargo run --locked -- build
 cargo run --locked -- build --app obsidian --app typora
 # 다른 원본을 지정할 때
 cargo run --locked -- build .\themes\lbrx.toml
 ```
 
-`build`는 같은 원본 검사를 거친 뒤 `dist\lbrx\resolved.toml`에 해석된 토큰을 쓴다. `dist\lbrx\windows-terminal`에는 배색표와 선택 적용용 글꼴 설정을, `dist\lbrx\typora`에는 라이트·다크 CSS를 생성한다. `dist\lbrx\obsidian\LBRX`에는 Obsidian 테마를 생성한다. 사용자 설정은 수정하지 않는다. [Windows Terminal 적용 방법](06-windows-terminal.md), [Typora 적용 방법](07-typora.md), [출력 교체·복구 규칙](01-architecture.md)을 참고한다.
+`build`는 같은 원본 검사를 거친 뒤 `dist\lbrx\resolved.toml`에 해석된 토큰을 쓴다. 각 앱의 결과 파일과 설치 안내 `README.md`를 같은 출력 폴더에 생성하고 경로를 터미널에 표시한다. 사용자 설정은 수정하지 않는다. [앱별 적용 계약](03-targets.md)과 [출력 교체·복구 규칙](01-architecture.md)을 참고한다.
 
 | 확인한 요구사항 | 설계 결정 |
 |---|---|
 | 장시간 글쓰기·읽기, 2026년 감성의 녹색 계열 | 저채도 배경과 청록 강조색을 쓰는 라이트·다크 한 쌍. 실제 색감은 시안이다. |
 | 글꼴·크기·줄 간격도 관리 | 본문과 고정폭 글꼴을 분리한다. 앱이 지원하지 않는 값은 억지로 변환하지 않는다. |
-| 편집과 미리보기 분리 | TOML은 파일에서 수정하고 Rust TUI에서는 앱별 색상 견본을 확인한다. |
 | 한 명령으로 생성, 수동 가져오기 | 생성기는 앱 설정에 쓰지 않는다. 사용자는 원하는 앱의 산출물만 가져간다. |
 
 1. [원본과 생성 구조](01-architecture.md) — 무엇을 어디서 바꾸며, 변경이 어떻게 일곱 앱에 전파되는가.
-2. [팔레트와 편집 경험](02-design-and-editor.md) — 색상·서체 시안, TUI 조작, 언어 등록·토큰 연결·구문색 편집 설계.
+2. [팔레트와 편집 경험](02-design-and-editor.md) — 색상·서체, 빌드 방법, 언어 등록·토큰 연결·구문색 설정.
 3. [앱별 적용 계약](03-targets.md) — 가져올 파일과 설정 위치, 상속·제한 사항, 구현 완료 조건.
 4. [옵션 표시와 확장 전략](04-option-strategy.md) — 공통값과 앱별 예외가 보이는 화면, 같은 샘플의 앱별 차이, 새 옵션의 도입·승격 기준.
 5. [사용 언어와 라이브러리 버전 관리](05-languages-and-dependencies.md) — 구현 언어·출력 형식, Rust 의존성 도입 기준, 버전 고정·갱신 절차와 대상 앱 검증 버전.
@@ -47,7 +45,7 @@ cargo run --locked -- build .\themes\lbrx.toml
 23. [Vim 언어별 코드 구문 강조](23-vim-language-highlighting.md) — 공통 역할과 Vim 그룹 매핑, 언어별 예외, RGB·cterm 검증.
 24. [Obsidian 언어별 코드 구문 강조](24-obsidian-language-highlighting.md) — 코드 펜스, 공통 역할과 CSS 변수 매핑, 언어별 읽기 뷰·라이브 프리뷰 검증.
 
-**사용 흐름:** [원본 TOML](../themes/lbrx.toml) 또는 [언어](../themes/languages/)·[앱](../themes/editors/) TOML을 직접 수정한다. `preview`에서 `Tab`으로 앱, `L`로 언어, `M`으로 모드를 바꾼다. `I`는 적용 근거, `R`은 저장된 설정 다시 읽기다. `build --app …`은 별도로 실행하며, 앱 적용은 수동이다.
+**사용 흐름:** [원본 TOML](../themes/lbrx.toml) 또는 [언어](../themes/languages/)·[앱](../themes/editors/) TOML을 수정하고 `build`를 실행한다. 출력된 앱별 안내를 따라 테마를 수동 적용한다.
 
 ## 개발 환경과 다음 단계
 

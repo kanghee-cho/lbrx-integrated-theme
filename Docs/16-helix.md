@@ -1,9 +1,8 @@
 # Helix에 LBRX 적용하기
 
-**라이트·다크 테마 생성 구현.** 색상은 [공통 TOML](../themes/lbrx.toml)에서 직접 수정한다. 읽기 전용 TUI에서 `M`으로 모드를 바꾸고 `R`로 저장된 원본을 다시 읽을 수 있다. 생성 범위는 [옵션 대장](17-helix-options.md)에 기록한다.
+**라이트·다크 테마 생성 구현.** 색상은 [공통 TOML](../themes/lbrx.toml)에서 직접 수정한다. 생성 범위는 [옵션 대장](17-helix-options.md)에 기록한다.
 
 ```powershell
-cargo run --locked -- preview --app helix
 cargo run --locked -- build --app helix
 ```
 

@@ -5,7 +5,7 @@ themes\lbrx.toml                 팔레트·역할·서체·ANSI 공통 원본
 themes\languages\*.toml          공통 토큰 매핑 + 언어별 예외
 themes\editors\*.toml            앱별 색상 옵션
     ↓ 저장된 파일 읽기
-Rust CLI ─ preview (읽기 전용 TUI) / check / build
+Rust CLI ─ check / build
     ↓ 두 모드의 참조 해석 → 타입·대비 검사 → 앱별 변환
 dist\lbrx\<target>\              가져올 파일, 옵션 설정 예시, 설치 안내
 ```
@@ -36,7 +36,7 @@ link = "pine"
 | ANSI 슬롯 | `[light.ansi]`와 `[dark.ansi]`에 키 `0`부터 `15`까지 모두 두고, 각 값은 같은 모드의 팔레트 키를 참조한다. |
 | 공통 서체 | `[typography.prose]`와 `[typography.mono]`에 우선순위 있는 글꼴 목록 `families`, 기준 크기 `size_px`(CSS px), 줄 높이 `line_height`(배수)를 둔다. 목록은 비어 있지 않아야 하며 수치는 유한한 양수여야 한다. 앱 단위 변환은 어댑터 책임이다. |
 
-**Rust 구성:** `model`은 기본 TOML 구조를 정의하고, `layers`는 원본과 같은 디렉터리에 있는 언어·앱 설정을 함께 읽는다. `resolve`는 양쪽 모드의 참조와 대비를 검증한다. `preview`(Crossterm)와 앱 어댑터는 같은 해석 결과를 사용한다. 미리보기는 원본을 읽기만 하고 `build`만 파일을 생성한다.
+**Rust 구성:** `model`은 기본 TOML 구조를 정의하고, `layers`는 원본과 같은 디렉터리에 있는 언어·앱 설정을 함께 읽는다. `resolve`는 양쪽 모드의 참조와 대비를 검증한다. `check`는 원본을 검사만 하고 `build`는 앱별 결과 파일과 설치 안내(`README.md`)를 생성한다.
 
 **실패와 재생성:** `check`는 원본을 변경하지 않는다. 스키마 버전 불일치, 누락된 역할·ANSI 슬롯, 알 수 없는 참조, 잘못된 크기나 필수 대비 미달은 모드·키·원인을 표시한다. `build`는 선택한 대상을 임시 출력에 생성·검사한 뒤에만 기존 생성본을 교체한다. 실패 시 직전 생성본을 보존한다. 같은 원본과 도구 버전에서는 선택한 대상의 출력이 바이트 단위로 같다. `dist` 수동 편집은 해당 앱의 재생성에서 사라지므로 변경은 원본에 한다.
 

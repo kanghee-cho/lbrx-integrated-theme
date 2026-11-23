@@ -5,9 +5,9 @@ use crate::{
 use std::fmt::Write as _;
 
 pub const DIRECTORY: &str = "obsidian/LBRX";
-pub const FILES: &[&str] = &["manifest.json", "theme.css"];
+pub const FILES: &[&str] = &["manifest.json", "theme.css", crate::build::GUIDE];
 
-pub fn render(theme: &ResolvedTheme) -> [(&'static str, String); 2] {
+pub fn render(theme: &ResolvedTheme) -> [(&'static str, String); 3] {
     let manifest = serde_json::json!({
         "name": "LBRX",
         "version": env!("CARGO_PKG_VERSION"),
@@ -104,7 +104,14 @@ pub fn render(theme: &ResolvedTheme) -> [(&'static str, String); 2] {
         "  color: var(--lbrx-selection-text);\n",
         "}\n"
     ));
-    [(FILES[0], format!("{manifest:#}\n")), (FILES[1], css)]
+    [
+        (FILES[0], format!("{manifest:#}\n")),
+        (FILES[1], css),
+        (
+            crate::build::GUIDE,
+            include_str!("../Docs/09-obsidian.md").into(),
+        ),
+    ]
 }
 
 fn rgb_to_hsl(rgb: [u8; 3]) -> [f64; 3] {

@@ -2,7 +2,7 @@ use crate::resolve::{ResolvedMode, ResolvedTheme, parse_rgb};
 use std::fmt::Write as _;
 
 pub const DIRECTORY: &str = "vim/colors";
-pub const FILES: &[&str] = &["lbrx_light.vim", "lbrx_dark.vim"];
+pub const FILES: &[&str] = &["lbrx_light.vim", "lbrx_dark.vim", crate::build::GUIDE];
 
 const GROUPS: &[(&str, &str, Option<&str>)] = &[
     ("Normal", "text", Some("background")),
@@ -48,16 +48,14 @@ const LANGUAGE_GROUPS: &[(&str, &str, &str)] = &[
     ("typescript", "comment", "typescriptLineComment"),
 ];
 
-pub fn language_groups(language: &str, token: &str) -> Option<&'static str> {
-    LANGUAGE_GROUPS
-        .iter()
-        .find_map(|&(lang, kind, groups)| (lang == language && kind == token).then_some(groups))
-}
-
-pub fn render(theme: &ResolvedTheme) -> [(&'static str, String); 2] {
+pub fn render(theme: &ResolvedTheme) -> [(&'static str, String); 3] {
     [
         (FILES[0], colorscheme(theme, "light", &theme.light)),
         (FILES[1], colorscheme(theme, "dark", &theme.dark)),
+        (
+            crate::build::GUIDE,
+            include_str!("../Docs/12-vim.md").into(),
+        ),
     ]
 }
 

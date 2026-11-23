@@ -6,7 +6,6 @@ mod layers;
 mod model;
 mod obsidian;
 mod resolve;
-mod tui;
 mod typora;
 mod vim;
 mod vscode;
@@ -33,19 +32,11 @@ enum Command {
         #[arg(default_value = "themes/lbrx.toml")]
         path: PathBuf,
     },
-    /// 검증된 토큰과 선택한 앱의 테마를 dist\lbrx에 생성합니다.
+    /// 검증된 토큰, 앱별 테마와 설치 안내를 dist\lbrx에 생성합니다.
     Build {
         #[arg(default_value = "themes/lbrx.toml")]
         path: PathBuf,
         /// 생성할 앱. 여러 번 지정할 수 있으며 생략하면 지원 앱 전체를 생성합니다.
-        #[arg(long, value_enum)]
-        app: Vec<App>,
-    },
-    /// 원본을 변경하지 않고 앱별 라이트·다크 견본을 표시합니다.
-    Preview {
-        #[arg(default_value = "themes/lbrx.toml")]
-        path: PathBuf,
-        /// 표시할 앱. 여러 번 지정할 수 있으며 생략하면 지원 앱 전체를 표시합니다.
         #[arg(long, value_enum)]
         app: Vec<App>,
     },
@@ -64,7 +55,6 @@ fn main() -> ExitCode {
 fn run(command: Command) -> Result<(), String> {
     let output = Path::new("dist");
     match command {
-        Command::Preview { path, app } => tui::run(&path, &app),
         Command::Check { path } => {
             resolve::check(&read_theme(&path)?).map_err(|e| format!("{}: {e}", path.display()))?;
             println!("{}: 테마 검사 통과", path.display());
@@ -75,7 +65,16 @@ fn run(command: Command) -> Result<(), String> {
             build::build(&read_theme(&path)?, output, apps)
                 .map_err(|e| format!("{}: {e}", path.display()))?;
             for app in App::ALL.into_iter().filter(|app| apps.contains(app)) {
-                println!("{}: {}", app.label(), app.output_path(output).display());
+                let directory = app.output_path(output);
+                println!("{}", app.label());
+                for &file in app.files() {
+                    let label = if file == build::GUIDE {
+                        "설치 안내"
+                    } else {
+                        "결과 파일"
+                    };
+                    println!("  {label}: {}", directory.join(file).display());
+                }
             }
             Ok(())
         }

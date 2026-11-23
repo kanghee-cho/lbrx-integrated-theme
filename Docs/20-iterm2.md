@@ -4,7 +4,6 @@
 
 ```text
 cargo run --locked -- build --app iterm2
-cargo run --locked -- preview --app iterm2
 ```
 
 ## 설치·복구
