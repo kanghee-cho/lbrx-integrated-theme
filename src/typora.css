@@ -61,6 +61,16 @@ body, content, #write {
 #write .cm-s-inner .cm-error { color: var(--lbrx-error); }
 
 #write::selection, #write *::selection {
+  background-color: var(--lbrx-prose-selection-background);
+  color: var(--lbrx-selection-text);
+}
+
+#write :is(code, .md-fences)::selection,
+#write :is(code, .md-fences) *::selection {
   background-color: var(--lbrx-selection-background);
   color: var(--lbrx-selection-text);
+}
+
+#write .md-fences .CodeMirror-selected {
+  background-color: var(--lbrx-selection-background);
 }

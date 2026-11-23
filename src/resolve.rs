@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
 const CODE_BLOCK_BACKGROUND: &str = "code_block_background";
+const PROSE_SELECTION_BACKGROUND: &str = "prose_selection_background";
 const ANSI_SLOTS: [&str; 16] = [
     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15",
 ];
@@ -52,6 +53,12 @@ pub struct ResolvedMode {
 }
 
 impl ResolvedMode {
+    pub fn prose_selection_background(&self) -> &str {
+        self.roles
+            .get(PROSE_SELECTION_BACKGROUND)
+            .unwrap_or(&self.roles["selection_background"])
+    }
+
     pub fn code_block_background_role(&self) -> &'static str {
         if self.roles.contains_key(CODE_BLOCK_BACKGROUND) {
             CODE_BLOCK_BACKGROUND
@@ -139,6 +146,46 @@ pub fn check(theme: &Theme) -> Result<(), String> {
         let luminance_of = |role: &str| {
             luminance(parse_rgb(&mode.palette[&mode.roles[role]]).expect("checked RGB"))
         };
+        if let Some(emphasis) = &theme.layers.typora_emphasis {
+            let colors = if name == "light" {
+                &emphasis.light
+            } else {
+                &emphasis.dark
+            };
+            let emphasis_luminance = |key: &str, value: &str| {
+                parse_rgb(value).map(luminance).ok_or_else(|| {
+                    format!("editors/typora.toml: emphasis.{name}.{key}: #RRGGBB 형식 필요")
+                })
+            };
+            let highlight =
+                emphasis_luminance("highlight_background", &colors.highlight_background)?;
+            let highlight_key = "editors/typora.toml: emphasis.highlight_background";
+            check_contrast(
+                name,
+                "text",
+                highlight_key,
+                luminance_of("text"),
+                highlight,
+                4.5,
+            )?;
+            for (key, color) in [
+                ("strong", &colors.strong),
+                ("italic", &colors.italic),
+                ("strikethrough", &colors.strikethrough),
+            ] {
+                let fg = emphasis_luminance(key, color)?;
+                let label = format!("editors/typora.toml: emphasis.{key}");
+                check_contrast(
+                    name,
+                    &label,
+                    "background",
+                    fg,
+                    luminance_of("background"),
+                    4.5,
+                )?;
+                check_contrast(name, &label, highlight_key, fg, highlight, 4.5)?;
+            }
+        }
         let code_bg = mode
             .roles
             .contains_key(CODE_BLOCK_BACKGROUND)
@@ -277,6 +324,16 @@ fn check_mode(name: &str, mode: &Mode) -> Result<(), String> {
         roles["selection_background"],
         4.5,
     )?;
+    if let Some(&bg) = roles.get(PROSE_SELECTION_BACKGROUND) {
+        check_contrast(
+            name,
+            "selection_text",
+            PROSE_SELECTION_BACKGROUND,
+            roles["selection_text"],
+            bg,
+            4.5,
+        )?;
+    }
     for adjacent in ["background", "surface"] {
         check_contrast(
             name,

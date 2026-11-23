@@ -646,6 +646,36 @@ mod tests {
     }
 
     #[test]
+    fn document_selection_keeps_code_green_and_checks_prose_contrast() {
+        let mut theme = sample();
+        let resolved = resolve::resolve(&theme).unwrap();
+        let typora = typora::render(&resolved);
+        let [_, (_, obsidian)] = obsidian::render(&resolved);
+        for ((_, css), expected) in typora.iter().zip(["#F3D3AB", "#60402A"]) {
+            let css = css.replace("\r\n", "\n");
+            let prose = format!("--lbrx-prose-selection-background: {expected};");
+            assert!(css.contains(&prose));
+            assert!(obsidian.contains(&prose));
+            assert!(css.contains(
+                "#write *::selection {\n  background-color: var(--lbrx-prose-selection-background);"
+            ));
+            assert!(css.contains("#write :is(code, .md-fences) *::selection {\n  background-color: var(--lbrx-selection-background);"));
+        }
+        assert!(obsidian.contains("--text-selection: #D8E6DA;"));
+        assert!(obsidian.contains("--text-selection: #304138;"));
+        assert!(obsidian.contains(".markdown-rendered :is(pre, code) *::selection,"));
+        theme
+            .dark
+            .roles
+            .insert("prose_selection_background".into(), "ink".into());
+        assert!(
+            resolve::check(&theme)
+                .unwrap_err()
+                .contains("prose_selection_background")
+        );
+    }
+
+    #[test]
     fn document_adapters_scope_the_code_block_background_and_validate_contrast() {
         let mut theme = sample();
         let resolved = resolve::resolve(&theme).unwrap();

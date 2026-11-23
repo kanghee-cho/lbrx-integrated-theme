@@ -49,6 +49,8 @@ Windows Terminal과 iTerm2는 프롬프트·커서·ANSI 16색을 보여 주며,
 
 ## 문서 속 코드 블록 배경
 
+Typora·Obsidian 본문에서 드래그한 텍스트는 `prose_selection_background`를 사용한다(라이트 `#F3D3AB`, 다크 `#60402A`). 코드에서 드래그한 텍스트는 기존 `selection_background`(라이트 `#D8E6DA`, 다크 `#304138`)를 유지한다. 선택 글자색은 두 경우 모두 `selection_text`다. Obsidian에서 CodeMirror가 자체 레이어로 그리는 선택은 기존 앱 배색을 유지하며, 커서만 놓인 줄의 강조색은 변경하지 않는다.
+
 `light.roles.code_block_background`와 `dark.roles.code_block_background`는 Typora와 Obsidian에서 여러 줄 코드 블록의 배경만 정한다. 기본은 라이트 `#E8EDE4`, 다크 `#25332C`이며, 기존 원본에서 이 역할이 없으면 문서 배경을 사용한다. 인라인 코드와 콜아웃 자체의 스타일, VS Code·Vim·Helix의 편집기 배경은 바뀌지 않는다. TUI에서는 Typora와 Obsidian의 코드 견본에만 이 배경을 표시한다. `check`는 지정된 코드 블록 배경과 기본 코드 글자·공통 및 언어별 구문색의 대비가 4.5:1 이상인지 검사한다.
 
 ## 언어별 구문색과 앱 전용 옵션

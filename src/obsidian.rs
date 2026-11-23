@@ -52,6 +52,12 @@ pub fn render(theme: &ResolvedTheme) -> [(&'static str, String); 2] {
             mode.code_block_background()
         )
         .unwrap();
+        writeln!(
+            css,
+            "  --lbrx-prose-selection-background: {};",
+            mode.prose_selection_background()
+        )
+        .unwrap();
         css.push_str("}\n");
         for token in ["number", "error"] {
             if theme.layers.common.contains_key(token) {
@@ -84,7 +90,20 @@ pub fn render(theme: &ResolvedTheme) -> [(&'static str, String); 2] {
     ] {
         writeln!(css, "  --{variable}: {};", font_stack(style)).unwrap();
     }
-    css.push_str("}\n\n.markdown-rendered ::selection, .markdown-source-view ::selection {\n  background-color: var(--text-selection);\n  color: var(--lbrx-selection-text);\n}\n");
+    css.push_str(concat!(
+        "}\n\n",
+        ".markdown-rendered ::selection, .markdown-source-view ::selection {\n",
+        "  background-color: var(--lbrx-prose-selection-background);\n",
+        "  color: var(--lbrx-selection-text);\n",
+        "}\n",
+        ".markdown-rendered :is(pre, code)::selection,\n",
+        ".markdown-rendered :is(pre, code) *::selection,\n",
+        ".markdown-source-view :is(.HyperMD-codeblock, .cm-inline-code)::selection,\n",
+        ".markdown-source-view :is(.HyperMD-codeblock, .cm-inline-code) *::selection {\n",
+        "  background-color: var(--text-selection);\n",
+        "  color: var(--lbrx-selection-text);\n",
+        "}\n"
+    ));
     [(FILES[0], format!("{manifest:#}\n")), (FILES[1], css)]
 }
 

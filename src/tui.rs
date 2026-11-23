@@ -466,13 +466,28 @@ impl<'a> Preview<'a> {
         } else {
             "selection_text"
         };
-        page.styled(
-            mode,
-            selection_fg,
-            Some("selection_background"),
-            " 선택 영역 ",
-            "  ",
-        )?;
+        if matches!(app, App::Typora | App::Obsidian) {
+            queue!(
+                page.out,
+                MoveTo(2, page.row),
+                SetForegroundColor(parse_color(&mode.roles[selection_fg])),
+                SetBackgroundColor(parse_color(mode.prose_selection_background())),
+                Print(" 본문 선택 "),
+                SetBackgroundColor(background),
+                Print("  "),
+                SetBackgroundColor(parse_color(&mode.roles["selection_background"])),
+                Print(" 코드 선택 "),
+            )?;
+            page.row += 1;
+        } else {
+            page.styled(
+                mode,
+                selection_fg,
+                Some("selection_background"),
+                " 선택 영역 ",
+                "  ",
+            )?;
+        }
         queue!(
             page.out,
             SetBackgroundColor(background),

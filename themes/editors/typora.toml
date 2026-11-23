@@ -1,5 +1,106 @@
-# Typora 문서 CSS 전용. 값은 lbrx.toml의 라이트·다크 roles 이름.
-# 키를 생략하면 어댑터 기본 매핑을 사용한다.
+# Typora 전용 문서 스타일. 조판 값은 라이트·다크에 공통 적용한다.
+# [colors]의 값은 lbrx.toml의 라이트·다크 roles 이름이며, 키를 생략하면 어댑터 기본 매핑을 사용한다.
 [colors]
 "--lbrx-quote" = "quote" # 블록 인용문의 글자색.
 "--lbrx-link" = "link" # 문서 링크의 글자색.
+"--lbrx-footnote-reference" = "function" # 본문 각주 번호의 청회색. 언어별 함수명 재정의는 적용하지 않음.
+
+[layout] # D05 본문 폭과 좌우 여백. 생략하면 Typora 기본 조판을 유지한다.
+max_width_px = 860 # 좌우 여백을 포함한 본문 컨테이너 최대 폭(px).
+padding_inline_min_px = 16 # 좁은 창에서 좌우 각각의 최소 안쪽 여백(px).
+padding_inline_max_px = 32 # 넓은 창에서 좌우 각각의 최대 안쪽 여백(px). 중간은 창 너비의 4%를 사용.
+
+[paragraph] # D06–D07: 최상위 일반 문단의 간격과 정렬.
+gap_px = 12 # 연속 문단 사이 간격(px). 원문의 빈 줄이나 본문 줄 높이는 바꾸지 않음.
+alignment = "start" # 시작 쪽 정렬. "justify"는 양쪽 정렬, 생략하면 앱 기본값 유지. 쓰기 방향은 강제하지 않음.
+
+# D08: 본문 자간·합자와 작은 대문자는 기본값을 유지하고 제목의 대소문자를 변환하지 않음. 코드 합자 설정은 그대로 유지.
+
+# D10: 제목 단계별 조판. 앱 기본값을 쓰려면 headings의 H1–H6 표를 모두 생략.
+[headings.h1]
+size_percent = 180 # 본문 대비 제목 크기(%).
+weight = 700 # 제목 굵기(CSS font-weight).
+margin_before_px = 32 # 제목 위 바깥 여백(px).
+margin_after_px = 16 # 제목 아래 바깥 여백(px).
+divider = true # 제목 아래에 muted 역할 색의 1px 구분선을 표시.
+
+[headings.h2]
+size_percent = 150 # 본문 대비 제목 크기(%).
+weight = 700 # 제목 굵기(CSS font-weight).
+margin_before_px = 28 # 제목 위 바깥 여백(px).
+margin_after_px = 12 # 제목 아래 바깥 여백(px).
+divider = false # 제목 아래 구분선을 표시하지 않음.
+
+[headings.h3]
+size_percent = 130 # 본문 대비 제목 크기(%).
+weight = 600 # 제목 굵기(CSS font-weight).
+margin_before_px = 24 # 제목 위 바깥 여백(px).
+margin_after_px = 10 # 제목 아래 바깥 여백(px).
+divider = false # 제목 아래 구분선을 표시하지 않음.
+
+[headings.h4]
+size_percent = 115 # 본문 대비 제목 크기(%).
+weight = 600 # 제목 굵기(CSS font-weight).
+margin_before_px = 20 # 제목 위 바깥 여백(px).
+margin_after_px = 8 # 제목 아래 바깥 여백(px).
+divider = false # 제목 아래 구분선을 표시하지 않음.
+
+[headings.h5]
+size_percent = 105 # 본문 대비 제목 크기(%).
+weight = 600 # 제목 굵기(CSS font-weight).
+margin_before_px = 16 # 제목 위 바깥 여백(px).
+margin_after_px = 8 # 제목 아래 바깥 여백(px).
+divider = false # 제목 아래 구분선을 표시하지 않음.
+
+[headings.h6]
+size_percent = 100 # 본문 대비 제목 크기(%).
+weight = 600 # 제목 굵기(CSS font-weight).
+margin_before_px = 16 # 제목 위 바깥 여백(px).
+margin_after_px = 8 # 제목 아래 바깥 여백(px).
+divider = false # 제목 아래 구분선을 표시하지 않음.
+
+# D11: 테마는 제목에 자동 번호를 붙이지 않음. Markdown에 직접 적은 번호는 그대로 표시.
+
+[emphasis.light] # D17: 라이트 본문 강조. 색상은 #RRGGBB이며 코드 구문색에는 적용하지 않음.
+strong = "#8B404B" # 굵은 글자의 저채도 장밋빛 글자색.
+italic = "#684882" # 기울임 글자의 저채도 보라색 글자색.
+strikethrough = "#555A63" # 취소선 글자와 선의 회색.
+highlight_background = "#F4E7A3" # 형광펜 배경의 옅은 노랑. 드래그 선택색과 별개.
+
+[emphasis.dark] # D17: 다크 본문 강조. 색상은 #RRGGBB이며 코드 구문색에는 적용하지 않음.
+strong = "#F2B9BE" # 굵은 글자의 파스텔 장밋빛 글자색.
+italic = "#D8C2F1" # 기울임 글자의 파스텔 라벤더 글자색.
+strikethrough = "#C5C8CF" # 취소선 글자와 선의 밝은 회색.
+highlight_background = "#51451D" # 형광펜 배경의 짙은 황갈색. 드래그 선택색과 별개.
+
+[footnotes] # D18: 문서 각주 스타일. 표를 생략하면 각주에 별도 CSS를 적용하지 않음.
+body_size_percent = 90 # 본문 대비 각주 글자 크기(%). 글자색은 보조 글자 역할(muted)을 사용.
+
+[horizontal_rule] # D18: Markdown 수평 구분선. 각주 영역의 자동 구분선은 제외.
+thickness_px = 1 # 구분선 두께(px). 보조 글자 역할(muted)의 색을 사용.
+margin_block_px = 24 # 구분선 위아래 각각의 바깥 여백(px).
+
+[table] # D21: 헤더는 surface 배경과 굵은 글씨, 본문은 가로선만 사용. 생략하면 앱 기본 표 스타일 유지.
+cell_padding_block_px = 8 # 셀 위아래 각각의 안쪽 여백(px).
+cell_padding_inline_px = 12 # 셀 좌우 각각의 안쪽 여백(px).
+row_rule_px = 1 # 행 아래 구분선 두께(px). 보조 글자 역할(muted)의 색을 사용.
+
+[lists] # D22: 일반 목록. 비순서 표식은 ● → ○ → ■(3단계 이상), 순서 목록 번호는 유지. 생략하면 앱 기본값.
+indent_px = 24 # 일반 항목이 있는 목록의 단계별 시작 쪽 들여쓰기(px).
+item_gap_px = 4 # 같은 단계에서 연달아 오는 일반 항목 사이의 추가 위쪽 여백(px).
+
+[task_lists] # D23: 체크박스는 테마 강조색(accent), 완료 문단은 보조 글자색(muted). 생략하면 앱 기본값.
+strike_completed = true # 완료 항목의 바로 아래 문단에만 취소선을 표시. 하위 목록과 미완료 문단은 유지.
+
+[images] # D24: 독립 이미지는 본문 폭 안에서 가운데 정렬. 명시적 이미지 캡션만 꾸밈. 생략하면 앱 기본값.
+caption_size_percent = 90 # 본문 대비 캡션 크기(%). 보조 글자 역할(muted)의 색을 사용.
+caption_gap_px = 8 # 이미지와 캡션 사이 간격(px).
+
+[math] # D25: 독립 수식만 꾸미고 화면에서는 렌더링 영역 안에서 가로 스크롤. 생략하면 앱 기본값.
+padding_block_px = 12 # 독립 수식 블록 위아래 각각의 안쪽 여백(px).
+padding_inline_px = 16 # 독립 수식 블록 좌우 각각의 안쪽 여백(px).
+shaded_background = true # 보조 배경 역할(surface)을 적용. false면 테마가 수식 배경을 추가하지 않음.
+
+[alerts] # D26: Typora 알림의 강조선·제목색. 기본 아이콘·라벨과 일반 인용문은 유지. 생략하면 앱 기본값.
+shaded_background = true # 모든 알림에 보조 배경 역할(surface)을 적용. false면 유형별 강조선·제목색만 적용.
+# 유형별 색 역할: NOTE=function(파랑), TIP=success(녹색), IMPORTANT=keyword(보라), WARNING=warning(황색), CAUTION=error(붉은색).
