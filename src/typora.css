@@ -40,8 +40,8 @@ body, content, #write {
   color: var(--lbrx-inline-code);
 }
 
-#write :is(.md-fences, .cm-s-inner, .cm-s-inner .CodeMirror-gutters) {
-  background-color: var(--lbrx-background);
+#write :is(.md-fences, .md-fences .cm-s-inner, .md-fences .CodeMirror-gutters) {
+  background-color: var(--lbrx-code-block-background);
   color: var(--lbrx-text);
 }
 

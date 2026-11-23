@@ -1,6 +1,6 @@
 # 사용 언어와 라이브러리 버전 관리
 
-**상태: CLI와 Windows Terminal·Typora 어댑터 구현.** [Cargo.toml](../Cargo.toml)의 `clap`, `serde`, `toml`, `serde_json`을 사용한다. 나머지 라이브러리는 아직 도입하지 않은 후보이며, 버전 요구식은 실제 도입 시 재검토한다.
+**상태: CLI·TUI 및 Windows Terminal·Typora·Obsidian·iTerm2 어댑터 구현.** 실제 의존성은 [Cargo.toml](../Cargo.toml)을 기준으로 삼는다. 어댑터 후보 라이브러리는 실제 도입 시 재검토한다.
 
 ## 사용 언어와 파일 형식
 
@@ -11,7 +11,7 @@
 | 문서형 앱 출력 | CSS | Typora와 Obsidian 테마. 대상 앱에서 확인한 선택자·속성만 사용한다. 별도 Sass·PostCSS 빌드는 두지 않는다. |
 | 구조화된 출력 | JSON / TOML | VS Code 테마·manifest, Windows Terminal 설정 조각은 JSON, Helix 테마는 TOML로 생성한다. |
 | Vim 출력 | Vim script | 터미널 Vim 색상 정의만 생성한다. Vim9 전용 문법이나 Neovim Lua를 전제로 하지 않는다. |
-| macOS 출력 | XML plist / 앱 전용 색상 데이터 | `.terminal` 프로필. plist 문법뿐 아니라 Terminal.app에서 실제로 가져오는지 확인한다. |
+| macOS 터미널 출력 | XML plist | iTerm2 `.itermcolors` 색 프리셋을 생성한다. Terminal.app의 `.terminal` 프로필은 별도 설계이며 아직 미구현이다. |
 | 안내·기준 샘플 | Markdown | 한국어 문서와 한글·영문 혼합 미리보기 샘플을 관리한다. |
 
 테마 생성 자체에는 JavaScript·TypeScript·Python이 필요하지 않다. 선택 기능인 [글꼴 도구](../scripts/theme-fonts.py)는 Python 3.11 이상과 표준 라이브러리를 사용하고, Linux에서는 Fontconfig의 `fc-list`와 `fc-cache`를 사용한다. VS Code용 산출물은 실행 코드 없는 색 테마 확장을 목표로 하므로 Node.js를 CLI 실행 필수 조건으로 두지 않는다. CSS·JSON·Vim script의 지원 범위는 **대상 앱의 검증 버전**으로 관리한다.
@@ -23,15 +23,16 @@
 | 라이브러리 | 버전 요구식 | 필요한 기능 / 용도 | 도입 시점 |
 |---|---|---|---|
 | `serde` | `1` | `derive`: 테마 모델의 직렬화·역직렬화 | 원본 모델 |
-| `toml` | `~0.8` | TOML 원본 읽기와 Helix 테마 출력 | 원본 검사 |
-| `clap` | `~4.5.32` | `derive`: `edit` / `check` / `build` 명령과 인자 검사 | CLI |
+| `toml` | `~0.8` | TOML 원본 읽기와 생성된 Helix 테마 재파싱 | 원본 검사·빌드 검증 |
+| `clap` | `~4.5.32` | `derive`: `preview` / `check` / `build` 명령과 인자 검사 | CLI |
 | `serde_json` | `1` | JSON 테마·manifest·설정 조각 생성과 출력 재파싱 | JSON 어댑터 |
-| `ratatui` | `~0.29.0` | 기본 Crossterm 백엔드: 견본·목록·미리보기 | TUI |
 | `crossterm` | `~0.28.1` | 키 입력, raw mode, 대체 화면 진입·복구 | TUI |
-| `plist` | `~1.7` | `.terminal` 프로필의 plist 읽기·쓰기. 앱 전용 색상 데이터의 호환성을 대신 보장하지는 않는다. | macOS 어댑터 |
-| `zip` | `~2.4` | VSIX 컨테이너 작성. 패키지 구조·manifest·설치 가능성은 별도 검증한다. | VS Code 패키징 |
+| `unicode-width` | `~0.2` | 한글 등 유니코드 문자열의 터미널 표시 폭 | TUI |
+| `tempfile` | `3` | 미리보기 다시 읽기 및 읽기 전용 동작을 검증하는 임시 테스트 원본 | 테스트 전용 |
+| `plist` | `~1.7` | iTerm2 `.itermcolors` XML 생성 및 재파싱 | iTerm2 어댑터 |
+| `zip` | `~2.4` | VSIX 컨테이너 작성 및 다시 읽기. 압축 기능 없이 저장한다. | VS Code 어댑터 |
 
-Ratatui `0.29.0`의 [공식 패키지 정의](https://docs.rs/crate/ratatui/0.29.0/source/Cargo.toml)는 Crossterm `0.28.1` 계열을 사용하므로 직접 의존성도 맞춘다. Rust Edition 2024는 [Rust 1.85.0에서 안정화](https://blog.rust-lang.org/2025/02/20/Rust-1.85.0/)되었다. 이것만으로 위 의존성 전체의 최소 Rust 버전 호환성이 검증되었다고 보지는 않는다.
+최소 TUI는 별도 위젯 프레임워크 없이 Crossterm으로 그린다. Rust Edition 2024는 [Rust 1.85.0에서 안정화](https://blog.rust-lang.org/2025/02/20/Rust-1.85.0/)되었다. 이것만으로 후보까지 포함한 의존성 전체의 최소 Rust 버전 호환성이 검증되었다고 보지는 않는다.
 
 비동기 런타임, 웹 프레임워크, 템플릿 엔진은 초기 필수 의존성이 아니다. 테스트도 먼저 Rust 기본 테스트 기능을 사용하고, 별도 라이브러리는 구현에 필요할 때 용도와 버전을 이 표에 추가한다. 사용하지 않는 어댑터의 라이브러리를 미리 설치하지 않는다.
 
@@ -58,9 +59,9 @@ Ratatui `0.29.0`의 [공식 패키지 정의](https://docs.rs/crate/ratatui/0.29
 |---|---|---|
 | Typora | 미검증 | 문서 CSS, 본문·코드 서체 |
 | Obsidian | 최소 테마 가독성 사용자 확인(2026-11-23), 앱 버전 미기록 | [확인 범위](10-obsidian-options.md#검증-기록). 최소 지원 버전 검증과는 별개 |
-| VS Code | 미검증 | manifest의 `engines.vscode`, VSIX 설치, 별도 서체 설정 |
+| VS Code | 1.147.0 (Windows, 임시 프로필) | VSIX 설치와 확장 등록 확인. 실제 화면 및 서체 적용은 미검증 |
 | Helix | 미검증 | 테마 scope와 호스트 터미널 |
-| Vim | 미검증 | `termguicolors`, `cterm`, 호스트 터미널 |
+| Vim | 9.2 (Windows, 비대화형 검증) | 라이트·다크 불러오기, 대표 RGB·`cterm` 값 확인. 실제 화면은 미검증 |
 | Windows Terminal | `1.25.3131.0` x64 Portable: 라이트·다크 프로필 스키마 검증 및 두 창 실행 확인 (2026-11-19) | 사용자가 미리보기 화면을 직접 확인하고 긍정적으로 평가함. 항목별 결과는 별도 기록하지 않음. |
 | macOS Terminal.app | 미검증 | macOS·Terminal.app 버전, 색상 데이터와 프로필 가져오기 |
 

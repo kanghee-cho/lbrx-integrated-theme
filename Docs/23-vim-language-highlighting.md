@@ -1,10 +1,10 @@
 # Vim 언어별 코드 구문 강조
 
-**상태: 설계안.** 터미널 Vim의 라이트·다크 색 구성표가 [VS Code 및 HTML](22-vscode-language-highlighting.md)과 동일한 구문 역할을 사용하도록 한다. Vim은 CSS를 읽지 않는다. 언어의 문법 파일이 토큰을 **구문 그룹**으로 식별하고, 색 구성표는 그 그룹이 연결된 **하이라이트 그룹**에 색을 지정한다. Neovim Tree-sitter 캡처와 플러그인 전용 그룹은 기본 범위 밖이다.
+**상태: 공통 그룹과 일부 언어 전용 그룹 생성 구현.** Vim은 CSS를 읽지 않는다. 문법 파일이 토큰을 **구문 그룹**으로 식별하고 색 구성표가 그룹의 색을 지정한다. [언어 파일](../themes/languages/)에 선언된 예외는 어댑터가 매핑한 그룹에만 RGB와 `cterm`으로 출력한다. Neovim Tree-sitter와 플러그인 그룹은 포함하지 않는다.
 
 ## 공통 역할 → Vim 하이라이트 그룹
 
-| 원본 역할 | 기본 매핑 후보 | 매핑 범위 |
+| 원본 역할 | 생성 그룹 | 매핑 범위 |
 |---|---|---|
 | `comment` | `Comment` | 주석. 문자열 안의 주석 기호까지 칠하지 않는다. |
 | `keyword` | `Keyword`, `Conditional`, `Repeat` | 키워드·조건·반복. 모든 `Statement` 하위 그룹을 키워드로 간주하지 않는다. |
@@ -16,7 +16,7 @@
 예를 들어 Python의 `def format_title():`에서 문법이 함수명을 `pythonFunction`으로 식별하고 `Function`에 연결한다면, 언어 전용 규칙은 필요 없다. 라이트 테마에서 아래처럼 표준 그룹만 지정하면 된다.
 
 ```vim
-" 라이트 RGB 경로의 출력 예시. 현재 생성되는 파일은 아니다.
+" 라이트 RGB 매핑의 일부
 highlight Function guifg=#43617B
 ```
 
@@ -24,9 +24,9 @@ highlight Function guifg=#43617B
 
 ## 언어별 지원 대장
 
-`filetype`은 Vim 이름을 사용한다. `[ ]`는 해당 경로에 대한 LBRX 출력 미구현, `—`는 화면 미검증이다. VS Code 문서와 같은 샘플을 쓰되 토큰 경계까지 같다고 가정하지 않는다.
+`filetype`은 Vim 이름을 사용한다(`ps1`의 원본 파일 ID는 `powershell`). 매핑에는 `pythonFunction`, `rustFuncCall`, `ps1Cmdlet`, `tomlInteger`, `typescriptNumber` 등이 있다. 아래 `[ ]`는 열거된 세부 토큰 전체에 대한 검증이 완료되지 않았다는 뜻이며 `—`는 화면 미검증이다. 매핑하지 않은 그룹에는 전용 규칙을 출력하지 않는다.
 
-| Vim `filetype` | 비교할 토큰 | RGB 생성 | cterm 생성 | 라이트 / 다크 실측 |
+| Vim `filetype` | 비교할 토큰 | 언어 전용 RGB | 언어 전용 cterm | 라이트 / 다크 실측 |
 |---|---|---|---|---|
 | `rust` | `fn` 뒤 선언명, 함수 호출, `println!` 매크로 | [ ] | [ ] | — / — |
 | `python` | `def` 뒤 선언명, 호출, f-string 안쪽 표현식 | [ ] | [ ] | — / — |

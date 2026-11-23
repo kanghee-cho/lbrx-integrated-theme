@@ -1,0 +1,4 @@
+# Python 전용 구문색. 활성화한 키만 common.toml의 값을 덮어쓴다.
+# 값에는 lbrx.toml의 라이트·다크 roles 이름을 사용한다.
+[tokens]
+# function = "accent" # 예시: Python 함수명을 기본 강조색으로 표시.

@@ -4,6 +4,8 @@ use std::collections::BTreeMap;
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Theme {
+    #[serde(skip)]
+    pub layers: crate::layers::Layers,
     pub schema_version: u32,
     pub light: Mode,
     pub dark: Mode,

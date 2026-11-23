@@ -15,12 +15,15 @@ Typora는 모드별 CSS 두 개를 선택하지만, Obsidian에는 `LBRX` 테마
 2. **설정 → 테마/외형(Appearance) → 테마(Themes)**에서 `LBRX`를 선택한다. 목록에 없으면 `LBRX\LBRX`로 이중 복사하지 않았는지, 폴더명과 manifest 이름이 일치하는지 확인하고 앱을 다시 연다.
 3. 같은 보관함에서 기본 색상 모드를 라이트와 다크로 바꾼다. 업데이트할 때는 LBRX 패키지 파일만 교체한다. 원복은 기존 테마 또는 기본 테마를 다시 선택하면 된다. 보관함의 설정 JSON, 노트, 스니펫은 덮어쓰지 않는다.
 
+**강조 색상(Accent Color):** 외형에서 강조색을 기본값으로 두면 라이트 `#246958`, 다크 `#84C7AC`가 모드에 따라 자동 적용된다. 이전에 HEX를 직접 입력했다면 강조색의 **기본값 복원**을 눌러 자동 전환을 사용한다. 직접 선택한 색이 있으면 Obsidian이 우선 적용한다. 링크색은 별도 `link` 역할을 따른다.
+
 ## 무엇을 공유하고 무엇을 분리하는가
 
 | 공통 원본 | Obsidian에서 의도하는 결과 |
 |---|---|
 | `background`, `surface`, `text`, `muted` | `--background-primary`, `--background-secondary`, `--text-normal`, `--text-muted`에 대응한다. 본문 외에 같은 변수를 쓰는 사이드바·설정 창의 실제 배경과 글자 조합도 검사한다. |
 | `link`, `focus`, 선택색 | 내부·외부·미생성 링크와 키보드 포커스는 의미를 구분한다. DOM 텍스트 선택과 편집기가 그리는 선택 영역을 각각 확인한다. |
+| `accent` | 모드별 RGB를 Obsidian 기본 강조색의 HSL 입력(`--accent-h`, `--accent-s`, `--accent-l`)으로 변환한다. 버튼·토글의 파생 상태색은 앱이 계산한다. |
 | `typography.prose`, `typography.mono` | 본문은 LINE Seed EN → KR → JP → `sans-serif`, 코드는 D2Coding ligature → `monospace`. 테마 기본 글꼴로 제공하고 사용자의 본문·고정폭 글꼴과 크기 설정을 강제로 덮지 않는다. UI 아이콘과 수식 글꼴은 대상이 아니다. |
 
 읽기 뷰는 렌더링된 문서를, 라이브 프리뷰는 커서 위치에 따라 Markdown 기호를 보여주는 편집기를 사용한다. **같은 옵션 ID는 같은 디자인 의도이지 같은 CSS 선택자를 뜻하지 않는다.** 먼저 공식 CSS 변수를 쓰고, 부족한 부분만 뷰에 한정한다. Typora의 `#write`나 코드 펜스 선택자를 복사하지 않는다. 소스 모드, 모바일, PDF는 별도 검증 대상이다.

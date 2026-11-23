@@ -16,27 +16,27 @@
 | `:highlight link A B` | A가 B의 스타일을 따름. 독립 설정과 구분해 링크 대상을 기록 |
 | 호스트/앱 설정 | 글꼴·pt·행 간격은 터미널 담당. 줄 번호·커서줄·맞춤법·diff 켜기는 Vim 옵션이며 색 구성표가 활성화하지 않음 |
 
-**실제 검증:** 미실시. 결과는 `그룹.필드 / Vim·OS·터미널 / 라이트 또는 다크 / RGB 또는 cterm / PASS·FAIL / 근거`로 기록한다. 아래 한 그룹의 전경만 구현했다면 배경·장식은 미구현으로 남긴다.
+**검증:** Windows의 Vim 9.2에서 사용자 설정 없이 라이트 → 다크 → 라이트를 불러왔다. `Normal`의 RGB 배경, 다크 `cterm` 배경, `Conditional` → `Keyword` 링크와 `termguicolors` 유지 여부를 비대화형으로 확인했다. 실제 화면은 미검증이다. 단일 역할만 적힌 그룹은 별도 표기가 없는 한 전경색을 지정한다.
 
 ## 문법 그룹
 
 | 그룹 | 분류 | 원본 또는 합일 대상 | Vim 생성 |
 |---|---|---|---|
-| `Comment` | 공통 | comment | [ ] |
+| `Comment` | 공통 | comment | [x] |
 | `Constant` | 합일 후보 | 편집기 구문 강조 | [ ] |
-| `String` | 공통 | string | [ ] |
+| `String` | 공통 | string | [x] |
 | `Character` | 합일 후보 | 편집기 구문 강조 | [ ] |
-| `Number` | 공통 | number | [ ] |
+| `Number` | 공통 | number | [x] |
 | `Boolean` | 합일 후보 | 편집기 구문 강조 | [ ] |
-| `Float` | 공통 | number | [ ] |
+| `Float` | 공통 | `Number`에 링크 | [x] |
 | `Identifier` | 합일 후보 | 편집기 구문 강조 | [ ] |
-| `Function` | 공통 | function | [ ] |
+| `Function` | 공통 | function | [x] |
 | `Statement` | 합일 후보 | 편집기 구문 강조 | [ ] |
-| `Conditional` | 합일 후보 | 편집기 구문 강조 | [ ] |
-| `Repeat` | 합일 후보 | 편집기 구문 강조 | [ ] |
+| `Conditional` | 공통 | `Keyword`에 링크 | [x] |
+| `Repeat` | 공통 | `Keyword`에 링크 | [x] |
 | `Label` | 합일 후보 | 편집기 구문 강조 | [ ] |
 | `Operator` | 합일 후보 | 편집기 구문 강조 | [ ] |
-| `Keyword` | 공통 | keyword | [ ] |
+| `Keyword` | 공통 | keyword | [x] |
 | `Exception` | 합일 후보 | 편집기 구문 강조 | [ ] |
 | `PreProc` | 합일 후보 | 편집기 구문 강조 | [ ] |
 | `Include` | 합일 후보 | 편집기 구문 강조 | [ ] |
@@ -55,7 +55,7 @@
 | `Debug` | 합일 후보 | 편집기 구문 강조 | [ ] |
 | `Underlined` | 합일 후보 | 편집기 구문 강조 | [ ] |
 | `Ignore` | 합일 후보 | 편집기 구문 강조 | [ ] |
-| `Error` | 공통 | error | [ ] |
+| `Error` | 공통 | error | [x] |
 | `Todo` | 합일 후보 | 편집기 구문 강조 | [ ] |
 
 ## 화면 그룹
@@ -68,20 +68,20 @@
 | `lCursor` | Vim 전용 | — | [ ] |
 | `CursorIM` | Vim 전용 | — | [ ] |
 | `CursorColumn` | Vim 전용 | — | [ ] |
-| `CursorLine` | 합일 후보 | 편집기 UI (그룹별 독립) | [ ] |
+| `CursorLine` | 공통 | 배경 `surface` | [x] |
 | `Directory` | Vim 전용 | — | [ ] |
 | `DiffAdd` | 합일 후보 | 편집기 UI (그룹별 독립) | [ ] |
 | `DiffChange` | 합일 후보 | 편집기 UI (그룹별 독립) | [ ] |
 | `DiffDelete` | 합일 후보 | 편집기 UI (그룹별 독립) | [ ] |
 | `DiffText` | 합일 후보 | 편집기 UI (그룹별 독립) | [ ] |
 | `EndOfBuffer` | Vim 전용 | — | [ ] |
-| `ErrorMsg` | 공통 | error | [ ] |
+| `ErrorMsg` | 공통 | error | [x] |
 | `VertSplit` | Vim 전용 | — | [ ] |
 | `Folded` | Vim 전용 | — | [ ] |
 | `FoldColumn` | Vim 전용 | — | [ ] |
 | `SignColumn` | 합일 후보 | 편집기 UI (그룹별 독립) | [ ] |
-| `IncSearch` | 합일 후보 | 편집기 UI (그룹별 독립) | [ ] |
-| `LineNr` | 공통 | muted | [ ] |
+| `IncSearch` | 공통 | background / focus | [x] |
+| `LineNr` | 공통 | muted | [x] |
 | `LineNrAbove` | Vim 전용 | — | [ ] |
 | `LineNrBelow` | Vim 전용 | — | [ ] |
 | `CursorLineNr` | 합일 후보 | 편집기 UI (그룹별 독립) | [ ] |
@@ -92,7 +92,7 @@
 | `ModeMsg` | Vim 전용 | — | [ ] |
 | `MoreMsg` | Vim 전용 | — | [ ] |
 | `NonText` | Vim 전용 | — | [ ] |
-| `Normal` | 공통 | text / background | [ ] |
+| `Normal` | 공통 | text / background | [x] |
 | `Pmenu` | 합일 후보 | 편집기 UI (그룹별 독립) | [ ] |
 | `PmenuSel` | 합일 후보 | 편집기 UI (그룹별 독립) | [ ] |
 | `PmenuKind` | 합일 후보 | 편집기 UI (그룹별 독립) | [ ] |
@@ -104,14 +104,14 @@
 | `PopupNotification` | Vim 전용 | — | [ ] |
 | `Question` | Vim 전용 | — | [ ] |
 | `QuickFixLine` | Vim 전용 | — | [ ] |
-| `Search` | 합일 후보 | 편집기 UI (그룹별 독립) | [ ] |
+| `Search` | 공통 | background / warning | [x] |
 | `CurSearch` | 합일 후보 | 편집기 UI (그룹별 독립) | [ ] |
 | `SpecialKey` | Vim 전용 | — | [ ] |
 | `SpellBad` | Vim 전용 | — | [ ] |
 | `SpellCap` | Vim 전용 | — | [ ] |
 | `SpellLocal` | Vim 전용 | — | [ ] |
 | `SpellRare` | Vim 전용 | — | [ ] |
-| `StatusLine` | 합일 후보 | 편집기 UI (그룹별 독립) | [ ] |
+| `StatusLine` | 공통 | text / surface | [x] |
 | `StatusLineNC` | 합일 후보 | 편집기 UI (그룹별 독립) | [ ] |
 | `StatusLineTerm` | 합일 후보 | 편집기 UI (그룹별 독립) | [ ] |
 | `StatusLineTermNC` | 합일 후보 | 편집기 UI (그룹별 독립) | [ ] |
@@ -120,9 +120,9 @@
 | `TabLineSel` | Vim 전용 | — | [ ] |
 | `Terminal` | Vim 전용 | — | [ ] |
 | `Title` | Vim 전용 | — | [ ] |
-| `Visual` | 공통 | selection_text / selection_background | [ ] |
+| `Visual` | 공통 | selection_text / selection_background | [x] |
 | `VisualNOS` | Vim 전용 | — | [ ] |
-| `WarningMsg` | 공통 | warning | [ ] |
+| `WarningMsg` | 공통 | warning | [x] |
 | `WildMenu` | Vim 전용 | — | [ ] |
 | `Menu` | GUI 경계 | 터미널 Vim 대상 밖 | — |
 | `Scrollbar` | GUI 경계 | 터미널 Vim 대상 밖 | — |

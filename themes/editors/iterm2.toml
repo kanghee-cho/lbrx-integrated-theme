@@ -1,0 +1,5 @@
+# iTerm2 색 프리셋 전용. 값은 lbrx.toml의 라이트·다크 roles 이름.
+# 키를 생략하면 어댑터 기본 매핑을 사용한다.
+[colors]
+"Cursor Color" = "terminal_cursor" # 터미널 커서색.
+"Selected Text Color" = "selection_text" # 선택 영역 안의 글자색.

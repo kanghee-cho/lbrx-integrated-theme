@@ -1,38 +1,112 @@
 use crate::{
+    helix, iterm2,
     model::Theme,
     obsidian,
     resolve::{self, ResolvedTheme},
-    typora, windows_terminal,
+    typora, vim, vscode, windows_terminal,
 };
 use std::{
     fs::{self, File, Metadata},
     io::{self, Write},
-    path::Path,
+    path::{Path, PathBuf},
 };
 
-const OUTPUT: &str = "lbrx";
+pub const OUTPUT: &str = "lbrx";
 const STAGING: &str = ".lbrx-build";
 const BACKUP: &str = ".lbrx-previous";
 const LOCK: &str = ".lbrx-build.lock";
 const TOKENS: &str = "resolved.toml";
-const ADAPTERS: &[(&str, &[&str])] = &[
-    (windows_terminal::DIRECTORY, &windows_terminal::FILES),
-    (typora::DIRECTORY, typora::FILES),
-    (obsidian::DIRECTORY, obsidian::FILES),
-];
-type AdapterOutput<'a> = (&'static str, &'a [(&'static str, String)]);
+type AdapterOutput = (App, Vec<(&'static str, Vec<u8>)>);
 
-pub fn build(theme: &Theme, parent: &Path) -> Result<(), String> {
+#[derive(Clone, Copy, PartialEq, Eq, clap::ValueEnum)]
+pub enum App {
+    WindowsTerminal,
+    Typora,
+    Obsidian,
+    #[value(name = "iterm2")]
+    Iterm2,
+    Vim,
+    #[value(name = "vscode")]
+    VsCode,
+    Helix,
+}
+
+impl App {
+    pub const ALL: [Self; 7] = [
+        Self::WindowsTerminal,
+        Self::Typora,
+        Self::Obsidian,
+        Self::Iterm2,
+        Self::Vim,
+        Self::VsCode,
+        Self::Helix,
+    ];
+
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::WindowsTerminal => "Windows Terminal",
+            Self::Typora => "Typora",
+            Self::Obsidian => "Obsidian",
+            Self::Iterm2 => "iTerm2",
+            Self::Vim => "Vim",
+            Self::VsCode => "VS Code",
+            Self::Helix => "Helix",
+        }
+    }
+
+    pub fn directory(self) -> &'static str {
+        self.output().0
+    }
+
+    pub fn output_path(self, parent: &Path) -> PathBuf {
+        Path::new(self.directory())
+            .components()
+            .fold(parent.join(OUTPUT), |path, component| path.join(component))
+    }
+
+    fn output(self) -> (&'static str, &'static [&'static str]) {
+        match self {
+            Self::WindowsTerminal => (windows_terminal::DIRECTORY, &windows_terminal::FILES),
+            Self::Typora => (typora::DIRECTORY, typora::FILES),
+            Self::Obsidian => (obsidian::DIRECTORY, obsidian::FILES),
+            Self::Iterm2 => (iterm2::DIRECTORY, &iterm2::FILES),
+            Self::Vim => (vim::DIRECTORY, vim::FILES),
+            Self::VsCode => (vscode::DIRECTORY, vscode::FILES),
+            Self::Helix => (helix::DIRECTORY, helix::FILES),
+        }
+    }
+
+    fn render(self, theme: &ResolvedTheme) -> Result<AdapterOutput, String> {
+        let files: Vec<(&str, String)> = match self {
+            Self::WindowsTerminal => windows_terminal::render(theme)?.into(),
+            Self::Typora => typora::render(theme).into(),
+            Self::Obsidian => obsidian::render(theme).into(),
+            Self::Iterm2 => iterm2::render(theme)?.into(),
+            Self::Vim => vim::render(theme).into(),
+            Self::VsCode => return Ok((self, vscode::render(theme)?.into())),
+            Self::Helix => helix::render(theme).into(),
+        };
+        Ok((
+            self,
+            files
+                .into_iter()
+                .map(|(name, text)| (name, text.into_bytes()))
+                .collect(),
+        ))
+    }
+}
+
+pub fn build(theme: &Theme, parent: &Path, apps: &[App]) -> Result<(), String> {
+    if apps.is_empty() {
+        return Err("생성할 앱을 하나 이상 선택하세요".into());
+    }
     let resolved = resolve::resolve(theme)?;
     let contents = toml::to_string_pretty(&resolved).map_err(|e| e.to_string())?;
-    let terminal_files = windows_terminal::render(&resolved)?;
-    let typora_files = typora::render(&resolved);
-    let obsidian_files = obsidian::render(&resolved);
-    let adapters = [
-        (windows_terminal::DIRECTORY, terminal_files.as_slice()),
-        (typora::DIRECTORY, typora_files.as_slice()),
-        (obsidian::DIRECTORY, obsidian_files.as_slice()),
-    ];
+    let adapters = App::ALL
+        .into_iter()
+        .filter(|app| apps.contains(app))
+        .map(|app| app.render(&resolved))
+        .collect::<Result<Vec<_>, _>>()?;
     if !exists(parent)? {
         fs::create_dir(parent).map_err(|e| format!("{}: {e}", parent.display()))?;
     }
@@ -63,7 +137,7 @@ fn build_locked(
     parent: &Path,
     resolved: &ResolvedTheme,
     contents: &str,
-    adapters: &[AdapterOutput<'_>],
+    adapters: &[AdapterOutput],
 ) -> Result<(), String> {
     let staging = parent.join(STAGING);
     fs::create_dir(&staging).map_err(|e| {
@@ -92,38 +166,82 @@ fn stage_and_publish(
     parent: &Path,
     resolved: &ResolvedTheme,
     contents: &str,
-    adapters: &[AdapterOutput<'_>],
+    adapters: &[AdapterOutput],
 ) -> Result<(), String> {
     let staging = parent.join(STAGING);
     let path = staging.join(TOKENS);
-    let written = write_staged(&path, contents)?;
-    let parsed: ResolvedTheme = toml::from_str(&written)
-        .map_err(|e| format!("{}: 출력 재파싱 실패: {e}", path.display()))?;
+    let written = write_staged(&path, contents.as_bytes())?;
+    let text = std::str::from_utf8(&written).map_err(|e| format!("{}: {e}", path.display()))?;
+    let parsed: ResolvedTheme =
+        toml::from_str(text).map_err(|e| format!("{}: 출력 재파싱 실패: {e}", path.display()))?;
     if parsed != *resolved {
         return Err(format!("{}: 해석 결과와 출력이 다름", path.display()));
     }
-    for (directory, files) in adapters {
-        let directory = staging.join(directory);
+    for (app, files) in adapters {
+        let directory = staging.join(app.directory());
         fs::create_dir_all(&directory).map_err(|e| format!("{}: {e}", directory.display()))?;
-        for (name, contents) in *files {
+        for (name, contents) in files {
             let path = directory.join(name);
             let written = write_staged(&path, contents)?;
             if name.ends_with(".json") {
-                serde_json::from_str::<serde_json::Value>(&written)
+                serde_json::from_slice::<serde_json::Value>(&written)
+                    .map_err(|e| format!("{}: 출력 재파싱 실패: {e}", path.display()))?;
+            } else if name.ends_with(".itermcolors") {
+                plist::Value::from_reader_xml(written.as_slice())
+                    .map_err(|e| format!("{}: 출력 재파싱 실패: {e}", path.display()))?;
+            } else if name.ends_with(".vsix") {
+                vscode::validate(&written)
+                    .map_err(|e| format!("{}: VSIX 검증 실패: {e}", path.display()))?;
+            } else if name.ends_with(".toml") {
+                let text = std::str::from_utf8(&written)
+                    .map_err(|e| format!("{}: {e}", path.display()))?;
+                toml::from_str::<toml::Table>(text)
                     .map_err(|e| format!("{}: 출력 재파싱 실패: {e}", path.display()))?;
             }
         }
     }
+    if adapters.len() < App::ALL.len() {
+        preserve_unselected(parent, &staging, adapters)?;
+    }
     publish(parent)
 }
 
-fn write_staged(path: &Path, contents: &str) -> Result<String, String> {
-    let write_and_read = || -> io::Result<String> {
+fn preserve_unselected(
+    parent: &Path,
+    staging: &Path,
+    adapters: &[AdapterOutput],
+) -> Result<(), String> {
+    let output = parent.join(OUTPUT);
+    if !exists(&output)? {
+        return Ok(());
+    }
+    require_generated_directory(&output)?;
+    for app in App::ALL {
+        if adapters.iter().any(|(selected, _)| *selected == app) {
+            continue;
+        }
+        let (directory, files) = app.output();
+        for name in files {
+            let source = output.join(directory).join(name);
+            if !exists(&source)? {
+                continue;
+            }
+            let destination = staging.join(directory).join(name);
+            fs::create_dir_all(staging.join(directory))
+                .and_then(|()| fs::copy(&source, &destination).map(|_| ()))
+                .map_err(|e| format!("{}: 미선택 앱 출력 보존 실패: {e}", source.display()))?;
+        }
+    }
+    Ok(())
+}
+
+fn write_staged(path: &Path, contents: &[u8]) -> Result<Vec<u8>, String> {
+    let write_and_read = || -> io::Result<Vec<u8>> {
         let mut file = File::create_new(path)?;
-        file.write_all(contents.as_bytes())?;
+        file.write_all(contents)?;
         file.sync_all()?;
         drop(file);
-        fs::read_to_string(path)
+        fs::read(path)
     };
     let written =
         write_and_read().map_err(|e| format!("{}: 임시 출력 실패: {e}", path.display()))?;
@@ -200,8 +318,8 @@ fn require_generated_directory(path: &Path) -> Result<(), String> {
 
 fn remove_generated_directory(path: &Path) -> io::Result<()> {
     check_tree(path)?;
-    for (directory, files) in ADAPTERS {
-        for name in *files {
+    for (directory, files) in App::ALL.map(App::output) {
+        for name in files {
             ignore_missing(fs::remove_file(path.join(directory).join(name)))?;
         }
         for dir in Path::new(directory)
@@ -226,8 +344,9 @@ fn check_tree(path: &Path) -> io::Result<()> {
     }
     let allowed: Vec<_> = std::iter::once(path.join(TOKENS))
         .chain(
-            ADAPTERS
-                .iter()
+            App::ALL
+                .map(App::output)
+                .into_iter()
                 .flat_map(|(dir, files)| files.iter().map(move |file| path.join(dir).join(file))),
         )
         .collect();
@@ -286,6 +405,52 @@ mod tests {
     use std::sync::atomic::{AtomicU64, Ordering};
 
     static NEXT_ID: AtomicU64 = AtomicU64::new(0);
+
+    fn build(theme: &Theme, parent: &Path) -> Result<(), String> {
+        super::build(theme, parent, &App::ALL)
+    }
+
+    #[test]
+    fn selected_build_only_generates_requested_apps_and_preserves_other_outputs() {
+        let workspace = Workspace::new();
+        let mut theme = sample();
+        let output = workspace.0.join(OUTPUT);
+        assert!(super::build(&theme, &workspace.0, &[]).is_err());
+        assert!(!output.exists());
+
+        super::build(&theme, &workspace.0, &[App::Obsidian]).unwrap();
+        assert!(workspace.output().is_file());
+        assert!(output.join(App::Obsidian.directory()).is_dir());
+        for app in [App::WindowsTerminal, App::Typora] {
+            assert!(!output.join(app.directory()).exists());
+        }
+
+        build(&theme, &workspace.0).unwrap();
+        let snapshot = |app: App| {
+            app.output()
+                .1
+                .iter()
+                .map(|file| fs::read(output.join(app.directory()).join(file)).unwrap())
+                .collect::<Vec<_>>()
+        };
+        let terminal = snapshot(App::WindowsTerminal);
+        let typora = snapshot(App::Typora);
+        let obsidian = snapshot(App::Obsidian);
+        theme.dark.palette.insert("pine".into(), "#93D1B9".into());
+        super::build(&theme, &workspace.0, &[App::Obsidian]).unwrap();
+        assert_eq!(snapshot(App::WindowsTerminal), terminal);
+        assert_eq!(snapshot(App::Typora), typora);
+        assert_ne!(snapshot(App::Obsidian), obsidian);
+        assert!(
+            fs::read_to_string(workspace.output())
+                .unwrap()
+                .contains("#93D1B9")
+        );
+
+        super::build(&theme, &workspace.0, &[App::WindowsTerminal, App::Typora]).unwrap();
+        assert_ne!(snapshot(App::WindowsTerminal), terminal);
+        assert_ne!(snapshot(App::Typora), typora);
+    }
 
     struct Workspace(std::path::PathBuf);
 
@@ -348,7 +513,173 @@ mod tests {
             adapter_contents
         );
         assert_eq!(fs::read_dir(&workspace.0).unwrap().count(), 1);
-        assert_eq!(fs::read_dir(workspace.0.join(OUTPUT)).unwrap().count(), 4);
+        assert_eq!(
+            fs::read_dir(workspace.0.join(OUTPUT)).unwrap().count(),
+            App::ALL.len() + 1
+        );
+    }
+
+    #[test]
+    fn helix_build_exports_separate_modes_and_preserves_other_apps() {
+        let workspace = Workspace::new();
+        let mut theme = sample();
+        let dir = App::Helix.output_path(&workspace.0);
+        let vim_dir = App::Vim.output_path(&workspace.0);
+        super::build(&theme, &workspace.0, &[App::Vim]).unwrap();
+        let vim = fs::read(vim_dir.join(vim::FILES[1])).unwrap();
+        assert!(!dir.exists());
+        super::build(&theme, &workspace.0, &[App::Helix]).unwrap();
+        let light_path = dir.join(helix::FILES[0]);
+        let dark_path = dir.join(helix::FILES[1]);
+        let light = fs::read_to_string(&light_path).unwrap();
+        let resolved = resolve::resolve(&theme).unwrap();
+        for (path, mode) in [(&light_path, &resolved.light), (&dark_path, &resolved.dark)] {
+            let table: toml::Table = toml::from_str(&fs::read_to_string(path).unwrap()).unwrap();
+            assert_eq!(
+                table["ui.background"]["bg"].as_str(),
+                Some(mode.roles["background"].as_str())
+            );
+            assert_eq!(
+                table["ui.selection.primary"]["fg"].as_str(),
+                Some(mode.roles["selection_text"].as_str())
+            );
+            assert_eq!(
+                table["diagnostic.warning"]["underline"]["color"].as_str(),
+                Some(mode.roles["warning"].as_str())
+            );
+            assert!(!table.contains_key("comment.block"));
+        }
+        theme.dark.roles.insert("function".into(), "ink".into());
+        super::build(&theme, &workspace.0, &[App::Helix]).unwrap();
+        assert_eq!(fs::read_to_string(light_path).unwrap(), light);
+        let updated: toml::Table = toml::from_str(&fs::read_to_string(dark_path).unwrap()).unwrap();
+        assert_eq!(
+            updated["function"].as_str(),
+            Some(resolved.dark.roles["text"].as_str())
+        );
+        assert_eq!(fs::read(vim_dir.join(vim::FILES[1])).unwrap(), vim);
+    }
+
+    #[test]
+    fn vim_build_keeps_light_bytes_when_a_dark_code_role_changes() {
+        let workspace = Workspace::new();
+        let mut theme = sample();
+        let dir = App::Vim.output_path(&workspace.0);
+        super::build(&theme, &workspace.0, &[App::Vim]).unwrap();
+        let light = fs::read(dir.join(vim::FILES[0])).unwrap();
+        let dark = fs::read_to_string(dir.join(vim::FILES[1])).unwrap();
+        assert_eq!(fs::read_dir(&dir).unwrap().count(), 2);
+        assert!(dark.contains("highlight! link Float Number\n"));
+        theme.dark.roles.insert("function".into(), "paper".into());
+        assert!(super::build(&theme, &workspace.0, &[App::Vim]).is_err());
+        theme.dark.roles.insert("function".into(), "ink".into());
+        super::build(&theme, &workspace.0, &[App::Vim]).unwrap();
+        assert_eq!(fs::read(dir.join(vim::FILES[0])).unwrap(), light);
+        let after = fs::read_to_string(dir.join(vim::FILES[1])).unwrap();
+        let changed: Vec<_> = dark
+            .lines()
+            .zip(after.lines())
+            .filter(|(a, b)| a != b)
+            .collect();
+        assert_eq!(changed.len(), 1);
+        assert!(
+            changed[0]
+                .1
+                .starts_with("highlight Function guifg=#DCE6DB guibg=NONE ctermfg=253 ")
+        );
+    }
+
+    #[test]
+    fn iterm2_presets_map_srgb_and_all_ansi_slots_with_dark_changes_isolated() {
+        let workspace = Workspace::new();
+        let mut theme = sample();
+        let directory = App::Iterm2.output_path(&workspace.0);
+        let read = |index: usize| fs::read(directory.join(iterm2::FILES[index])).unwrap();
+        super::build(&theme, &workspace.0, &[App::Iterm2]).unwrap();
+        assert_eq!(fs::read_dir(&directory).unwrap().count(), 2);
+        assert!(!App::WindowsTerminal.output_path(&workspace.0).exists());
+        let light = read(0);
+        let dark = read(1);
+        let resolved = resolve::resolve(&theme).unwrap();
+        let parse = |data: &[u8]| {
+            plist::Value::from_reader_xml(data)
+                .unwrap()
+                .into_dictionary()
+                .unwrap()
+        };
+        for (data, mode) in [(&light, &resolved.light), (&dark, &resolved.dark)] {
+            let colors = parse(data);
+            assert_eq!(colors.len(), 21);
+            let check = |name: &str, hex: &str| {
+                let color = colors[name].as_dictionary().unwrap();
+                assert_eq!(color["Color Space"].as_string(), Some("sRGB"));
+                assert_eq!(color["Alpha Component"].as_real(), Some(1.0));
+                for (component, byte) in ["Red", "Green", "Blue"]
+                    .into_iter()
+                    .zip(resolve::parse_rgb(hex).unwrap())
+                {
+                    let actual = color[&format!("{component} Component")].as_real().unwrap();
+                    assert!(
+                        (actual - f64::from(byte) / 255.0).abs() < 1e-12,
+                        "{name}: {component}"
+                    );
+                }
+            };
+            check("Foreground Color", &mode.roles["terminal_foreground"]);
+            check("Background Color", &mode.roles["terminal_background"]);
+            check("Cursor Color", &mode.roles["terminal_cursor"]);
+            check("Selection Color", &mode.roles["selection_background"]);
+            check("Selected Text Color", &mode.roles["selection_text"]);
+            for (slot, hex) in mode.ansi.iter().enumerate() {
+                check(&format!("Ansi {slot} Color"), hex);
+            }
+        }
+        theme
+            .dark
+            .ansi
+            .insert("2".into(), "ansi_bright_green".into());
+        super::build(&theme, &workspace.0, &[App::Iterm2]).unwrap();
+        assert_eq!(read(0), light);
+        let mut expected = parse(&dark);
+        expected.insert("Ansi 2 Color".into(), expected["Ansi 10 Color"].clone());
+        assert_eq!(parse(&read(1)), expected);
+    }
+
+    #[test]
+    fn document_adapters_scope_the_code_block_background_and_validate_contrast() {
+        let mut theme = sample();
+        let resolved = resolve::resolve(&theme).unwrap();
+        for ((_, css), hex) in typora::render(&resolved)
+            .iter()
+            .take(2)
+            .zip(["#E8EDE4", "#25332C"])
+        {
+            assert!(css.contains(&format!("--lbrx-code-block-background: {hex};")));
+            assert!(css.replace("\r\n", "\n").contains(".md-fences .CodeMirror-gutters) {\n  background-color: var(--lbrx-code-block-background);"));
+        }
+        let [_, (_, css)] = obsidian::render(&resolved);
+        assert!(css.contains("--code-background: #F3F4EC;"));
+        assert!(css.contains("--code-background: #19231F;"));
+        assert!(css.contains(".markdown-rendered pre,\n.markdown-source-view.is-live-preview .HyperMD-codeblock {\n  --code-background: var(--lbrx-code-block-background);"));
+
+        theme
+            .light
+            .roles
+            .insert("code_block_background".into(), "ink".into());
+        assert!(
+            resolve::check(&theme)
+                .unwrap_err()
+                .contains("code_block_background")
+        );
+        theme.light.roles.remove("code_block_background");
+        theme.dark.roles.remove("code_block_background");
+        assert_eq!(
+            resolve::resolve(&theme)
+                .unwrap()
+                .light
+                .code_block_background(),
+            "#F3F4EC"
+        );
     }
 
     #[test]
@@ -393,6 +724,43 @@ mod tests {
                 .contains("교체 거부")
         );
         assert_eq!(fs::read_to_string(dir.join("note.md")).unwrap(), "keep");
+    }
+
+    #[test]
+    fn obsidian_accent_follows_each_modes_accent_role_independently_of_links() {
+        let mut theme = sample();
+        let render = |theme: &Theme| {
+            obsidian::render(&resolve::resolve(theme).unwrap())[1]
+                .1
+                .clone()
+        };
+        let before = render(&theme);
+        let (light, dark) = before.split_once(".theme-dark {").unwrap();
+        assert!(light.contains("--accent-h: 165.21739130;"));
+        assert!(light.contains("--accent-s: 48.93617021%;"));
+        assert!(light.contains("--accent-l: 27.64705882%;"));
+        assert!(dark.contains("--accent-h: 155.82089552;"));
+        assert!(dark.contains("--accent-s: 37.43016760%;"));
+        assert!(dark.contains("--accent-l: 64.90196078%;"));
+
+        theme
+            .dark
+            .palette
+            .insert("test_accent".into(), "#808080".into());
+        theme
+            .light
+            .palette
+            .insert("test_accent".into(), "#808080".into());
+        theme
+            .dark
+            .roles
+            .insert("accent".into(), "test_accent".into());
+        let after = render(&theme);
+        let expected = dark
+            .replace("--accent-h: 155.82089552;", "--accent-h: 0.00000000;")
+            .replace("--accent-s: 37.43016760%;", "--accent-s: 0.00000000%;")
+            .replace("--accent-l: 64.90196078%;", "--accent-l: 50.19607843%;");
+        assert_eq!(after, format!("{light}.theme-dark {{{expected}"));
     }
 
     #[test]

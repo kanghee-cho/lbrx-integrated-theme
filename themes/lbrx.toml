@@ -1,143 +1,148 @@
-schema_version = 1
+# LBRX 공통 원본: 글꼴, 모드별 색상 팔레트, 색상 역할, 터미널 ANSI 슬롯.
+# roles와 ansi의 값은 같은 모드의 palette 키를 참조한다.
+# 팔레트 또는 역할 키를 추가할 때는 라이트·다크 양쪽에 둔다.
+schema_version = 1 # 원본 형식 버전. 현재는 1만 지원.
 
-[typography.prose]
-families = ["LINE Seed Sans", "LINE Seed Sans KR", "LINE Seed JP_TTF", "sans-serif"]
-size_px = 16
-line_height = 1.65
+[typography.prose] # 본문용 글꼴
+families = ["LINE Seed Sans", "LINE Seed Sans KR", "LINE Seed JP_TTF", "sans-serif"] # 왼쪽부터 글리프 폴백, 마지막은 일반 글꼴 계열.
+size_px = 16 # 본문 글자 크기(px).
+line_height = 1.65 # 본문 줄 높이. 글자 크기에 곱하는 배율(단위 없음).
 
-[typography.mono]
-families = ["D2Coding ligature", "monospace"]
-size_px = 14
-line_height = 1.45
+[typography.mono] # 코드·고정폭 글꼴
+families = ["D2Coding ligature", "monospace"] # 코드 글꼴 우선순위. 마지막은 일반 고정폭 계열.
+size_px = 14 # 코드 글자 크기(px). 일부 앱은 다른 단위로 변환.
+line_height = 1.45 # 코드 줄 높이. 글자 크기에 곱하는 배율(단위 없음).
 
-[light.palette]
-paper = "#F3F4EC"
-ink = "#24362F"
-pine = "#246958"
-muted = "#52655B"
-slate = "#43617B"
-plum = "#80516A"
-ochre = "#815919"
-clay = "#A44540"
-surface = "#E8EDE4"
-selection = "#D8E6DA"
-ansi_black = "#202923"
-ansi_cyan = "#28646A"
-ansi_white = "#D7DED4"
-ansi_bright_black = "#65716A"
-ansi_bright_red = "#C2554C"
-ansi_bright_green = "#338869"
-ansi_bright_yellow = "#A67728"
-ansi_bright_blue = "#5280A6"
-ansi_bright_magenta = "#A0648C"
-ansi_bright_cyan = "#36848C"
-ansi_bright_white = "#FFFFFF"
+[light.palette] # 라이트 실제 색상. 각 값은 #RRGGBB 문자열.
+paper = "#F3F4EC" # 기본 배경에 쓰는 종이색.
+ink = "#24362F" # 기본 글자에 쓰는 잉크색.
+pine = "#246958" # 강조·링크 등에 쓰는 청록색.
+muted = "#52655B" # 보조 글자·주석에 쓰는 저채도 녹회색.
+slate = "#43617B" # 함수명 등에 쓰는 남회색.
+plum = "#80516A" # 키워드·인라인 코드 등에 쓰는 자주색.
+ochre = "#815919" # 숫자·경고 등에 쓰는 황토색.
+clay = "#A44540" # 오류 등에 쓰는 적갈색.
+surface = "#E8EDE4" # 패널 같은 보조 배경색.
+selection = "#D8E6DA" # 선택 영역의 배경색.
+ansi_black = "#202923" # 일반 ANSI 검정.
+ansi_cyan = "#28646A" # 일반 ANSI 시안.
+ansi_white = "#D7DED4" # 일반 ANSI 흰색.
+ansi_bright_black = "#65716A" # 밝은 ANSI 검정.
+ansi_bright_red = "#C2554C" # 밝은 ANSI 빨강.
+ansi_bright_green = "#338869" # 밝은 ANSI 초록.
+ansi_bright_yellow = "#A67728" # 밝은 ANSI 노랑.
+ansi_bright_blue = "#5280A6" # 밝은 ANSI 파랑.
+ansi_bright_magenta = "#A0648C" # 밝은 ANSI 마젠타.
+ansi_bright_cyan = "#36848C" # 밝은 ANSI 시안.
+ansi_bright_white = "#FFFFFF" # 밝은 ANSI 흰색.
 
-[light.roles]
-background = "paper"
-surface = "surface"
-text = "ink"
-accent = "pine"
-muted = "muted"
-focus = "pine"
-selection_text = "ink"
-selection_background = "selection"
-heading = "ink"
-link = "pine"
-quote = "muted"
-inline_code = "plum"
-comment = "muted"
-string = "pine"
-keyword = "plum"
-function = "slate"
-number = "ochre"
-error = "clay"
-warning = "ochre"
-success = "pine"
-terminal_foreground = "ink"
-terminal_background = "paper"
-terminal_cursor = "pine"
+[light.roles] # 라이트의 용도별 색상. 오른쪽은 light.palette 키.
+background = "paper" # 문서·편집기의 기본 배경.
+code_block_background = "surface" # Typora·Obsidian의 여러 줄 코드 블록 바탕. 인라인 코드와 편집기 전체 배경은 제외.
+surface = "surface" # 패널·사이드바 등의 보조 배경.
+text = "ink" # 본문·편집기의 기본 글자색.
+accent = "pine" # 앱 UI의 기본 강조색.
+muted = "muted" # 보조 텍스트·줄 번호 등에 쓰는 색.
+focus = "pine" # 포커스 경계 등의 강조색.
+selection_text = "ink" # 선택 영역 안의 글자색.
+selection_background = "selection" # 선택 영역의 배경색.
+heading = "ink" # 문서 제목·헤딩 색.
+link = "pine" # 링크 글자색.
+quote = "muted" # 인용문 글자색.
+inline_code = "plum" # 문단 안 인라인 코드 글자색.
+comment = "muted" # 코드 주석의 기본 역할색.
+string = "pine" # 문자열 리터럴의 기본 역할색.
+keyword = "plum" # 언어 키워드의 기본 역할색.
+function = "slate" # 함수명 토큰의 기본 역할색.
+number = "ochre" # 숫자 리터럴의 기본 역할색.
+error = "clay" # 오류 상태 및 오류 토큰에 사용할 색.
+warning = "ochre" # 경고 상태·진단에 사용할 색.
+success = "pine" # 성공 상태에 사용할 색.
+terminal_foreground = "ink" # 터미널의 기본 글자색.
+terminal_background = "paper" # 터미널의 기본 배경색.
+terminal_cursor = "pine" # 터미널 커서색.
 
-[light.ansi]
-0 = "ansi_black"
-1 = "clay"
-2 = "pine"
-3 = "ochre"
-4 = "slate"
-5 = "plum"
-6 = "ansi_cyan"
-7 = "ansi_white"
-8 = "ansi_bright_black"
-9 = "ansi_bright_red"
-10 = "ansi_bright_green"
-11 = "ansi_bright_yellow"
-12 = "ansi_bright_blue"
-13 = "ansi_bright_magenta"
-14 = "ansi_bright_cyan"
-15 = "ansi_bright_white"
+[light.ansi] # 라이트 터미널의 필수 ANSI 16색. 오른쪽은 light.palette 키.
+0 = "ansi_black" # 일반 검정.
+1 = "clay" # 일반 빨강.
+2 = "pine" # 일반 초록.
+3 = "ochre" # 일반 노랑.
+4 = "slate" # 일반 파랑.
+5 = "plum" # 일반 마젠타.
+6 = "ansi_cyan" # 일반 시안.
+7 = "ansi_white" # 일반 흰색.
+8 = "ansi_bright_black" # 밝은 검정.
+9 = "ansi_bright_red" # 밝은 빨강.
+10 = "ansi_bright_green" # 밝은 초록.
+11 = "ansi_bright_yellow" # 밝은 노랑.
+12 = "ansi_bright_blue" # 밝은 파랑.
+13 = "ansi_bright_magenta" # 밝은 마젠타.
+14 = "ansi_bright_cyan" # 밝은 시안.
+15 = "ansi_bright_white" # 밝은 흰색.
 
-[dark.palette]
-paper = "#19231F"
-ink = "#DCE6DB"
-pine = "#84C7AC"
-muted = "#A3B5A9"
-slate = "#97BBD6"
-plum = "#D4A8BD"
-ochre = "#D6B378"
-clay = "#E59E91"
-surface = "#25332C"
-selection = "#304138"
-ansi_black = "#111915"
-ansi_cyan = "#7DC5C9"
-ansi_white = "#CAD8CC"
-ansi_bright_black = "#62756A"
-ansi_bright_red = "#F8B4A7"
-ansi_bright_green = "#A2E3C6"
-ansi_bright_yellow = "#F0CC90"
-ansi_bright_blue = "#B1D0EE"
-ansi_bright_magenta = "#EABED5"
-ansi_bright_cyan = "#A0E2E5"
-ansi_bright_white = "#F3F7F1"
+[dark.palette] # 다크 실제 색상. 각 값은 #RRGGBB 문자열.
+paper = "#19231F" # 기본 배경에 쓰는 짙은 녹회색.
+ink = "#DCE6DB" # 기본 글자에 쓰는 밝은 잉크색.
+pine = "#84C7AC" # 강조·링크 등에 쓰는 밝은 청록색.
+muted = "#A3B5A9" # 보조 글자·주석에 쓰는 저채도 녹회색.
+slate = "#97BBD6" # 함수명 등에 쓰는 밝은 남회색.
+plum = "#D4A8BD" # 키워드·인라인 코드 등에 쓰는 밝은 자주색.
+ochre = "#D6B378" # 숫자·경고 등에 쓰는 밝은 황토색.
+clay = "#E59E91" # 오류 등에 쓰는 옅은 적갈색.
+surface = "#25332C" # 패널 같은 보조 배경색.
+selection = "#304138" # 선택 영역의 배경색.
+ansi_black = "#111915" # 일반 ANSI 검정.
+ansi_cyan = "#7DC5C9" # 일반 ANSI 시안.
+ansi_white = "#CAD8CC" # 일반 ANSI 흰색.
+ansi_bright_black = "#62756A" # 밝은 ANSI 검정.
+ansi_bright_red = "#F8B4A7" # 밝은 ANSI 빨강.
+ansi_bright_green = "#A2E3C6" # 밝은 ANSI 초록.
+ansi_bright_yellow = "#F0CC90" # 밝은 ANSI 노랑.
+ansi_bright_blue = "#B1D0EE" # 밝은 ANSI 파랑.
+ansi_bright_magenta = "#EABED5" # 밝은 ANSI 마젠타.
+ansi_bright_cyan = "#A0E2E5" # 밝은 ANSI 시안.
+ansi_bright_white = "#F3F7F1" # 밝은 ANSI 흰색.
 
-[dark.roles]
-background = "paper"
-surface = "surface"
-text = "ink"
-accent = "pine"
-muted = "muted"
-focus = "pine"
-selection_text = "ink"
-selection_background = "selection"
-heading = "ink"
-link = "pine"
-quote = "muted"
-inline_code = "plum"
-comment = "muted"
-string = "pine"
-keyword = "plum"
-function = "slate"
-number = "ochre"
-error = "clay"
-warning = "ochre"
-success = "pine"
-terminal_foreground = "ink"
-terminal_background = "paper"
-terminal_cursor = "pine"
+[dark.roles] # 다크의 용도별 색상. 오른쪽은 dark.palette 키.
+background = "paper" # 문서·편집기의 기본 배경.
+code_block_background = "surface" # Typora·Obsidian의 여러 줄 코드 블록 바탕. 인라인 코드와 편집기 전체 배경은 제외.
+surface = "surface" # 패널·사이드바 등의 보조 배경.
+text = "ink" # 본문·편집기의 기본 글자색.
+accent = "pine" # 앱 UI의 기본 강조색.
+muted = "muted" # 보조 텍스트·줄 번호 등에 쓰는 색.
+focus = "pine" # 포커스 경계 등의 강조색.
+selection_text = "ink" # 선택 영역 안의 글자색.
+selection_background = "selection" # 선택 영역의 배경색.
+heading = "ink" # 문서 제목·헤딩 색.
+link = "pine" # 링크 글자색.
+quote = "muted" # 인용문 글자색.
+inline_code = "plum" # 문단 안 인라인 코드 글자색.
+comment = "muted" # 코드 주석의 기본 역할색.
+string = "pine" # 문자열 리터럴의 기본 역할색.
+keyword = "plum" # 언어 키워드의 기본 역할색.
+function = "slate" # 함수명 토큰의 기본 역할색.
+number = "ochre" # 숫자 리터럴의 기본 역할색.
+error = "clay" # 오류 상태 및 오류 토큰에 사용할 색.
+warning = "ochre" # 경고 상태·진단에 사용할 색.
+success = "pine" # 성공 상태에 사용할 색.
+terminal_foreground = "ink" # 터미널의 기본 글자색.
+terminal_background = "paper" # 터미널의 기본 배경색.
+terminal_cursor = "pine" # 터미널 커서색.
 
-[dark.ansi]
-0 = "ansi_black"
-1 = "clay"
-2 = "pine"
-3 = "ochre"
-4 = "slate"
-5 = "plum"
-6 = "ansi_cyan"
-7 = "ansi_white"
-8 = "ansi_bright_black"
-9 = "ansi_bright_red"
-10 = "ansi_bright_green"
-11 = "ansi_bright_yellow"
-12 = "ansi_bright_blue"
-13 = "ansi_bright_magenta"
-14 = "ansi_bright_cyan"
-15 = "ansi_bright_white"
+[dark.ansi] # 다크 터미널의 필수 ANSI 16색. 오른쪽은 dark.palette 키.
+0 = "ansi_black" # 일반 검정.
+1 = "clay" # 일반 빨강.
+2 = "pine" # 일반 초록.
+3 = "ochre" # 일반 노랑.
+4 = "slate" # 일반 파랑.
+5 = "plum" # 일반 마젠타.
+6 = "ansi_cyan" # 일반 시안.
+7 = "ansi_white" # 일반 흰색.
+8 = "ansi_bright_black" # 밝은 검정.
+9 = "ansi_bright_red" # 밝은 빨강.
+10 = "ansi_bright_green" # 밝은 초록.
+11 = "ansi_bright_yellow" # 밝은 노랑.
+12 = "ansi_bright_blue" # 밝은 파랑.
+13 = "ansi_bright_magenta" # 밝은 마젠타.
+14 = "ansi_bright_cyan" # 밝은 시안.
+15 = "ansi_bright_white" # 밝은 흰색.

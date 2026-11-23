@@ -1,8 +1,8 @@
 # VS Code 언어별 구문 강조와 동반 CSS
 
-**상태: 설계안.** 같은 코드를 VS Code에서 편집할 때와 HTML 문서에서 읽을 때 주석·함수·숫자가 같은 의미의 색으로 보이게 한다. [공통 테마](../themes/lbrx.toml)의 역할을 한 번 정하고, 대상에 맞게 두 형식으로 출력한다. 현재 VSIX와 동반 CSS는 생성되지 않는다.
+**공통·언어별 토큰 생성 구현.** [언어 설정](../themes/languages/)에서 VS Code 테마와 동반 CSS에 쓸 색 역할을 선택한다. 기본 TextMate 전경색 6개와 semantic 선택자 `function`, `number`에 더해, 언어 파일에 명시한 키만 한정 규칙으로 출력한다. 언어별 실제 렌더링은 미검증이다.
 
-| 보는 곳 | 예정 산출물 | 토큰을 구별하는 주체 |
+| 보는 곳 | 생성 파일 | 토큰을 구별하는 주체 |
 |---|---|---|
 | VS Code 편집기 | [VSIX의 라이트·다크 색 테마](18-vscode.md)에 `tokenColors`, `semanticTokenColors`를 포함 | TextMate 문법과 언어 서비스. 편집기 자체에는 CSS를 주입하지 않는다. |
 | HTML 문서·코드 미리보기 | 선택 배포하는 `lbrx-code.css` 한 파일에 라이트·다크 규칙 포함 | 렌더러가 원문을 토큰으로 나누고 클래스가 붙은 HTML을 만든다. CSS만 로드해서는 원문이 강조되지 않는다. |
@@ -20,7 +20,7 @@
 | `number` | `constant.numeric` | `.tok-number` |
 | `error` | `invalid.illegal` | `.tok-error` |
 
-예를 들어 TypeScript의 함수 **선언**은 문법이 잡더라도 함수 **호출**은 언어 서비스가 있어야 구분될 수 있다. 서비스가 실제로 `function` 타입을 제공한다면 `function:typescript`에 같은 `function` 색을 연결한다. 일반 변수까지 함수색으로 칠하지 않는다. `invalid.illegal`도 문법 오류 토큰이지 LSP 진단 밑줄을 뜻하지 않는다.
+예를 들어 TypeScript의 함수 **선언**은 문법이 잡더라도 함수 **호출**은 언어 서비스가 있어야 구분될 수 있다. TypeScript 파일에서 `function` 값을 지정하면 `function:typescript`와 `source.ts entity.name.function`을 출력한다. `invalid.illegal`은 문법 오류 토큰이지 LSP 진단 밑줄을 뜻하지 않는다.
 
 ### 같은 함수색을 두 형식으로 제공하는 예
 
@@ -32,7 +32,7 @@
     { "scope": "entity.name.function", "settings": { "foreground": "#43617B" } }
   ],
   "semanticHighlighting": true,
-  "semanticTokenColors": { "function:typescript": "#43617B" }
+  "semanticTokenColors": { "function": "#43617B" }
 }
 ```
 
@@ -49,7 +49,7 @@
 
 ## 언어별 지원 대장
 
-첫 후보는 저장소에서 쓰는 Rust·Python·PowerShell·TOML과 위 예시의 TypeScript다. `[ ]`는 출력 미구현, `—`는 실제 검증 기록 없음이다. 다른 언어도 같은 형식으로 추가한다.
+기본 5개 언어 모두 명시된 토큰의 편집기·HTML 한정 규칙을 생성할 수 있다. 아래 `[ ]`는 각 예제의 세부 구별(호출·보간·매크로 등)을 아직 개별 확인하지 않았다는 뜻이고, `—`는 실제 검증 기록 없음이다.
 
 | VS Code 언어 ID | 언어별로 구별할 예 | 편집기 JSON | 동반 CSS/HTML 매핑 | 라이트·다크 실측 |
 |---|---|---|---|---|

@@ -1,6 +1,6 @@
 # Obsidian 언어별 코드 구문 강조
 
-**상태: 공통 코드 CSS 변수 생성, 언어별 예외와 실제 화면 검증은 미착수.** 노트의 Markdown 코드 펜스 안에서 [공통 구문색](11-cross-app-options.md)을 사용한다. CSS는 이미 식별된 토큰의 모양을 바꿀 뿐, 언어를 분석하지 않는다.
+**상태: 공통 코드 CSS 변수 및 읽기 뷰 언어 예외 생성 구현.** [언어 설정](../themes/languages/)에 지정한 토큰은 읽기 뷰의 `code.language-<id> .token.<토큰>`에만 적용한다. CSS는 이미 식별된 토큰의 모양을 바꿀 뿐, 언어를 분석하지 않는다. 라이브 프리뷰의 언어 예외와 실제 화면 확인은 미완료다.
 
 ## 코드 펜스와 두 가지 뷰
 
@@ -19,7 +19,7 @@ Obsidian의 **읽기 뷰와 편집 뷰는 서로 다른 구문 강조 라이브�
 
 | 공통 역할 | Obsidian 변수 또는 대응 방식 | 적용 범위 |
 |---|---|---|
-| `background`, `text` | `--code-background`, `--code-normal` | 코드 영역 배경과 구문으로 구별되지 않은 텍스트 |
+| `code_block_background`, `text` | 블록에 한정한 `--code-background`, `--code-normal` | 여러 줄 코드 블록 배경과 구문으로 구별되지 않은 텍스트. 인라인 배경은 기존 `background`를 유지한다. |
 | `comment` | `--code-comment` | 실제 주석 |
 | `keyword` | `--code-keyword` | 제어문·선언 등 키워드 |
 | `string` | `--code-string` | 문자열. 보간식은 렌더러가 나눈 부분만 별도 처리 |
@@ -40,7 +40,7 @@ Obsidian의 **읽기 뷰와 편집 뷰는 서로 다른 구문 강조 라이브�
 
 ## 언어별 지원 대장
 
-`[ ]`는 LBRX 매핑 미구현, `—`는 화면 미검증이다. 뷰별 결과는 `라이트 / 다크` 순서로 기록한다. 비교용 예제는 [VS Code](22-vscode-language-highlighting.md)·[Vim](23-vim-language-highlighting.md)과 같은 의미의 토큰을 사용한다.
+아래 모든 언어는 읽기 뷰용 한정 CSS를 생성할 수 있다. `[ ]`는 해당 예제의 세부 토큰 모두에 대한 매핑 확인 전, `—`는 화면 미검증이다. 뷰별 결과는 `라이트 / 다크` 순서로 기록한다. 비교용 예제는 [VS Code](22-vscode-language-highlighting.md)·[Vim](23-vim-language-highlighting.md)과 같은 의미의 토큰을 사용한다.
 
 | 펜스 언어 | 구별할 토큰 | CSS 생성 | 읽기 뷰 | 라이브 프리뷰 |
 |---|---|---|---|---|

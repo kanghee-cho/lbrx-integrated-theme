@@ -1,6 +1,5 @@
 use crate::{
     css::font_stack,
-    model::Typography,
     resolve::{ResolvedMode, ResolvedTheme},
 };
 use std::fmt::Write as _;
@@ -12,8 +11,8 @@ pub const FILES: &[&str] = &[LIGHT, DARK, "README.md"];
 
 pub fn render(theme: &ResolvedTheme) -> [(&'static str, String); 3] {
     [
-        (LIGHT, stylesheet(&theme.light, &theme.typography, false)),
-        (DARK, stylesheet(&theme.dark, &theme.typography, true)),
+        (LIGHT, stylesheet(theme, &theme.light, false)),
+        (DARK, stylesheet(theme, &theme.dark, true)),
         (
             "README.md",
             include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/Docs/07-typora.md")).into(),
@@ -21,8 +20,15 @@ pub fn render(theme: &ResolvedTheme) -> [(&'static str, String); 3] {
     ]
 }
 
-fn stylesheet(mode: &ResolvedMode, typography: &Typography, dark: bool) -> String {
+fn stylesheet(theme: &ResolvedTheme, mode: &ResolvedMode, dark: bool) -> String {
+    let typography = &theme.typography;
     let mut css = String::from("/* LBRX — generated from the theme source. */\n:root {\n");
+    writeln!(
+        css,
+        "  --lbrx-code-block-background: {};",
+        mode.code_block_background()
+    )
+    .unwrap();
     for role in [
         "background",
         "text",
@@ -41,11 +47,12 @@ fn stylesheet(mode: &ResolvedMode, typography: &Typography, dark: bool) -> Strin
         "number",
         "error",
     ] {
+        let key = format!("--lbrx-{}", role.replace('_', "-"));
+        let fg = theme.token(mode, "", role);
         writeln!(
             css,
-            "  --lbrx-{}: {};",
-            role.replace('_', "-"),
-            mode.roles[role]
+            "  {key}: {};",
+            theme.editor_color(mode, DIRECTORY, &key, fg)
         )
         .unwrap();
     }
@@ -61,6 +68,16 @@ fn stylesheet(mode: &ResolvedMode, typography: &Typography, dark: bool) -> Strin
     }
     css.push_str("}\n");
     css.push_str(include_str!("typora.css"));
+    for (lang, tokens) in &theme.layers.languages {
+        for token in tokens.keys() {
+            writeln!(
+                css,
+                "#write .md-fences[lang=\"{lang}\"] {{ --lbrx-{token}: {}; }}",
+                theme.token(mode, lang, token)
+            )
+            .unwrap();
+        }
+    }
     if dark {
         css.push_str(include_str!("typora-preferences-dark.css"));
     } else {

@@ -1,0 +1,9 @@
+# 전체 언어의 기본 구문색. 값은 lbrx.toml의 라이트·다크 roles 이름.
+# 개별 언어 파일에 같은 토큰이 있으면 그 값이 우선한다.
+[tokens]
+comment = "comment" # 코드 주석.
+keyword = "keyword" # 언어 예약어·키워드.
+string = "string" # 문자열 리터럴.
+function = "function" # 함수명으로 식별된 토큰.
+number = "number" # 숫자 리터럴.
+error = "error" # 문법이 식별한 오류 토큰. 진단 밑줄과는 별개.

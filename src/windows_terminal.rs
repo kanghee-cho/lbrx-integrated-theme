@@ -29,8 +29,8 @@ const ANSI_FIELDS: [&str; 16] = [
 pub fn render(theme: &ResolvedTheme) -> Result<[(&'static str, String); 3], String> {
     let schemes = json!({
         "schemes": [
-            scheme("LBRX Light", &theme.light),
-            scheme("LBRX Dark", &theme.dark)
+            scheme(theme, "LBRX Light", &theme.light),
+            scheme(theme, "LBRX Dark", &theme.dark)
         ]
     });
     let mono = &theme.typography.mono;
@@ -57,7 +57,7 @@ const INCLUDE_GUIDE: &str = include_str!(concat!(
     "/Docs/06-windows-terminal.md"
 ));
 
-fn scheme(name: &str, mode: &ResolvedMode) -> Value {
+fn scheme(theme: &ResolvedTheme, name: &str, mode: &ResolvedMode) -> Value {
     let mut scheme = serde_json::Map::new();
     scheme.insert("name".into(), json!(name));
     for (field, role) in [
@@ -66,7 +66,10 @@ fn scheme(name: &str, mode: &ResolvedMode) -> Value {
         ("cursorColor", "terminal_cursor"),
         ("selectionBackground", "selection_background"),
     ] {
-        scheme.insert(field.into(), json!(mode.roles[role]));
+        scheme.insert(
+            field.into(),
+            json!(theme.editor_color(mode, DIRECTORY, field, &mode.roles[role])),
+        );
     }
     for (field, color) in ANSI_FIELDS.into_iter().zip(&mode.ansi) {
         scheme.insert(field.into(), json!(color));

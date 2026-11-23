@@ -1,12 +1,16 @@
 # LBRX 통합 테마 설계
 
-**상태: 원본 검증 `check`와 Windows Terminal·Typora·Obsidian용 `build` 구현.** 목적은 일곱 앱을 똑같이 보이게 하는 것이 아니라, 한 곳에서 바꾼 디자인 의도가 각 앱에서 같은 의미로 보이게 하는 것이다.
+**상태: 읽기 전용 TUI `preview`, 원본 검증 `check`, Windows Terminal·Typora·Obsidian·iTerm2·Vim·VS Code·Helix 선택 빌드 구현.** 원본은 직접 편집하고, 각 앱에서 같은 디자인 의도로 보이도록 변환한다.
+
+언어 공통·언어별 구문색과 앱별 색상 옵션을 수정하려면 [설정 파일과 우선순위](02-design-and-editor.md#언어별-구문색과-앱-전용-옵션)를 참고한다.
 
 저장소 루트에서 `cargo run --locked -- check`를 실행하면 [예제 테마](../themes/lbrx.toml)를 변경하지 않고 검사한다. 다른 파일은 `check` 뒤에 경로를 전달한다. 스키마 버전, 팔레트·역할 키 일치, HEX와 참조, ANSI 16색, 서체, 대비를 확인한다. 대비는 본문/기본 배경 7:1, 보조·문서·구문·상태 색/기본 배경 및 선택 글자/선택 배경 4.5:1, 포커스/기본 배경·표면 3:1을 기준으로 한다. ANSI는 슬롯과 참조를 검사하며 임의의 ANSI 조합에는 대비 기준을 적용하지 않는다. `cargo test --locked`로 테스트를 실행한다.
 
 ```powershell
 cargo run --locked -- check
+cargo run --locked -- preview --app obsidian --app typora
 cargo run --locked -- build
+cargo run --locked -- build --app obsidian --app typora
 # 다른 원본을 지정할 때
 cargo run --locked -- build .\themes\lbrx.toml
 ```
@@ -17,7 +21,7 @@ cargo run --locked -- build .\themes\lbrx.toml
 |---|---|
 | 장시간 글쓰기·읽기, 2026년 감성의 녹색 계열 | 저채도 배경과 청록 강조색을 쓰는 라이트·다크 한 쌍. 실제 색감은 시안이다. |
 | 글꼴·크기·줄 간격도 관리 | 본문과 고정폭 글꼴을 분리한다. 앱이 지원하지 않는 값은 억지로 변환하지 않는다. |
-| 색을 보면서 수정하는 Rust TUI | 색상 견본과 실제 문장·코드 미리보기를 함께 제공한다. 원본 파일도 직접 편집할 수 있다. |
+| 편집과 미리보기 분리 | TOML은 파일에서 수정하고 Rust TUI에서는 앱별 색상 견본을 확인한다. |
 | 한 명령으로 생성, 수동 가져오기 | 생성기는 앱 설정에 쓰지 않는다. 사용자는 원하는 앱의 산출물만 가져간다. |
 
 1. [원본과 생성 구조](01-architecture.md) — 무엇을 어디서 바꾸며, 변경이 어떻게 일곱 앱에 전파되는가.
@@ -38,14 +42,17 @@ cargo run --locked -- build .\themes\lbrx.toml
 14. [macOS Terminal.app 적용 가이드](14-macos-terminal.md) · 15. [프로파일·ANSI 옵션 대장](15-macos-terminal-options.md)
 16. [Helix 적용 가이드](16-helix.md) · 17. [스코프별 옵션 대장](17-helix-options.md)
 18. [VS Code 적용 가이드](18-vscode.md) · 19. [색 테마 옵션 대장](19-vscode-options.md)
-20. [iTerm2 적용 가이드](20-iterm2.md) · 21. [색 프리셋 옵션 대장](21-iterm2-options.md) — 기존 일곱 앱과 별도로 검토하는 추가 대상.
+20. [iTerm2 적용 가이드](20-iterm2.md) · 21. [색 프리셋 옵션 대장](21-iterm2-options.md) — 라이트·다크 프리셋 생성과 수동 프로파일 설정.
 22. [VS Code 언어별 구문 강조와 동반 CSS](22-vscode-language-highlighting.md) — 편집기 테마와 HTML 코드 블록이 같은 구문색을 쓰는 방법, 언어별 지원 대장.
 23. [Vim 언어별 코드 구문 강조](23-vim-language-highlighting.md) — 공통 역할과 Vim 그룹 매핑, 언어별 예외, RGB·cterm 검증.
 24. [Obsidian 언어별 코드 구문 강조](24-obsidian-language-highlighting.md) — 코드 펜스, 공통 역할과 CSS 변수 매핑, 언어별 읽기 뷰·라이브 프리뷰 검증.
 
-**향후 사용 흐름:** TUI에서 다크 모드의 청록 견본을 바꾸고 저장한 뒤 `lbrx-theme build`로 패키지를 다시 만든다. 사용자가 가져오기 전까지 앱 화면은 변하지 않는다. `edit`와 Windows Terminal·Typora·Obsidian 이외의 앱별 출력은 아직 제공하지 않는다.
+**사용 흐름:** [원본 TOML](../themes/lbrx.toml) 또는 [언어](../themes/languages/)·[앱](../themes/editors/) TOML을 직접 수정한다. `preview`에서 `Tab`으로 앱, `L`로 언어, `M`으로 모드를 바꾼다. `I`는 적용 근거, `R`은 저장된 설정 다시 읽기다. `build --app …`은 별도로 실행하며, 앱 적용은 수동이다.
 
 ## 개발 환경과 다음 단계
+
+- **현재 배색:** 라이트·다크에서 문자열은 기존 청록색을 쓴다. 올리브색은 비교 시안이며 기본값에 반영하지 않았다. Typora와 Obsidian은 [독립 코드 블록 배경](02-design-and-editor.md#문서-속-코드-블록-배경)을 쓰고, VS Code·Vim·Helix의 편집기 배경은 그대로다.
+- **다음 확인:** Typora·Obsidian 실제 화면에서 코드 블록의 라이트·다크 배경을 확인하고, 앱별 언어 토큰이 기대한 색으로 표시되는지 기록한다. Helix 화면과 macOS의 iTerm2 프리셋 가져오기도 확인 대상이다. macOS Terminal.app 어댑터는 아직 미구현이다.
 
 ### 테마 글꼴 확인과 설치
 

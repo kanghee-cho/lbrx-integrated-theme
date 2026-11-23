@@ -8,12 +8,12 @@
 |---|---|---|
 | [Typora](08-typora-options.md) | 모드별 CSS · 생성 | 문서 색·서체·코드 구문색을 직접 지정. 설정 창 일부는 앱 전용 |
 | [Obsidian](10-obsidian-options.md) | 테마 CSS + manifest · 최소 테마 생성 | 문서 역할을 읽기 뷰·라이브 프리뷰에 각각 연결. Publish는 별도 배포 |
-| [VS Code](19-vscode-options.md) | VSIX 색 테마 · 예정 | 작업 화면 색 ID·TextMate·semantic token에 연결. 서체는 별도 사용자 설정 |
-| [Vim](13-vim-options.md) | Vim 색 구성표 · 예정 | 하이라이트 그룹에 RGB 또는 `cterm` 근사값을 지정. 글꼴·셀 높이는 호스트 소유 |
-| [Helix](17-helix-options.md) | TOML 테마 · 예정 | 구문·UI 스코프에 색과 장식을 지정. 글꼴·셀 높이는 호스트 소유 |
+| [VS Code](19-vscode-options.md) | VSIX 색 테마 · 생성 구현 | 작업 화면 색 ID·TextMate·semantic token에 연결. 서체는 별도 사용자 설정 |
+| [Vim](13-vim-options.md) | Vim 색 구성표 · 생성 | 기본 화면·공통 구문 그룹에 RGB와 256색 `cterm` 근사값을 지정. 글꼴·셀 높이는 호스트 소유 |
+| [Helix](17-helix-options.md) | TOML 테마 · 생성 구현 | 구문·UI·진단 스코프에 색과 장식을 지정. 글꼴·셀 높이는 호스트 소유 |
 | [Windows Terminal](06-windows-terminal.md) | 배색표 JSON + 글꼴 조각 · 생성 | 전경·배경·커서·선택 배경·ANSI 16색. 글꼴은 첫 패밀리와 pt 크기만 선택 적용 |
 | [macOS Terminal.app](15-macos-terminal-options.md) | `.terminal` 프로파일 · 예정 | 프로파일에 터미널 배색을 매핑. 글꼴·간격은 사용자 설정 안내 |
-| [iTerm2](21-iterm2-options.md) | `.itermcolors` 프리셋 · 예정 | 기존 프로파일의 배색만 교체. 선택 글자색은 프로파일 옵션, 글꼴·간격은 수동 |
+| [iTerm2](21-iterm2-options.md) | `.itermcolors` 프리셋 · 생성 | 기존 프로파일의 배색만 변경. 선택 글자색 사용 여부와 글꼴·간격은 프로파일에서 설정 |
 
 ## 공통 옵션을 고르는 기준
 

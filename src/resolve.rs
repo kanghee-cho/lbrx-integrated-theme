@@ -2,6 +2,7 @@ use crate::model::{FontStyle, Mode, Theme, Typography};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
+const CODE_BLOCK_BACKGROUND: &str = "code_block_background";
 const ANSI_SLOTS: [&str; 16] = [
     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15",
 ];
@@ -34,6 +35,8 @@ const REQUIRED_ROLES: &[&str] = &[
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct ResolvedTheme {
+    #[serde(default)]
+    pub layers: crate::layers::Layers,
     pub schema_version: u32,
     pub tool_version: String,
     pub light: ResolvedMode,
@@ -41,11 +44,64 @@ pub struct ResolvedTheme {
     pub typography: Typography,
 }
 
-#[derive(Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct ResolvedMode {
     pub roles: BTreeMap<String, String>,
     pub ansi: [String; 16],
+}
+
+impl ResolvedMode {
+    pub fn code_block_background_role(&self) -> &'static str {
+        if self.roles.contains_key(CODE_BLOCK_BACKGROUND) {
+            CODE_BLOCK_BACKGROUND
+        } else {
+            "background"
+        }
+    }
+
+    pub fn code_block_background(&self) -> &str {
+        &self.roles[self.code_block_background_role()]
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum ColorSource {
+    Language,
+    Common,
+    Editor,
+    Base,
+}
+
+impl ResolvedTheme {
+    pub fn token_role<'a>(&'a self, lang: &str, token: &'a str) -> (&'a str, ColorSource) {
+        if let Some(role) = self.layers.languages.get(lang).and_then(|m| m.get(token)) {
+            (role, ColorSource::Language)
+        } else if let Some(role) = self.layers.common.get(token) {
+            (role, ColorSource::Common)
+        } else {
+            (token, ColorSource::Base)
+        }
+    }
+
+    pub fn token<'a>(&self, mode: &'a ResolvedMode, lang: &str, token: &str) -> &'a str {
+        &mode.roles[self.token_role(lang, token).0]
+    }
+
+    pub fn editor_role<'a>(&'a self, app: &str, key: &str) -> Option<&'a str> {
+        self.layers.editors.get(app)?.get(key).map(String::as_str)
+    }
+
+    pub fn editor_color<'a>(
+        &self,
+        mode: &'a ResolvedMode,
+        app: &str,
+        key: &str,
+        fallback: &'a str,
+    ) -> &'a str {
+        self.editor_role(app, key)
+            .map_or(fallback, |role| &mode.roles[role])
+    }
 }
 
 pub fn resolve(theme: &Theme) -> Result<ResolvedTheme, String> {
@@ -61,6 +117,7 @@ pub fn resolve(theme: &Theme) -> Result<ResolvedTheme, String> {
         }),
     };
     Ok(ResolvedTheme {
+        layers: theme.layers.clone(),
         schema_version: theme.schema_version,
         tool_version: env!("CARGO_PKG_VERSION").into(),
         light: mode(&theme.light),
@@ -78,6 +135,52 @@ pub fn check(theme: &Theme) -> Result<(), String> {
     }
     check_mode("light", &theme.light)?;
     check_mode("dark", &theme.dark)?;
+    for (name, mode) in [("light", &theme.light), ("dark", &theme.dark)] {
+        let luminance_of = |role: &str| {
+            luminance(parse_rgb(&mode.palette[&mode.roles[role]]).expect("checked RGB"))
+        };
+        let code_bg = mode
+            .roles
+            .contains_key(CODE_BLOCK_BACKGROUND)
+            .then(|| luminance_of(CODE_BLOCK_BACKGROUND));
+        if let Some(bg) = code_bg {
+            for token in std::iter::once("text").chain(crate::layers::TOKENS.iter().copied()) {
+                let role = theme.layers.common.get(token).map_or(token, String::as_str);
+                check_contrast(
+                    name,
+                    token,
+                    CODE_BLOCK_BACKGROUND,
+                    luminance_of(role),
+                    bg,
+                    4.5,
+                )?;
+            }
+        }
+        for (language, tokens) in std::iter::once(("common", &theme.layers.common))
+            .chain(theme.layers.languages.iter().map(|(k, v)| (k.as_str(), v)))
+        {
+            for (token, role) in tokens {
+                check_contrast(
+                    name,
+                    &format!("languages/{language}.toml: {token} ({role})"),
+                    "background",
+                    luminance_of(role),
+                    luminance_of("background"),
+                    4.5,
+                )?;
+                if let Some(bg) = code_bg.filter(|_| language != "common") {
+                    check_contrast(
+                        name,
+                        &format!("languages/{language}.toml: {token} ({role})"),
+                        CODE_BLOCK_BACKGROUND,
+                        luminance_of(role),
+                        bg,
+                        4.5,
+                    )?;
+                }
+            }
+        }
+    }
     check_font("prose", &theme.typography.prose)?;
     check_font("mono", &theme.typography.mono)?;
     for (name, this, other) in [
@@ -206,7 +309,7 @@ fn check_font(kind: &str, font: &FontStyle) -> Result<(), String> {
     Ok(())
 }
 
-fn parse_rgb(value: &str) -> Option<[u8; 3]> {
+pub(crate) fn parse_rgb(value: &str) -> Option<[u8; 3]> {
     let hex = value.strip_prefix('#')?;
     if hex.len() != 6 || !hex.bytes().all(|b| b.is_ascii_hexdigit()) {
         return None;
@@ -238,13 +341,21 @@ fn check_contrast(
     bg: f64,
     minimum: f64,
 ) -> Result<(), String> {
-    let ratio = (fg.max(bg) + 0.05) / (fg.min(bg) + 0.05);
+    let ratio = luminance_ratio(fg, bg);
     if ratio < minimum {
         return Err(format!(
             "{mode}.roles.{foreground} / {mode}.roles.{background}: 대비 {ratio}:1 (최소 {minimum}:1)"
         ));
     }
     Ok(())
+}
+
+fn luminance_ratio(fg: f64, bg: f64) -> f64 {
+    (fg.max(bg) + 0.05) / (fg.min(bg) + 0.05)
+}
+
+pub(crate) fn contrast_ratio(fg: [u8; 3], bg: [u8; 3]) -> f64 {
+    luminance_ratio(luminance(fg), luminance(bg))
 }
 
 #[cfg(test)]

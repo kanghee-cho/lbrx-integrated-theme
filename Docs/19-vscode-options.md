@@ -2,19 +2,19 @@
 
 [적용 가이드](18-vscode.md) · [공통 원본](../themes/lbrx.toml) · [공식 색 ID 목록 고정본](https://github.com/microsoft/vscode-docs/blob/d1e499c3abac3a4d3fb28e18b0e7e9f72c0d17f9/api/references/theme-color.md)
 
-`tokenColors`와 `semanticTokenColors`의 언어별 적용 상태, HTML 코드 블록에 함께 제공할 CSS는 [언어별 구문 강조 설계](22-vscode-language-highlighting.md)에서 추적한다.
+`tokenColors`와 `semanticTokenColors`의 언어별 적용 상태 및 HTML 코드 블록용 동반 CSS는 [언어별 구문 강조](22-vscode-language-highlighting.md)에서 추적한다.
 
-`[ ]`는 해당 VS Code 출력 미구현이다. 공통 역할은 매핑 제안이며 다른 앱의 생성 결과를 가져와 완료 처리하지 않는다. 아래 `colors` 색인 범위는 고정본이 명명한 작업 화면 색 ID다. 개별 확장의 추가 ID, 언어별 임의 TextMate scope와 semantic selector 조합은 유한한 전수 목록이 아니다.
+`[x]`는 두 모드에서 생성, `[ ]`는 미구현이다. 체크는 실제 화면 확인을 뜻하지 않는다. 아래 `colors` 색인 범위는 고정본이 명명한 작업 화면 색 ID다. 개별 확장의 추가 ID, 언어별 임의 TextMate scope와 semantic selector 조합은 유한한 전수 목록이 아니다.
 
 | 적용 경로 | 설정 가능한 값 | 공통 / 합일 / 전용 |
 |---|---|---|
 | `colors` | 작업 화면 요소의 전경·배경·경계·상태 색. 반투명이 필요한 오버레이는 알파를 보존 | 아래 ID별로 추적 |
-| `tokenColors[].scope` / `.settings` | TextMate scope별 `foreground`, `fontStyle`(굵게·기울임·밑줄·취소선). 예: `comment`, `string`, `keyword`, `entity.name.function`, `constant.numeric`, `invalid` | 공통 역할 `comment`, `string`, `keyword`, `function`, `number`, `error` → 언어 문법별 합일 후보. 각 매핑 미구현 |
-| `semanticHighlighting`, `semanticTokenColors` | 의미 강조 참여 여부와 `타입.수식어:언어` 선택자별 색·굵기·기울임·밑줄. 예: `variable.readonly:typescript` | VS Code 전용 매핑. provider가 반환한 토큰만 적용. [표준 타입·수식어 및 fallback](https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide) |
-| 사용자 설정 조각 | `editor.fontFamily`, `editor.fontSize`, `editor.lineHeight`, `editor.fontLigatures`; 통합 터미널은 `terminal.integrated.fontFamily` 등 별도 | 코드 서체 합일 후보. 색 테마에서 강제하지 않음 |
+| `tokenColors[].scope` / `.settings` | TextMate scope별 `foreground`, `fontStyle`(굵게·기울임·밑줄·취소선) | [x] 공통 역할 6개 및 제공 언어 5종의 설정된 예외 전경색. 서체 스타일은 미구현 |
+| `semanticHighlighting`, `semanticTokenColors` | 의미 강조 참여 여부와 `타입.수식어:언어` 선택자별 색·굵기·기울임·밑줄 | [x] 공통 `function`, `number` 색. provider가 반환한 토큰만 적용. [표준 타입·수식어 및 fallback](https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide) |
+| 사용자 설정 조각 | `editor.fontFamily`, `editor.fontSize`, `editor.lineHeight`, `terminal.integrated.fontFamily`, `terminal.integrated.fontSize` | [x] 선택 병합용 설정 조각 생성. 합자 설정은 수동이며 색 테마에서 강제하지 않음 |
 | 아이콘 | 파일 아이콘 / 제품 아이콘 테마 선택 | 별도 확장 기여점. 로컬 아이콘 폰트가 있다고 구현된 것이 아님 |
 
-**검증 기록:** 아직 없음. ID 또는 구문 선택자별로 `VS Code 버전·언어/확장·모드·기대값·실제값·근거`를 기록한다. 생성 열과 실제 화면 검증은 분리한다.
+**검증 기록:** 두 테마 JSON의 색 ID 35개가 아래 체크와 일치한다. Windows VS Code 1.147.0의 임시 프로필에서 VSIX 설치와 확장 등록을 확인했다. 라이트·다크 실제 화면 및 언어별 토큰은 미검증이다.
 
 ## 공식 작업 화면 색 ID
 
@@ -24,14 +24,14 @@
 |---|---|---|---|
 | `contrastActiveBorder` | Contrast colors | VS Code 전용 | [ ] |
 | `contrastBorder` | Contrast colors | VS Code 전용 | [ ] |
-| `focusBorder` | Base colors | 공통 · focus | [ ] |
-| `foreground` | Base colors | VS Code 전용 | [ ] |
+| `focusBorder` | Base colors | 공통 · focus | [x] |
+| `foreground` | Base colors | 공통 · text | [x] |
 | `disabledForeground` | Base colors | VS Code 전용 | [ ] |
 | `widget.border` | Base colors | VS Code 전용 | [ ] |
 | `widget.shadow` | Base colors | VS Code 전용 | [ ] |
 | `selection.background` | Base colors | VS Code 전용 | [ ] |
 | `descriptionForeground` | Base colors | VS Code 전용 | [ ] |
-| `errorForeground` | Base colors | 공통 · error | [ ] |
+| `errorForeground` | Base colors | 공통 · error | [x] |
 | `icon.foreground` | Base colors | VS Code 전용 | [ ] |
 | `sash.hoverBorder` | Base colors | VS Code 전용 | [ ] |
 | `window.activeBorder` | Window border | VS Code 전용 | [ ] |
@@ -69,7 +69,7 @@
 | `textBlockQuote.border` | Text colors | VS Code 전용 | [ ] |
 | `textCodeBlock.background` | Text colors | VS Code 전용 | [ ] |
 | `textLink.activeForeground` | Text colors | VS Code 전용 | [ ] |
-| `textLink.foreground` | Text colors | VS Code 전용 | [ ] |
+| `textLink.foreground` | Text colors | 공통 · link | [x] |
 | `textPreformat.foreground` | Text colors | VS Code 전용 | [ ] |
 | `textPreformat.background` | Text colors | VS Code 전용 | [ ] |
 | `textPreformat.border` | Text colors | VS Code 전용 | [ ] |
@@ -108,9 +108,9 @@
 | `dropdown.listBackground` | Dropdown control | VS Code 전용 | [ ] |
 | `dropdown.border` | Dropdown control | VS Code 전용 | [ ] |
 | `dropdown.foreground` | Dropdown control | VS Code 전용 | [ ] |
-| `input.background` | Input control | VS Code 전용 | [ ] |
+| `input.background` | Input control | 공통 · background | [x] |
 | `input.border` | Input control | VS Code 전용 | [ ] |
-| `input.foreground` | Input control | VS Code 전용 | [ ] |
+| `input.foreground` | Input control | 공통 · text | [x] |
 | `input.placeholderForeground` | Input control | VS Code 전용 | [ ] |
 | `inputOption.activeBackground` | Input control | VS Code 전용 | [ ] |
 | `inputOption.activeBorder` | Input control | VS Code 전용 | [ ] |
@@ -188,8 +188,8 @@
 | `profileBadge.background` | Profiles | VS Code 전용 | [ ] |
 | `profileBadge.foreground` | Profiles | VS Code 전용 | [ ] |
 | `profiles.sashBorder` | Profiles | VS Code 전용 | [ ] |
-| `sideBar.background` | Side Bar | VS Code 전용 | [ ] |
-| `sideBar.foreground` | Side Bar | VS Code 전용 | [ ] |
+| `sideBar.background` | Side Bar | 공통 · surface | [x] |
+| `sideBar.foreground` | Side Bar | 공통 · text | [x] |
 | `sideBar.border` | Side Bar | VS Code 전용 | [ ] |
 | `sideBar.dropBackground` | Side Bar | VS Code 전용 | [ ] |
 | `sideBarTitle.foreground` | Side Bar | VS Code 전용 | [ ] |
@@ -260,21 +260,21 @@
 | `editorPane.background` | Editor Groups & Tabs | VS Code 전용 | [ ] |
 | `sideBySideEditor.horizontalBorder` | Editor Groups & Tabs | VS Code 전용 | [ ] |
 | `sideBySideEditor.verticalBorder` | Editor Groups & Tabs | VS Code 전용 | [ ] |
-| `editor.background` | Editor colors | 공통 · background | [ ] |
-| `editor.foreground` | Editor colors | 공통 · text | [ ] |
-| `editorLineNumber.foreground` | Editor colors | 합일 후보 | [ ] |
+| `editor.background` | Editor colors | 공통 · background | [x] |
+| `editor.foreground` | Editor colors | 공통 · text | [x] |
+| `editorLineNumber.foreground` | Editor colors | 공통 · muted | [x] |
 | `editorLineNumber.activeForeground` | Editor colors | 합일 후보 | [ ] |
 | `editorLineNumber.dimmedForeground` | Editor colors | 합일 후보 | [ ] |
 | `editorCursor.background` | Editor colors | 합일 후보 | [ ] |
-| `editorCursor.foreground` | Editor colors | 합일 후보 | [ ] |
+| `editorCursor.foreground` | Editor colors | 공통 · focus | [x] |
 | `editorMultiCursor.primary.foreground` | Editor colors | VS Code 전용 | [ ] |
 | `editorMultiCursor.primary.background` | Editor colors | VS Code 전용 | [ ] |
 | `editorMultiCursor.secondary.foreground` | Editor colors | VS Code 전용 | [ ] |
 | `editorMultiCursor.secondary.background` | Editor colors | VS Code 전용 | [ ] |
 | `editor.placeholder.foreground` | Editor colors | VS Code 전용 | [ ] |
 | `editor.compositionBorder` | Editor colors | VS Code 전용 | [ ] |
-| `editor.selectionBackground` | Editor colors | 공통 · selection_background | [ ] |
-| `editor.selectionForeground` | Editor colors | 공통 · selection_text | [ ] |
+| `editor.selectionBackground` | Editor colors | 공통 · selection_background | [x] |
+| `editor.selectionForeground` | Editor colors | 공통 · selection_text | [x] |
 | `editor.inactiveSelectionBackground` | Editor colors | VS Code 전용 | [ ] |
 | `editor.selectionHighlightBackground` | Editor colors | VS Code 전용 | [ ] |
 | `editor.selectionHighlightBorder` | Editor colors | VS Code 전용 | [ ] |
@@ -710,27 +710,27 @@
 | `keybindingLabel.bottomBorder` | Keybinding label colors | VS Code 전용 | [ ] |
 | `keybindingTable.headerBackground` | Keyboard shortcut table colors | VS Code 전용 | [ ] |
 | `keybindingTable.rowsBackground` | Keyboard shortcut table colors | VS Code 전용 | [ ] |
-| `terminal.background` | Integrated Terminal colors | 공통 · terminal_background | [ ] |
+| `terminal.background` | Integrated Terminal colors | 공통 · terminal_background | [x] |
 | `terminal.border` | Integrated Terminal colors | 합일 후보 | [ ] |
-| `terminal.foreground` | Integrated Terminal colors | 공통 · terminal_foreground | [ ] |
-| `terminal.ansiBlack` | Integrated Terminal colors | 공통 · ANSI 0 | [ ] |
-| `terminal.ansiBlue` | Integrated Terminal colors | 공통 · ANSI 4 | [ ] |
-| `terminal.ansiBrightBlack` | Integrated Terminal colors | 공통 · ANSI 8 | [ ] |
-| `terminal.ansiBrightBlue` | Integrated Terminal colors | 공통 · ANSI 12 | [ ] |
-| `terminal.ansiBrightCyan` | Integrated Terminal colors | 공통 · ANSI 14 | [ ] |
-| `terminal.ansiBrightGreen` | Integrated Terminal colors | 공통 · ANSI 10 | [ ] |
-| `terminal.ansiBrightMagenta` | Integrated Terminal colors | 공통 · ANSI 13 | [ ] |
-| `terminal.ansiBrightRed` | Integrated Terminal colors | 공통 · ANSI 9 | [ ] |
-| `terminal.ansiBrightWhite` | Integrated Terminal colors | 공통 · ANSI 15 | [ ] |
-| `terminal.ansiBrightYellow` | Integrated Terminal colors | 공통 · ANSI 11 | [ ] |
-| `terminal.ansiCyan` | Integrated Terminal colors | 공통 · ANSI 6 | [ ] |
-| `terminal.ansiGreen` | Integrated Terminal colors | 공통 · ANSI 2 | [ ] |
-| `terminal.ansiMagenta` | Integrated Terminal colors | 공통 · ANSI 5 | [ ] |
-| `terminal.ansiRed` | Integrated Terminal colors | 공통 · ANSI 1 | [ ] |
-| `terminal.ansiWhite` | Integrated Terminal colors | 공통 · ANSI 7 | [ ] |
-| `terminal.ansiYellow` | Integrated Terminal colors | 공통 · ANSI 3 | [ ] |
-| `terminal.selectionBackground` | Integrated Terminal colors | 공통 · selection_background | [ ] |
-| `terminal.selectionForeground` | Integrated Terminal colors | 공통 · selection_text | [ ] |
+| `terminal.foreground` | Integrated Terminal colors | 공통 · terminal_foreground | [x] |
+| `terminal.ansiBlack` | Integrated Terminal colors | 공통 · ANSI 0 | [x] |
+| `terminal.ansiBlue` | Integrated Terminal colors | 공통 · ANSI 4 | [x] |
+| `terminal.ansiBrightBlack` | Integrated Terminal colors | 공통 · ANSI 8 | [x] |
+| `terminal.ansiBrightBlue` | Integrated Terminal colors | 공통 · ANSI 12 | [x] |
+| `terminal.ansiBrightCyan` | Integrated Terminal colors | 공통 · ANSI 14 | [x] |
+| `terminal.ansiBrightGreen` | Integrated Terminal colors | 공통 · ANSI 10 | [x] |
+| `terminal.ansiBrightMagenta` | Integrated Terminal colors | 공통 · ANSI 13 | [x] |
+| `terminal.ansiBrightRed` | Integrated Terminal colors | 공통 · ANSI 9 | [x] |
+| `terminal.ansiBrightWhite` | Integrated Terminal colors | 공통 · ANSI 15 | [x] |
+| `terminal.ansiBrightYellow` | Integrated Terminal colors | 공통 · ANSI 11 | [x] |
+| `terminal.ansiCyan` | Integrated Terminal colors | 공통 · ANSI 6 | [x] |
+| `terminal.ansiGreen` | Integrated Terminal colors | 공통 · ANSI 2 | [x] |
+| `terminal.ansiMagenta` | Integrated Terminal colors | 공통 · ANSI 5 | [x] |
+| `terminal.ansiRed` | Integrated Terminal colors | 공통 · ANSI 1 | [x] |
+| `terminal.ansiWhite` | Integrated Terminal colors | 공통 · ANSI 7 | [x] |
+| `terminal.ansiYellow` | Integrated Terminal colors | 공통 · ANSI 3 | [x] |
+| `terminal.selectionBackground` | Integrated Terminal colors | 공통 · selection_background | [x] |
+| `terminal.selectionForeground` | Integrated Terminal colors | 공통 · selection_text | [x] |
 | `terminal.inactiveSelectionBackground` | Integrated Terminal colors | 합일 후보 | [ ] |
 | `terminal.findMatchBackground` | Integrated Terminal colors | 합일 후보 | [ ] |
 | `terminal.findMatchBorder` | Integrated Terminal colors | 합일 후보 | [ ] |
@@ -738,7 +738,7 @@
 | `terminal.findMatchHighlightBorder` | Integrated Terminal colors | 합일 후보 | [ ] |
 | `terminal.hoverHighlightBackground` | Integrated Terminal colors | 합일 후보 | [ ] |
 | `terminalCursor.background` | Integrated Terminal colors | VS Code 전용 | [ ] |
-| `terminalCursor.foreground` | Integrated Terminal colors | 공통 · terminal_cursor | [ ] |
+| `terminalCursor.foreground` | Integrated Terminal colors | 공통 · terminal_cursor | [x] |
 | `terminal.dropBackground` | Integrated Terminal colors | 합일 후보 | [ ] |
 | `terminal.tab.activeBorder` | Integrated Terminal colors | 합일 후보 | [ ] |
 | `terminalCommandDecoration.defaultBackground` | Integrated Terminal colors | VS Code 전용 | [ ] |
