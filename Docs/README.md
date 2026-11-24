@@ -2,6 +2,12 @@
 
 하나의 TOML 원본에서 8개 앱의 라이트·다크 테마를 생성한다. 생성기는 설치된 앱이나 사용자 설정을 수정하지 않는다.
 
+## V1.0 정식 배포
+
+[GitHub Releases의 V1.0](https://github.com/kanghee-cho/lbrx-integrated-theme/releases/tag/V1.0)에서 `lbrx-themes-1.0.0.zip`을 내려받아 압축을 푼다. `lbrx` 아래 앱별 `README.md`를 따라 수동 설치한다. VS Code만 사용할 경우 `lbrx-theme-1.0.0.vsix`를 내려받아 **Install from VSIX**로 설치할 수 있다. `SHA256SUMS.txt`는 두 배포 파일의 SHA-256 확인용이다.
+
+배포 파일에는 글꼴과 앱 실행 파일이 포함되지 않는다. 글꼴은 아래 안내에 따라 별도로 준비한다. 테마 파일 생성과 실제 앱 화면 검증의 범위는 [검증 버전과 범위](05-languages-and-dependencies.md#대상-앱과-외부-도구-버전)를 따른다.
+
 ## 시작하기
 
 `rustup`으로 [고정 Rust 도구체인](../rust-toolchain.toml)을 사용한다. Windows MSVC에서는 Visual Studio Build Tools의 C++ 빌드 도구와 Windows SDK도 필요하다. 저장소 루트에서 실행한다.

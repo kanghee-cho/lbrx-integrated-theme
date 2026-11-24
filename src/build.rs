@@ -622,7 +622,11 @@ mod tests {
         fs::create_dir(&editors).unwrap();
         fs::write(&source, include_str!("../themes/lbrx.toml")).unwrap();
         let settings = editors.join("helix.toml");
-        let stock = include_str!("../themes/editors/helix.toml");
+        let stock = r#"
+[colors]
+"ui.linenr" = "muted"
+"ui.linenr.selected" = "text"
+"#;
         fs::write(&settings, stock).unwrap();
         let dir = App::Helix.output_path(&workspace.0);
         let read = |name| fs::read_to_string(dir.join(name)).unwrap();
