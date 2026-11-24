@@ -8,7 +8,7 @@
 
 팔레트·역할·서체는 [공통 원본](../themes/lbrx.toml)에서 관리한다. [Typora 설정](../themes/editors/typora.toml)의 `[colors]`에는 인용문·링크·각주 번호·집중 모드의 **Typora 전용 역할 연결 예시**가 있다. 주석 그대로 두면 각 옵션의 기본 동작을 따르고, 필요한 줄을 활성화하면 Typora에서만 역할 연결이 바뀐다. 고정 CSS나 아직 지원하지 않는 기능은 설정 예시로 제공하지 않는다.
 
-본문 폭·문단 간격·제목 조판·본문 강조는 공통화 후보다. 현재는 Typora에서만 이 조판 값을 읽으므로 전용 파일에 두고, Obsidian 등 두 번째 앱에서 적용 대상·단위·기대 결과가 같을 때 [공통 옵션 승격](04-option-strategy.md#확장-규칙-새-앱이-생겨도-공통-메뉴는-자동으로-늘지-않는다)을 검토한다. 표·이미지·수식·알림의 앱별 렌더링 차이는 그대로 둔다.
+본문 폭·문단 간격·제목 조판·본문 강조는 Obsidian과 기능 ID를 공유하지만 값은 각 앱의 TOML에서 조정한다. 동일한 기능이라도 앱의 렌더러와 적용 뷰에 따라 결과가 달라질 수 있다.
 
 ## 공통 문서 기능의 Typora 적용
 
@@ -71,7 +71,7 @@
 
 ## 검증 기록
 
-생성 근거는 [Typora 변환 코드](../src/typora.rs), [문서 CSS](../src/typora.css), [다크 환경설정](../src/typora-preferences-dark.css), [라이트 환경설정](../src/typora-preferences-light.css), [생성 테스트](../src/build.rs)를 기준으로 한다. 새 항목은 원본 키 또는 고정 선언 → 생성된 CSS → 실제 앱 순서로 기록한다. 의도·단위·적용 범위·샘플이 일치할 때만 [공통 옵션으로 승격](04-option-strategy.md)한다.
+생성 근거는 [Typora 변환 코드](../src/typora.rs), [문서 CSS](../src/typora.css), [다크 환경설정](../src/typora-preferences-dark.css), [라이트 환경설정](../src/typora-preferences-light.css), [생성 테스트](../src/build.rs)다. 새 항목은 [옵션 확장 기준](01-architecture.md#옵션-확장-기준)을 따른다.
 
 | 날짜 | 앱·OS·버전 | ID 또는 CSS 변수 | 뷰·모드 | 결과·차이 / 근거 |
 |---|---|---|---|---|

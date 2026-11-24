@@ -1,6 +1,8 @@
 # Typora에 LBRX 적용
 
-저장소 루트에서 `cargo run --locked -- build`를 실행하면 `dist\lbrx\typora`에 `lbrx-light.css`와 `lbrx-dark.css`가 생성됩니다. 생성기는 Typora 설정을 바꾸지 않습니다.
+저장소 루트에서 `cargo run --locked -- build --app typora`를 실행하면 `dist\lbrx\typora`에 `lbrx-light.css`와 `lbrx-dark.css`가 생성된다.
+
+## 설치·복구
 
 1. Typora의 **환경설정 → 모양 → 테마 폴더 열기**에서 테마 폴더를 엽니다.
 2. 두 CSS 파일을 복사하고 Typora를 다시 시작합니다. **테마** 메뉴에서 **Lbrx Light** 또는 **Lbrx Dark**를 선택합니다.

@@ -7,10 +7,10 @@
 | 대상·상세 문서 | 출력과 현재 생성 여부 | 공통값의 적용 경로 또는 한계 |
 |---|---|---|
 | [Typora](08-typora-options.md) | 모드별 CSS · 생성 | 문서 색·서체·코드 구문색을 직접 지정. 설정 창 일부는 앱 전용 |
-| [Obsidian](10-obsidian-options.md) | 테마 CSS + manifest · 최소 테마 생성 | 문서 역할을 읽기 뷰·라이브 프리뷰에 각각 연결. Publish는 별도 배포 |
+| [Obsidian](10-obsidian-options.md) | 테마 CSS + manifest | 읽기 뷰·라이브 프리뷰·앱 UI·인쇄에 범위를 나누어 적용. Publish는 별도 배포 |
 | [VS Code](19-vscode-options.md) | VSIX 색 테마 · 생성 구현 | 작업 화면 색 ID·TextMate·semantic token에 연결. 서체는 별도 사용자 설정 |
 | [Vim](13-vim-options.md) | Vim 색 구성표 · 생성 | 기본 화면·공통 구문 그룹에 RGB와 256색 `cterm` 근사값을 지정. 글꼴·셀 높이는 호스트 소유 |
-| [Helix](17-helix-options.md) | TOML 테마 · 생성 구현 | 구문·UI·진단 스코프에 색과 장식을 지정. 글꼴·셀 높이는 호스트 소유 |
+| [Helix](17-helix-options.md) | TOML 테마 + `config.toml`·`languages.toml` | 구문·UI·진단 스코프를 지정. 설정 두 파일은 수동 병합하며 글꼴·셀 높이는 호스트 소유 |
 | [Windows Terminal](06-windows-terminal.md) | 배색표 JSON + 글꼴 조각 · 생성 | 전경·배경·커서·선택 배경·ANSI 16색. 글꼴은 첫 패밀리와 pt 크기만 선택 적용 |
 | [macOS Terminal.app](15-macos-terminal-options.md) | `.terminal` 프로파일 · 생성 | 프로파일에 터미널 배색을 매핑. 글꼴·간격은 사용자 설정 안내 |
 | [iTerm2](21-iterm2-options.md) | `.itermcolors` 프리셋 · 생성 | 기존 프로파일의 배색만 변경. 선택 글자색 사용 여부와 글꼴·간격은 프로파일에서 설정 |
@@ -27,7 +27,7 @@
 | ANSI 16색 | 모드별 `ansi` 슬롯 0–15 | Windows Terminal·Terminal.app·iTerm2 및 VS Code **통합 터미널** 대상. Vim `cterm`이 슬롯을 사용하는 것과 호스트 팔레트를 설정하는 것은 별개다. |
 | 문서 조판 | 아래 D01–D26 중 문서 역할 및 합일 후보 | 우선 Typora·Obsidian을 비교한다. 문서 최대 폭을 Vim 줄바꿈이나 터미널 열 수로 바꾸지 않는다. |
 
-이 표는 **지원 경계와 연결 방식**을 기록한다. 개별 옵션의 생성 여부·고정값·모드별 실측은 각 앱 문서에서 관리한다. 값의 의미·단위·범위가 일치할 때만 [공통 옵션으로 승격](04-option-strategy.md)한다.
+이 표는 **지원 경계와 연결 방식**을 기록한다. 개별 옵션과 실제 검증 결과는 각 앱의 대장을 따른다. 새 옵션은 [옵션 확장 기준](01-architecture.md#옵션-확장-기준)을 참고한다.
 
 <a id="shared"></a>
 
@@ -60,27 +60,4 @@
 - **D25 수식**
 - **D26 알림·콜아웃**
 
-## 선택자·속성 매핑
-
-아래는 두 앱의 [공유 ID](#shared)를 잃지 않기 위한 선택자 단위 보충표다. 속성은 **적용할 값**이며, 두 앱에 같은 선택자를 복사하라는 뜻은 아니다.
-
-| 범위 / ID | 적용할 CSS 값 | Typora 대응 예 |
-|---|---|---|
-| 공통 D04 | 코드 블록·인라인 코드의 `line-height` | 원본 `typography.mono.line_height` |
-| 합일 D07 | 문단 `text-align`, `direction`, `writing-mode` | 미구현 |
-| 합일 D08 | 본문 `letter-spacing`, `font-variant-ligatures`, `font-variant-caps`, `text-transform` | 미구현 |
-| 합일 D11 | 제목 번호 `counter-reset`, `counter-increment`, `::before`의 `content` | 미구현 |
-| 공통 D13 | 링크 `:focus-visible`의 `outline-color` | 원본 `focus` |
-| 합일 D13 | 포커스 `outline-width` / `outline-style` / `outline-offset` | 고정 `2px` / `solid` / `2px` |
-| 합일 D14 | 인용 `padding-inline-start` | 고정 `0.9em` |
-| 공통 D15 | 인라인 코드만의 `color` | 원본 `inline_code` |
-| 공통 D16 | 선택 영역의 **글자** `color` (배경 변수와 별개) | 원본 `selection_text` |
-| 합일 D17 | 취소선 `text-decoration-color`, `text-decoration-thickness` | 미구현 |
-| 합일 D19 | 코드 블록 `border`, `border-radius`, `padding` | 색 `muted`, 나머지 고정 `1px solid`, `0.35em`, `0.7em` |
-| 공통 D20 | 숫자·오류 토큰 각각의 `color` | 원본 `number` / `error` |
-| 합일 D21 | 표 셀 `padding`, 넓은 표 컨테이너 `overflow-x` | 미구현 |
-| 합일 D24 | 이미지 `max-width`, 정렬용 여백, 캡션 `color`·여백 | 미구현 |
-| 합일 D25 | 수식 컨테이너 여백·배경·`overflow-x` | 미구현 |
-| 합일 T13/T14 ↔ O08 | 설정창 좌측 기본·선택 배경/글자, 우측 내용 배경/글자 | 다크 좌측·라이트 우측만 생성. 공통 UI 전체에 적용하지 않음 |
-
-한 행의 일부만 구현할 때는 속성·상태·뷰별로 행을 쪼개고 완료된 부분만 체크한다. 예: 체크박스 변수를 작업 목록에 매핑하더라도 환경설정 체크박스까지 함께 바꾸는 것은 합일이 아니라 별도 결정이다.
+ID는 기능을 비교하기 위한 이름이다. 실제 값과 적용 범위는 [Typora](08-typora-options.md)와 [Obsidian](10-obsidian-options.md)의 대장에서 각각 확인한다.

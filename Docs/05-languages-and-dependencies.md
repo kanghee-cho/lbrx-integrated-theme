@@ -1,6 +1,6 @@
 # 사용 언어와 라이브러리 버전 관리
 
-**상태: CLI 및 8개 앱 어댑터 구현.** 실제 의존성은 [Cargo.toml](../Cargo.toml)을 기준으로 삼는다. 어댑터 후보 라이브러리는 실제 도입 시 재검토한다.
+Rust 의존성은 [Cargo.toml](../Cargo.toml)의 버전 요구식과 [Cargo.lock](../Cargo.lock)의 실제 해석 버전으로 관리한다.
 
 ## 사용 언어와 파일 형식
 
@@ -9,7 +9,7 @@
 | 프로그램 | Rust, Edition 2024 | CLI, 토큰 검증, 앱별 변환을 단일 Cargo 패키지로 구현한다. 최소 Rust 버전 목표는 `1.85.0`이다. |
 | 테마 원본 | TOML | `themes\lbrx.toml`의 팔레트·역할·서체·옵션. 원본 계약은 `schema_version = 1`부터 시작하며 TOML 라이브러리 버전과 별개다. |
 | 문서형 앱 출력 | CSS | Typora와 Obsidian 테마. 대상 앱에서 확인한 선택자·속성만 사용한다. 별도 Sass·PostCSS 빌드는 두지 않는다. |
-| 구조화된 출력 | JSON / TOML | VS Code 테마·manifest, Windows Terminal 설정 조각은 JSON, Helix 테마는 TOML로 생성한다. |
+| 구조화된 출력 | JSON / TOML | VS Code 테마·manifest와 Windows Terminal 설정 조각은 JSON, Helix 테마 및 편집기·언어 설정은 TOML로 생성한다. |
 | Vim 출력 | Vim script | 터미널 Vim 색상 정의만 생성한다. Vim9 전용 문법이나 Neovim Lua를 전제로 하지 않는다. |
 | macOS 터미널 출력 | plist | iTerm2 `.itermcolors` 색 프리셋과 Terminal.app `.terminal` 프로파일을 각각 생성한다. 후자는 색을 바이너리 NSColor 아카이브로 포함한다. |
 | 안내·기준 샘플 | Markdown | 한국어 문서와 한글·영문 혼합 미리보기 샘플을 관리한다. |
@@ -18,7 +18,7 @@
 
 ## Rust 직접 의존성
 
-버전 열은 `Cargo.toml`에 적용하거나 도입할 버전 요구식이다. `~0.29.0`은 `0.29.x`, `~4.5.32`는 `4.5.32` 이상 `4.6.0` 미만, `1`은 `1.x`의 호환 업데이트를 허용한다. 실제 패치 버전과 전이 의존성은 [Cargo.lock](../Cargo.lock)에서 확인한다.
+버전 열은 `Cargo.toml`의 요구식이다. 예를 들어 `~4.5.32`는 `4.5.32` 이상 `4.6.0` 미만을 허용한다. 실제 버전은 `Cargo.lock`에서 확인한다.
 
 | 라이브러리 | 버전 요구식 | 필요한 기능 / 용도 | 도입 시점 |
 |---|---|---|---|
@@ -29,10 +29,6 @@
 | `tempfile` | `3` | 미리보기 다시 읽기 및 읽기 전용 동작을 검증하는 임시 테스트 원본 | 테스트 전용 |
 | `plist` | `~1.7` | iTerm2 `.itermcolors` XML 생성 및 재파싱 | iTerm2 어댑터 |
 | `zip` | `~2.4` | VSIX 컨테이너 작성 및 다시 읽기. 압축 기능 없이 저장한다. | VS Code 어댑터 |
-
-Rust Edition 2024는 [Rust 1.85.0에서 안정화](https://blog.rust-lang.org/2025/02/20/Rust-1.85.0/)되었다. 이것만으로 후보까지 포함한 의존성 전체의 최소 Rust 버전 호환성이 검증되었다고 보지는 않는다.
-
-비동기 런타임, 웹 프레임워크, 템플릿 엔진은 초기 필수 의존성이 아니다. 테스트도 먼저 Rust 기본 테스트 기능을 사용하고, 별도 라이브러리는 구현에 필요할 때 용도와 버전을 이 표에 추가한다. 사용하지 않는 어댑터의 라이브러리를 미리 설치하지 않는다.
 
 ## 버전의 기준 파일과 변경 절차
 
@@ -56,11 +52,12 @@ Rust Edition 2024는 [Rust 1.85.0에서 안정화](https://blog.rust-lang.org/20
 | 대상 | 검증 버전 / 환경 | 특히 확인할 항목 |
 |---|---|---|
 | Typora | 미검증 | 문서 CSS, 본문·코드 서체 |
-| Obsidian | 최소 테마 가독성 사용자 확인(2026-11-23), 앱 버전 미기록 | [확인 범위](10-obsidian-options.md#검증-기록). 최소 지원 버전 검증과는 별개 |
+| Obsidian | 초기 테마 가독성 사용자 확인(2026-11-23), 앱 버전 미기록 | [확인 범위](10-obsidian-options.md#검증-기록). 이후 기능별 화면·모바일·PDF 검증과는 별개 |
 | VS Code | 1.147.0 (Windows, 임시 프로필) | VSIX 설치와 확장 등록 확인. 실제 화면 및 서체 적용은 미검증 |
-| Helix | 미검증 | 테마 scope와 호스트 터미널 |
+| Helix | 25.07 규격·기본 언어 카탈로그 기준, 화면 미검증 | 스코프, 설정 병합, 호스트 터미널 |
 | Vim | 9.2 (Windows, 비대화형 검증) | 라이트·다크 불러오기, 대표 RGB·`cterm` 값 확인. 실제 화면은 미검증 |
 | Windows Terminal | `1.25.3131.0` x64 Portable: 라이트·다크 프로필 스키마 검증 및 두 창 실행 확인 (2026-11-19) | 사용자가 미리보기 화면을 직접 확인하고 긍정적으로 평가함. 항목별 결과는 별도 기록하지 않음. |
 | macOS Terminal.app | 미검증 | macOS·Terminal.app 버전, 색상 데이터와 프로필 가져오기 |
+| iTerm2 | 미검증 | macOS·iTerm2 버전, `.itermcolors` 가져오기와 실제 배색 |
 
-VSIX를 Rust에서 직접 생성하는 기준이므로 `@vscode/vsce`는 현재 필수 도구가 아니다. 구현 과정에서 외부 패키징 도구가 필요해지면 해당 도구와 Node.js 버전, 실행 환경을 별도로 명시한다. LINE Seed EN·KR·JP와 D2Coding ligature는 사용자 글꼴이며 번들 의존성이 아니다. 조판 비교 때는 실제 설치된 글꼴 버전도 함께 기록한다.
+VSIX는 Rust에서 직접 생성하며 `@vscode/vsce`는 필요하지 않다. [package.json](../package.json)과 [pnpm-lock.yaml](../pnpm-lock.yaml)은 별도의 아이콘 자산 버전을 관리하며, Rust CLI나 테마 설치의 요구 사항이 아니다. LINE Seed EN·KR·JP와 D2Coding ligature는 사용자가 설치하는 글꼴이다.

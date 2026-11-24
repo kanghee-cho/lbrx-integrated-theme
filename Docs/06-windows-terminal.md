@@ -1,6 +1,8 @@
 # Windows Terminal에 LBRX 적용
 
-`lbrx-theme build`를 실행하면 Windows Terminal용 파일이 `dist\lbrx\windows-terminal`에 생성됩니다. 생성기는 설치된 앱이나 사용자 설정을 변경하지 않습니다.
+저장소 루트에서 `cargo run --locked -- build --app windows-terminal`을 실행하면 `dist\lbrx\windows-terminal`에 배색표와 선택 적용용 글꼴 설정 조각이 생성된다.
+
+## 설치·복구
 
 1. Windows Terminal의 **설정 → JSON 파일 열기**에서 현재 `settings.json`을 열고 백업합니다.
 2. `schemes.json`에 있는 `LBRX Light`, `LBRX Dark` 객체를 기존 최상위 `schemes` 배열에 추가합니다. 같은 이름이 이미 있으면 해당 객체만 교체합니다. 다른 배색표와 설정은 유지합니다.

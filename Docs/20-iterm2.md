@@ -1,8 +1,8 @@
-# iTerm2에 LBRX 적용하기
+# iTerm2에 LBRX 적용
 
-**색 프리셋 생성 구현.** Apple 기본 Terminal.app의 `.terminal`은 프로파일이고, iTerm2의 `.itermcolors`는 **기존 프로파일에 적용하는 색 프리셋**이다. 서로 호환되지 않는다.
+`.itermcolors`는 **기존 iTerm2 프로파일에 적용하는 색 프리셋**이다. macOS Terminal.app의 `.terminal` 프로파일과 호환되지 않는다.
 
-```text
+```powershell
 cargo run --locked -- build --app iterm2
 ```
 

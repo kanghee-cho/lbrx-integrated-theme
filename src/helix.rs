@@ -1,8 +1,17 @@
 use crate::resolve::{ResolvedMode, ResolvedTheme};
-use std::fmt::Write as _;
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    fmt::Write as _,
+};
 
 pub const DIRECTORY: &str = "helix";
-pub const FILES: &[&str] = &["lbrx_light.toml", "lbrx_dark.toml", crate::build::GUIDE];
+pub const FILES: &[&str] = &[
+    "lbrx_light.toml",
+    "lbrx_dark.toml",
+    "config.toml",
+    "languages.toml",
+    crate::build::GUIDE,
+];
 
 pub(crate) fn is_supported_scope(scope: &str) -> bool {
     include_str!("../Docs/17-helix-options.md")
@@ -16,15 +25,104 @@ pub(crate) fn is_supported_scope(scope: &str) -> bool {
         })
 }
 
-pub fn render(theme: &ResolvedTheme) -> Result<[(&'static str, String); 3], String> {
+pub fn render(theme: &ResolvedTheme) -> Result<[(&'static str, String); 5], String> {
     Ok([
         (FILES[0], colorscheme(theme, &theme.light)?),
         (FILES[1], colorscheme(theme, &theme.dark)?),
+        (
+            FILES[2],
+            render_config(FILES[2], &theme.layers.helix_config)?,
+        ),
+        (FILES[3], render_config(FILES[3], &language_config(theme)?)?),
         (
             crate::build::GUIDE,
             include_str!("../Docs/16-helix.md").into(),
         ),
     ])
+}
+
+fn language_config(theme: &ResolvedTheme) -> Result<toml::Table, String> {
+    use toml::Value;
+    let catalog: BTreeMap<String, toml::Table> =
+        toml::from_str(include_str!("helix-language-defaults.toml"))
+            .map_err(|err| format!("Helix 언어 기본값 읽기 실패: {err}"))?;
+    let mut defaults = BTreeMap::new();
+    for id in theme.language_ids() {
+        let name = match id {
+            "csharp" => "c-sharp",
+            "shell" => "bash",
+            _ => id,
+        };
+        if let Some(settings) = catalog.get(name).filter(|settings| !settings.is_empty()) {
+            defaults.entry(name).or_insert_with(|| settings.clone());
+        }
+    }
+
+    let mut config = theme.layers.helix_languages.clone();
+    let mut languages = Vec::new();
+    if let Some(entries) = config.remove("language") {
+        let Value::Array(entries) = entries else {
+            return Err("Helix: [[languages.language]]는 언어 표의 배열이어야 합니다".into());
+        };
+        let mut names = BTreeSet::new();
+        for (index, entry) in entries.into_iter().enumerate() {
+            let Value::Table(mut user) = entry else {
+                return Err(format!(
+                    "Helix: languages.language[{index}]는 표여야 합니다"
+                ));
+            };
+            let name = user
+                .get("name")
+                .and_then(Value::as_str)
+                .filter(|name| !name.trim().is_empty())
+                .ok_or_else(|| format!("Helix: languages.language[{index}].name이 필요합니다"))?
+                .to_owned();
+            if !names.insert(name.clone()) {
+                return Err(format!("Helix: 언어 '{name}' 설정이 중복되었습니다"));
+            }
+            let mut settings = defaults.remove(name.as_str()).unwrap_or_default();
+            if user.contains_key("comment-token") && user.contains_key("comment-tokens") {
+                return Err(format!(
+                    "Helix: 언어 '{name}'의 줄 주석 키는 하나만 지정하세요"
+                ));
+            }
+            // Preserve the built-in key spelling to avoid duplicate aliases after Helix merges.
+            for (native, alternate) in [
+                ("comment-token", "comment-tokens"),
+                ("comment-tokens", "comment-token"),
+            ] {
+                if settings.contains_key(native) {
+                    if let Some(value) = user.remove(alternate) {
+                        user.insert(native.into(), value);
+                    }
+                }
+            }
+            if let (Some(Value::Table(default_indent)), Some(Value::Table(user_indent))) =
+                (settings.get_mut("indent"), user.get("indent"))
+            {
+                default_indent.extend(user_indent.clone());
+                user.remove("indent");
+            }
+            settings.extend(user);
+            languages.push(Value::Table(settings));
+        }
+    }
+    for (name, mut settings) in defaults {
+        settings.insert("name".into(), Value::String(name.into()));
+        languages.push(Value::Table(settings));
+    }
+    if !languages.is_empty() {
+        config.insert("language".into(), Value::Array(languages));
+    }
+    Ok(config)
+}
+
+fn render_config(filename: &str, config: &toml::Table) -> Result<String, String> {
+    let settings = toml::to_string_pretty(config)
+        .map_err(|err| format!("Helix {filename} 생성 실패: {err}"))?;
+    Ok(format!(
+        "# LBRX - 사용자 설정과 비교한 뒤 적용하세요.\n{settings}"
+    ))
 }
 
 fn colorscheme(theme: &ResolvedTheme, mode: &ResolvedMode) -> Result<String, String> {

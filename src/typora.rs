@@ -1,8 +1,9 @@
 use crate::{
     css::font_stack,
     layers::{
-        TYPORA_ALERT_ROLES, TYPORA_EDITING_AID_COLORS, TYPORA_SIDEBAR_COLORS, TYPORA_SOURCE_COLORS,
-        TyporaDiagrams, TyporaListMarkers, TyporaPrint, TyporaSidebar, TyporaSourceFont, TyporaToc,
+        DOCUMENT_ALERT_ROLES, DocumentListMarkers, TYPORA_EDITING_AID_COLORS,
+        TYPORA_SIDEBAR_COLORS, TYPORA_SOURCE_COLORS, TyporaDiagrams, TyporaPrint, TyporaSidebar,
+        TyporaSourceFont, TyporaToc,
     },
     resolve::{ResolvedMode, ResolvedTheme},
 };
@@ -299,7 +300,7 @@ fn stylesheet(theme: &ResolvedTheme, mode: &ResolvedMode, dark: bool) -> String 
             lists.indent_px, lists.item_gap_px
         )
         .unwrap();
-        let defaults = TyporaListMarkers::default();
+        let defaults = DocumentListMarkers::default();
         let markers = lists.markers.as_ref().unwrap_or(&defaults).styles();
         for (ancestors, marker) in ["", ":is(ol, ul) ", ":is(ol, ul) :is(ol, ul) "]
             .into_iter()
@@ -370,8 +371,8 @@ fn stylesheet(theme: &ResolvedTheme, mode: &ResolvedMode, dark: bool) -> String 
         if alerts.shaded_background {
             css.push_str("#write .md-alert { background-color: var(--lbrx-surface); }\n");
         }
-        for (kind, default_role) in TYPORA_ALERT_ROLES {
-            let role = alerts.colors.get(kind).map_or(default_role, String::as_str);
+        for (kind, default_role) in DOCUMENT_ALERT_ROLES {
+            let role = alerts.role(kind, default_role);
             let color = &mode.roles[role];
             writeln!(
                 css,

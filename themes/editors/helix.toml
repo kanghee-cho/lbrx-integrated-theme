@@ -1,8 +1,76 @@
-# Helix 테마. 색은 lbrx.toml의 라이트·다크 roles 이름 또는 터미널 기본색 "default".
+# Helix 테마와 편집기·언어 설정. 테마 색은 lbrx.toml의 역할 이름 또는 터미널 기본색 "default".
 # [colors]는 기존 줄 번호 전경색 설정. [styles]에서 같은 항목을 지정하면 [styles]가 우선한다.
 [colors]
 "ui.linenr" = "muted" # 일반 줄 번호의 글자색.
 "ui.linenr.selected" = "text" # 커서가 놓인 줄 번호의 글자색.
+
+# ── config.toml: 편집기 동작·키맵 ──
+# 시작 테마·줄 번호·현재 줄 강조는 앱 기본값 유지로 결정했다.
+# 아래 값은 비활성 예시다. 필요한 표와 값만 함께 주석 해제한다.
+# [config]
+# theme = "lbrx_dark" # 시작 테마. "lbrx_light" 또는 내장 테마 "tokyonight", "catppuccin_mocha", "gruvbox", "nord"도 선택 가능.
+# [config.editor]
+# line-number = "relative" # 상대 줄 번호. absolute는 절대 줄 번호.
+# mouse = true # 마우스로 커서 이동·선택 허용. false는 끄기.
+# scrolloff = 5 # 스크롤 시 커서 위아래에 유지할 화면 여백(줄).
+# rulers = [80, 120] # 80열과 120열에 세로 안내선 표시. []는 표시하지 않음.
+# cursorline = true # 현재 줄 강조 사용. false는 끄기.
+# cursorcolumn = true # 현재 열 강조 표시.
+# true-color = true # 터미널이 24비트 색상을 지원하지만 자동 감지에 실패할 때 강제 사용.
+# bufferline = "multiple" # 버퍼가 여러 개일 때만 버퍼줄 표시. always 또는 never도 선택 가능.
+# color-modes = true # 상태줄의 모드 표시기에 모드별 색을 적용. HEX 색상 미리보기 기능은 아님.
+#
+# [config.editor.auto-save]
+# focus-lost = false # Helix가 포커스를 잃을 때 자동 저장할지 설정.
+# [config.editor.auto-save.after-delay]
+# enable = false # 마지막 편집 후 일정 시간이 지나면 자동 저장할지 설정.
+# timeout = 3000 # 지연 자동 저장을 켰을 때 마지막 편집 이후 대기 시간(ms).
+#
+# [config.editor.soft-wrap]
+# enable = true # 화면 너비에 맞춰 표시만 줄바꿈. 파일에 새 줄을 넣지 않음.
+#
+# [config.editor.cursor-shape]
+# insert = "bar" # 삽입 모드 커서는 세로 막대.
+# normal = "block" # 일반 모드 커서는 블록.
+# select = "underline" # 선택 모드 커서는 밑줄.
+#
+# [config.editor.whitespace.render]
+# space = "all" # 공백을 모두 표시.
+# tab = "all" # 탭을 모두 표시.
+# newline = "none" # 줄바꿈 문자는 표시하지 않음.
+#
+# [config.editor.indent-guides]
+# render = true # 들여쓰기 안내선 표시.
+# character = "╎" # 안내선에 사용할 문자.
+#
+# [config.editor.statusline]
+# left = ["mode", "spinner", "file-name", "read-only-indicator", "file-modification-indicator"] # 왼쪽: 모드, 작업 표시, 파일명, 읽기 전용·수정 상태.
+# center = [] # 가운데에 표시할 항목 없음.
+# right = ["diagnostics", "selections", "position", "file-encoding", "file-line-ending", "file-type"] # 오른쪽: 진단, 선택 수, 위치, 인코딩, 줄 끝 형식, 파일 유형.
+#
+# [config.editor.lsp]
+# display-inlay-hints = true # 언어 서버가 제공하는 인레이 힌트 표시.
+# display-messages = true # 언어 서버의 window/showMessage 알림을 상태줄 아래에 표시.
+#
+# [config.keys.normal]
+# esc = ["collapse_selection", "keep_primary_selection"] # 일반 모드에서 Esc 한 번으로 선택을 축소하고 주 선택만 남김.
+# C-s = ":w" # 일반 모드에서 Ctrl+S로 현재 파일 저장.
+#
+# [config.keys.insert]
+# j = { k = "normal_mode" } # 삽입 모드에서 j → k를 입력하면 일반 모드로 전환.
+
+# ── languages.toml: Helix 기본값에 대한 수동 재정의 ──
+# 등록 언어의 들여쓰기·주석 기호는 Helix 25.07 기준으로 자동 출력한다.
+# 언어별 값을 바꾸려면 [[languages.language]]를 반복한다. name은 Helix의 언어 이름.
+[[languages.language]]
+name = "rust" # 설정을 덮어쓸 기존 언어 이름.
+auto-format = true
+
+[[languages.language]]
+name = "python"
+auto-format = true
+indent = { tab-width = 4, unit = "    " }
+# language-servers = ["pyright", "ruff"]  # ruff나 pyright 등 사용할 LSP 지정
 
 [styles]
 # Docs/17-helix-options.md의 공통·합일 후보·Helix 전용 스코프를 지정할 수 있다. 예시는 기본 비활성.

@@ -1,13 +1,13 @@
 # 앱별 적용 계약
 
-모드 이름과 내부 식별자는 `LBRX Light` / `LBRX Dark`를 기준으로 유지한다. 아래는 생성기가 제공해야 할 결과와 사용자가 수행할 작업이다. 테마를 바꿀 때 앱의 설정 파일 전체를 덮어쓰지 않는다.
+모드 이름은 앱 형식에 따라 `LBRX Light` / `LBRX Dark` 또는 `lbrx_light` / `lbrx_dark`를 사용한다. Obsidian은 단일 `LBRX` 테마에서 앱의 밝기 모드를 따른다. 아래는 실제 생성물과 수동 적용 경계다.
 
 | 대상 | 생성물과 수동 적용 | 서체·간격 경계 |
 |---|---|---|
 | Typora | 모드별 `lbrx-light.css`, `lbrx-dark.css`를 테마 폴더에 복사하고 재시작 후 테마 메뉴에서 선택. [적용 방법](07-typora.md) | 본문·코드 서체를 분리한다. 편집 UI 전체가 아닌 문서 영역을 기준으로 한다. |
 | Obsidian | `manifest.json`과 `theme.css`가 든 `LBRX` 폴더를 보관함의 `.obsidian\themes`에 복사한 뒤 외형에서 활성화. CSS가 `.theme-light`, `.theme-dark`를 구분 | 본문과 고정폭 CSS 변수를 매핑하고 읽기 뷰·라이브 프리뷰를 각각 확인한다. 사용자 서체 설정과 충돌하는 강제 규칙은 피한다. |
 | VS Code | 두 색 테마를 선언한 `.vsix`를 **Install from VSIX**로 설치하고 Color Theme에서 선택 | 색 테마는 글꼴을 설정하지 않는다. 편집기 글꼴·크기·줄 높이는 별도 `settings.json` 조각을 사용자가 병합한다. |
-| Helix | 두 `.toml`을 Helix 설정 디렉터리의 `themes`에 복사하고 `:theme lbrx_dark` 또는 `:theme lbrx_light`로 확인. 지속 설정은 `config.toml`의 `theme` | 글꼴·크기·간격은 호스트 터미널 소유. 구문 scope와 `ui.*`만 변환한다. |
+| Helix | 두 테마 `.toml`을 Helix 설정 디렉터리의 `themes`에 복사하고 `:theme lbrx_dark` 또는 `:theme lbrx_light`로 확인. 생성된 `config.toml`·`languages.toml`은 상위 설정 디렉터리에서 기존 파일과 수동 병합 | 글꼴·크기·간격은 호스트 터미널 소유. 편집기 설정은 명시값을, 언어 설정은 등록 언어의 25.07 들여쓰기·주석 기본값과 명시적 재정의를 내보낸다. |
 | Vim | `lbrx_dark.vim`, `lbrx_light.vim`을 사용자 runtimepath의 `colors`에 복사하고 `:colorscheme lbrx_dark` 등으로 선택. 지속 설정은 vimrc | 터미널 Vim을 기준으로 하며 글꼴은 상속한다. `termguicolors`용 RGB와 저색상 터미널용 `cterm` 근사값을 분리한다. |
 | Windows Terminal | 두 배색표를 기존 `settings.json`의 `schemes`에 이름 기준으로 병합하고 프로필의 `colorScheme`에서 선택. [적용 방법](06-windows-terminal.md) | 배색표와 프로필의 `font` 설정 조각을 분리한다. 글꼴 크기는 pt로 변환(기준 px × 72/96). 현재 셀 높이는 출력하지 않는다. |
 | iTerm2 | [라이트·다크 `.itermcolors` 프리셋](20-iterm2.md)을 기존 프로필에 가져와 선택한다. | 글꼴과 프로필 설정은 수동이다. |

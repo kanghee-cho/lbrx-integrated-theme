@@ -1,6 +1,6 @@
-# VS Code에 LBRX 적용하기
+# VS Code에 LBRX 적용
 
-**라이트·다크 테마 생성 구현.** 색상은 [공통 TOML](../themes/lbrx.toml)에서 직접 수정한다.
+라이트·다크 색 테마를 담은 VSIX를 생성한다. 공통 색은 [공통 TOML](../themes/lbrx.toml)에서 수정한다.
 
 ```powershell
 cargo run --locked -- build --app vscode
@@ -13,6 +13,8 @@ cargo run --locked -- build --app vscode
 | `lbrx-theme.vsix` | `LBRX Light`와 `LBRX Dark`를 함께 등록하는 색 테마 확장. 실행 코드, 글꼴, 아이콘은 포함하지 않는다. |
 | `settings-font.json` | 편집기·통합 터미널 글꼴 설정 조각. 편집기 줄 높이는 픽셀 단위로 변환한다. |
 | `lbrx-code.css` | HTML 코드 블록용 [동반 CSS](22-vscode-language-highlighting.md). VS Code에 자동 주입되지 않는다. |
+
+## 설치·복구
 
 1. 기존 색 테마 이름을 기록하고, 명령 팔레트에서 **Extensions: Install from VSIX…**로 VSIX를 설치한다. **Preferences: Color Theme**에서 `LBRX Light` 또는 `LBRX Dark`를 고른다.
 2. 글꼴도 바꾸려면 필요한 글꼴을 먼저 설치하고, `settings-font.json`에서 원하는 항목만 기존 사용자 설정에 병합한다. 색 테마를 선택하는 것만으로 글꼴이나 합자 설정은 바뀌지 않는다.

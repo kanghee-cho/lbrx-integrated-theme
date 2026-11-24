@@ -182,7 +182,50 @@ pub fn check(theme: &Theme) -> Result<(), String> {
         let luminance_of = |role: &str| {
             luminance(parse_rgb(&mode.palette[&mode.roles[role]]).expect("checked RGB"))
         };
-        if let Some(emphasis) = &theme.layers.typora_emphasis {
+        if let Some(callouts) = &theme.layers.obsidian_callouts {
+            if callouts.shaded_background {
+                for (kind, fallback) in crate::layers::DOCUMENT_ALERT_ROLES {
+                    let role = callouts.role(kind, fallback);
+                    check_contrast(
+                        name,
+                        role,
+                        "surface",
+                        luminance_of(role),
+                        luminance_of("surface"),
+                        4.5,
+                    )
+                    .map_err(|error| {
+                        format!("editors/obsidian.toml: callouts.colors.{kind}: {error}")
+                    })?;
+                }
+            }
+        }
+        if let Some(role) = theme
+            .layers
+            .editors
+            .get("obsidian")
+            .and_then(|colors| colors.get(crate::obsidian::INLINE_CODE_COLOR))
+        {
+            check_contrast(
+                name,
+                role,
+                "background",
+                luminance_of(role),
+                luminance_of("background"),
+                4.5,
+            )
+            .map_err(|error| {
+                format!(
+                    "editors/obsidian.toml: colors.{}: {error}",
+                    crate::obsidian::INLINE_CODE_COLOR
+                )
+            })?;
+        }
+        for (app, emphasis) in [
+            ("typora", &theme.layers.typora_emphasis),
+            ("obsidian", &theme.layers.obsidian_emphasis),
+        ] {
+            let Some(emphasis) = emphasis else { continue };
             let colors = if name == "light" {
                 &emphasis.light
             } else {
@@ -190,16 +233,16 @@ pub fn check(theme: &Theme) -> Result<(), String> {
             };
             let emphasis_luminance = |key: &str, value: &str| {
                 parse_rgb(value).map(luminance).ok_or_else(|| {
-                    format!("editors/typora.toml: emphasis.{name}.{key}: #RRGGBB 형식 필요")
+                    format!("editors/{app}.toml: emphasis.{name}.{key}: #RRGGBB 형식 필요")
                 })
             };
             let highlight =
                 emphasis_luminance("highlight_background", &colors.highlight_background)?;
-            let highlight_key = "editors/typora.toml: emphasis.highlight_background";
+            let highlight_key = format!("editors/{app}.toml: emphasis.highlight_background");
             check_contrast(
                 name,
                 "text",
-                highlight_key,
+                &highlight_key,
                 luminance_of("text"),
                 highlight,
                 4.5,
@@ -210,7 +253,7 @@ pub fn check(theme: &Theme) -> Result<(), String> {
                 ("strikethrough", &colors.strikethrough),
             ] {
                 let fg = emphasis_luminance(key, color)?;
-                let label = format!("editors/typora.toml: emphasis.{key}");
+                let label = format!("editors/{app}.toml: emphasis.{key}");
                 check_contrast(
                     name,
                     &label,
@@ -219,7 +262,7 @@ pub fn check(theme: &Theme) -> Result<(), String> {
                     luminance_of("background"),
                     4.5,
                 )?;
-                check_contrast(name, &label, highlight_key, fg, highlight, 4.5)?;
+                check_contrast(name, &label, &highlight_key, fg, highlight, 4.5)?;
             }
         }
         let code_bg = mode

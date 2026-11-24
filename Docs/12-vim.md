@@ -1,8 +1,8 @@
-# Vim에 LBRX 적용하기
+# Vim에 LBRX 적용
 
-**색 구성표 생성 구현.** 터미널 Vim이 대상이다. Neovim 전용 그룹, GUI 글꼴 및 플러그인별 설정은 포함하지 않는다. 지원 그룹은 [Vim 옵션 대장](13-vim-options.md)에 정리한다.
+터미널 Vim을 대상으로 한다. Neovim 전용 그룹, GUI 글꼴 및 플러그인별 설정은 포함하지 않는다. 지원 그룹은 저장소의 `Docs/13-vim-options.md`에서 확인한다.
 
-```text
+```powershell
 cargo run --locked -- build --app vim
 ```
 

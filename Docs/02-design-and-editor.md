@@ -1,6 +1,6 @@
-# 팔레트와 앱별 미리보기
+# 팔레트와 설정 편집
 
-청록 계열의 라이트·다크 한 쌍을 사용한다. 아래 값은 프로젝트 시안이며, 장문은 중립색으로 두고 링크·포커스 등 시선이 필요한 곳에 강조색을 쓴다.
+청록 계열의 라이트·다크 한 쌍을 사용한다. 아래는 현재 공통 원본의 대표 색이다.
 
 | 팔레트 키 | 라이트 | 다크 | 대표 용도 |
 |---|---|---|---|
@@ -62,7 +62,7 @@ function = "accent"
 | [Vim](23-vim-language-highlighting.md) | Vim 문법이 제공하는 명명된 그룹만 적용. 예: `pythonFunction`, `rustKeyword`, `ps1Cmdlet`, `tomlInteger`, `typescriptNumber` |
 | Typora · [Obsidian](24-obsidian-language-highlighting.md) | Typora는 `lang`이 있는 코드 펜스, Obsidian은 읽기 뷰의 `code.language-<id>` 내부 Prism 토큰만 적용. Obsidian 라이브 프리뷰에 읽기 뷰 규칙을 적용하지 않는다. |
 | Helix | 단일 색 테마는 언어 ID를 구분하지 않으므로 공통 구문색만 적용 |
-| Windows Terminal · iTerm2 | 언어를 분석하지 않는다. 터미널 자체 배색에는 각 앱의 전용 파일만 적용 |
+| Windows Terminal · macOS Terminal.app · iTerm2 | 언어를 분석하지 않는다. 공통 터미널 역할과 ANSI, 각 앱의 전용 설정을 배색에 사용한다. |
 
 `check`와 `build`는 지정한 원본 **파일 옆**의 `languages`와 `editors` 디렉터리에서 `.toml` 파일을 읽는다. 다른 이름의 원본이라도 같은 디렉터리에 있으면 설정을 공유한다. 두 디렉터리 없이 기존 단일 파일만 사용해도 된다. 언어 ID는 소문자 영문으로 시작하고 소문자·숫자·하이픈을 허용한다. 새 언어 파일을 추가해도 해당 앱의 문법 또는 HTML 렌더러가 실제로 제공하는 토큰만 색칠된다.
 

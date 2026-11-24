@@ -1,0 +1,40 @@
+# Helix 25.07의 등록 언어별 들여쓰기(탭 표시 폭과 삽입 문자열) 및 줄·블록 주석 기호.
+# 출처: https://github.com/helix-editor/helix/blob/25.07/languages.toml
+# 명시된 값만 기록한다. 빈 표는 해당 Helix 언어에 이 설정이 없음을 나타낸다.
+bash = { indent = { tab-width = 2, unit = "  " }, comment-token = "#" }
+c = { indent = { tab-width = 2, unit = "  " }, comment-token = "//", block-comment-tokens = { start = "/*", end = "*/" } }
+c-sharp = { indent = { tab-width = 4, unit = "\t" }, comment-token = "//", block-comment-tokens = { start = "/*", end = "*/" } }
+common-lisp = { indent = { tab-width = 2, unit = "  " }, comment-token = ";" }
+cpp = { indent = { tab-width = 2, unit = "  " }, comment-token = "//", block-comment-tokens = { start = "/*", end = "*/" } }
+css = { indent = { tab-width = 2, unit = "  " }, block-comment-tokens = { start = "/*", end = "*/" } }
+csv = {}
+dart = { indent = { tab-width = 2, unit = "  " }, comment-tokens = ["//", "///"], block-comment-tokens = { start = "/*", end = "*/" } }
+dockerfile = { indent = { tab-width = 2, unit = "  " }, comment-token = "#" }
+go = { indent = { tab-width = 4, unit = "\t" }, comment-token = "//", block-comment-tokens = { start = "/*", end = "*/" } }
+graphql = { indent = { tab-width = 2, unit = "  " }, comment-token = "#", block-comment-tokens = { start = '"""', end = '"""' } }
+hcl = { indent = { tab-width = 2, unit = "  " }, comment-token = "#", block-comment-tokens = { start = "/*", end = "*/" } }
+html = { indent = { tab-width = 2, unit = "  " }, block-comment-tokens = { start = "<!--", end = "-->" } }
+java = { indent = { tab-width = 2, unit = "  " }, comment-tokens = ["//"], block-comment-tokens = { start = "/*", end = "*/" } }
+javascript = { indent = { tab-width = 2, unit = "  " }, comment-token = "//", block-comment-tokens = { start = "/*", end = "*/" } }
+json = { indent = { tab-width = 2, unit = "  " } }
+jsonc = { indent = { tab-width = 2, unit = "  " }, comment-token = "//", block-comment-tokens = { start = "/*", end = "*/" } }
+julia = { indent = { tab-width = 4, unit = "    " }, comment-token = "#", block-comment-tokens = { start = "#=", end = "=#" } }
+kotlin = { indent = { tab-width = 4, unit = "    " }, comment-token = "//", block-comment-tokens = { start = "/*", end = "*/" } }
+log = {}
+lua = { indent = { tab-width = 2, unit = "  " }, comment-token = "--", block-comment-tokens = { start = "--[[", end = "--]]" } }
+markdown = { indent = { tab-width = 2, unit = "  " }, block-comment-tokens = { start = "<!--", end = "-->" } }
+php = { indent = { tab-width = 4, unit = "    " }, comment-token = "//", block-comment-tokens = [{ start = "/**", end = "*/" }, { start = "/*", end = "*/" }] }
+powershell = { indent = { tab-width = 4, unit = "    " }, comment-token = "#", block-comment-tokens = { start = "<#", end = "#>" } }
+python = { indent = { tab-width = 4, unit = "    " }, comment-token = "#" }
+r = { indent = { tab-width = 2, unit = "  " }, comment-tokens = ["#", "#'"] }
+regex = {}
+ruby = { indent = { tab-width = 2, unit = "  " }, comment-token = "#" }
+rust = { indent = { tab-width = 4, unit = "    " }, comment-tokens = ["//", "///", "//!"], block-comment-tokens = [{ start = "/*", end = "*/" }, { start = "/**", end = "*/" }, { start = "/*!", end = "*/" }] }
+sql = { indent = { tab-width = 4, unit = "    " }, comment-token = "--", block-comment-tokens = { start = "/*", end = "*/" } }
+swift = { comment-token = "//", block-comment-tokens = { start = "/*", end = "*/" } }
+toml = { indent = { tab-width = 2, unit = "  " }, comment-token = "#" }
+tsx = { indent = { tab-width = 2, unit = "  " }, comment-token = "//", block-comment-tokens = { start = "/*", end = "*/" } }
+typescript = { indent = { tab-width = 2, unit = "  " }, comment-token = "//", block-comment-tokens = { start = "/*", end = "*/" } }
+xml = { indent = { tab-width = 2, unit = "  " }, block-comment-tokens = { start = "<!--", end = "-->" } }
+yaml = { indent = { tab-width = 2, unit = "  " }, comment-token = "#" }
+zig = { indent = { tab-width = 4, unit = "    " }, comment-tokens = ["//", "///", "//!"] }

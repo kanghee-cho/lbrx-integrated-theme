@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use std::{collections::BTreeMap, fs, path::Path};
 
 pub type Mapping = BTreeMap<String, String>;
-pub const TYPORA_ALERT_ROLES: [(&str, &str); 5] = [
+pub const DOCUMENT_ALERT_ROLES: [(&str, &str); 5] = [
     ("note", "function"),
     ("tip", "success"),
     ("important", "keyword"),
@@ -226,7 +226,25 @@ const EDITORS: &[(&str, &[&str])] = &[
             "--lbrx-code-nonmatching-bracket",
         ],
     ),
-    ("obsidian", &["--link-external-color", "--text-muted"]),
+    (
+        "obsidian",
+        &[
+            "--link-color",
+            "--link-color-hover",
+            "--link-external-color",
+            "--link-external-color-hover",
+            "--text-muted",
+            "--h1-color",
+            "--h2-color",
+            "--h3-color",
+            "--h4-color",
+            "--h5-color",
+            "--h6-color",
+            "--inline-title-color",
+            crate::obsidian::INLINE_CODE_COLOR,
+            crate::obsidian::FOOTNOTE_REFERENCE_COLOR,
+        ],
+    ),
 ];
 
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
@@ -239,34 +257,102 @@ pub struct Layers {
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub language_styles: BTreeMap<String, TokenStyles>,
     pub editors: BTreeMap<String, Mapping>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_prose: Option<ObsidianLineHeight>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_prose_detail: Option<ObsidianProseDetail>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_code: Option<ObsidianCode>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_layout: Option<DocumentLayout>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_paragraph: Option<DocumentParagraph>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_headings: Option<DocumentHeadings>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_links: Option<ObsidianLinks>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_blockquote: Option<ObsidianBlockquote>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_emphasis: Option<DocumentEmphasis>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_footnotes: Option<DocumentFootnotes>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_horizontal_rule: Option<DocumentHorizontalRule>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_table: Option<DocumentTable>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_lists: Option<DocumentLists>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_task_lists: Option<DocumentTaskLists>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_images: Option<DocumentImages>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_math: Option<DocumentMath>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_callouts: Option<DocumentAlerts>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_live_preview: Option<ObsidianLivePreview>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_source_mode: Option<ObsidianSourceMode>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_internal_links: Option<ObsidianInternalLinks>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_tags_and_properties: Option<ObsidianTagsAndProperties>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_navigation_sidebar: Option<ObsidianNavigationSidebar>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_workspace: Option<ObsidianWorkspace>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_dialogs: Option<ObsidianDialogs>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_search: Option<ObsidianSearch>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_graph: Option<ObsidianGraph>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_canvas: Option<ObsidianCanvas>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_bases: Option<ObsidianBases>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_mermaid: Option<ObsidianMermaid>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_icons: Option<ObsidianIcons>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_mobile: Option<ObsidianMobile>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub obsidian_print: Option<ObsidianPrint>,
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub helix_styles: BTreeMap<String, HelixStyle>,
+    #[serde(skip_serializing_if = "toml::Table::is_empty")]
+    pub helix_config: toml::Table,
+    #[serde(skip_serializing_if = "toml::Table::is_empty")]
+    pub helix_languages: toml::Table,
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub vim_highlights: BTreeMap<String, VimHighlight>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub typora_layout: Option<TyporaLayout>,
+    pub typora_layout: Option<DocumentLayout>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub typora_paragraph: Option<TyporaParagraph>,
+    pub typora_paragraph: Option<DocumentParagraph>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub typora_headings: Option<TyporaHeadings>,
+    pub typora_headings: Option<DocumentHeadings>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub typora_emphasis: Option<TyporaEmphasis>,
+    pub typora_emphasis: Option<DocumentEmphasis>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub typora_footnotes: Option<TyporaFootnotes>,
+    pub typora_footnotes: Option<DocumentFootnotes>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub typora_horizontal_rule: Option<TyporaHorizontalRule>,
+    pub typora_horizontal_rule: Option<DocumentHorizontalRule>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub typora_table: Option<TyporaTable>,
+    pub typora_table: Option<DocumentTable>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub typora_lists: Option<TyporaLists>,
+    pub typora_lists: Option<DocumentLists>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub typora_task_lists: Option<TyporaTaskLists>,
+    pub typora_task_lists: Option<DocumentTaskLists>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub typora_images: Option<TyporaImages>,
+    pub typora_images: Option<DocumentImages>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub typora_math: Option<TyporaMath>,
+    pub typora_math: Option<DocumentMath>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub typora_alerts: Option<TyporaAlerts>,
+    pub typora_alerts: Option<DocumentAlerts>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub typora_source_mode: Option<TyporaSourceMode>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -591,30 +677,34 @@ impl TyporaSourceMode {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct TyporaAlerts {
+pub struct DocumentAlerts {
     pub shaded_background: bool,
     #[serde(default, skip_serializing_if = "Mapping::is_empty")]
     pub colors: Mapping,
 }
 
-impl TyporaAlerts {
-    fn validate(&self, path: &Path, theme: &Theme) -> Result<(), String> {
+impl DocumentAlerts {
+    fn validate(&self, path: &Path, theme: &Theme, section: &str) -> Result<(), String> {
         for (kind, role) in &self.colors {
-            if !TYPORA_ALERT_ROLES.iter().any(|(key, _)| key == kind) {
+            if !DOCUMENT_ALERT_ROLES.iter().any(|(key, _)| key == kind) {
                 return Err(format!(
-                    "{}: alerts.colors.{kind}: 지원하지 않는 알림 유형",
+                    "{}: {section}.colors.{kind}: 지원하지 않는 알림 유형",
                     path.display()
                 ));
             }
-            validate_role(path, &format!("alerts.colors.{kind}"), role, theme)?;
+            validate_role(path, &format!("{section}.colors.{kind}"), role, theme)?;
         }
         Ok(())
+    }
+
+    pub fn role<'a>(&'a self, kind: &str, fallback: &'a str) -> &'a str {
+        self.colors.get(kind).map_or(fallback, String::as_str)
     }
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct TyporaMath {
+pub struct DocumentMath {
     pub padding_block_px: u16,
     pub padding_inline_px: u16,
     pub shaded_background: bool,
@@ -622,7 +712,7 @@ pub struct TyporaMath {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct TyporaImages {
+pub struct DocumentImages {
     pub caption_size_percent: std::num::NonZeroU16,
     pub caption_gap_px: u16,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -657,7 +747,7 @@ impl TyporaAlignment {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct TyporaTaskLists {
+pub struct DocumentTaskLists {
     pub strike_completed: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub checkbox_color: Option<String>,
@@ -665,41 +755,44 @@ pub struct TyporaTaskLists {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct TyporaLists {
+pub struct DocumentLists {
     pub indent_px: std::num::NonZeroU16,
     pub item_gap_px: u16,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub markers: Option<TyporaListMarkers>,
+    pub markers: Option<DocumentListMarkers>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct TyporaListMarkers {
-    level_1: Option<TyporaListMarker>,
-    level_2: Option<TyporaListMarker>,
-    level_3: Option<TyporaListMarker>,
+pub struct DocumentListMarkers {
+    level_1: Option<ListMarker>,
+    level_2: Option<ListMarker>,
+    level_3: Option<ListMarker>,
 }
 
-impl TyporaListMarkers {
+impl DocumentListMarkers {
     pub fn styles(&self) -> [&'static str; 3] {
+        self.shapes().map(ListMarker::css_value)
+    }
+
+    pub fn shapes(&self) -> [ListMarker; 3] {
         [
-            self.level_1.unwrap_or(TyporaListMarker::Disc),
-            self.level_2.unwrap_or(TyporaListMarker::Circle),
-            self.level_3.unwrap_or(TyporaListMarker::Square),
+            self.level_1.unwrap_or(ListMarker::Disc),
+            self.level_2.unwrap_or(ListMarker::Circle),
+            self.level_3.unwrap_or(ListMarker::Square),
         ]
-        .map(TyporaListMarker::css_value)
     }
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(rename_all = "snake_case")]
-enum TyporaListMarker {
+pub enum ListMarker {
     Disc,
     Circle,
     Square,
 }
 
-impl TyporaListMarker {
+impl ListMarker {
     const fn css_value(self) -> &'static str {
         match self {
             Self::Disc => "disc",
@@ -711,7 +804,7 @@ impl TyporaListMarker {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct TyporaTable {
+pub struct DocumentTable {
     pub cell_padding_block_px: u16,
     pub cell_padding_inline_px: u16,
     pub row_rule_px: std::num::NonZeroU16,
@@ -719,27 +812,27 @@ pub struct TyporaTable {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct TyporaFootnotes {
+pub struct DocumentFootnotes {
     pub body_size_percent: std::num::NonZeroU16,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct TyporaHorizontalRule {
+pub struct DocumentHorizontalRule {
     pub thickness_px: std::num::NonZeroU16,
     pub margin_block_px: u16,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct TyporaEmphasis {
-    pub light: TyporaEmphasisColors,
-    pub dark: TyporaEmphasisColors,
+pub struct DocumentEmphasis {
+    pub light: DocumentEmphasisColors,
+    pub dark: DocumentEmphasisColors,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct TyporaEmphasisColors {
+pub struct DocumentEmphasisColors {
     pub strong: String,
     pub italic: String,
     pub strikethrough: String,
@@ -748,18 +841,18 @@ pub struct TyporaEmphasisColors {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct TyporaHeadings {
-    h1: TyporaHeading,
-    h2: TyporaHeading,
-    h3: TyporaHeading,
-    h4: TyporaHeading,
-    h5: TyporaHeading,
-    h6: TyporaHeading,
+pub struct DocumentHeadings {
+    h1: DocumentHeading,
+    h2: DocumentHeading,
+    h3: DocumentHeading,
+    h4: DocumentHeading,
+    h5: DocumentHeading,
+    h6: DocumentHeading,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct TyporaHeading {
+pub struct DocumentHeading {
     pub size_percent: u16,
     pub weight: u16,
     pub margin_before_px: u16,
@@ -767,8 +860,8 @@ pub struct TyporaHeading {
     pub divider: bool,
 }
 
-impl TyporaHeadings {
-    pub fn levels(&self) -> [(&'static str, &TyporaHeading); 6] {
+impl DocumentHeadings {
+    pub fn levels(&self) -> [(&'static str, &DocumentHeading); 6] {
         [
             ("h1", &self.h1),
             ("h2", &self.h2),
@@ -794,19 +887,19 @@ impl TyporaHeadings {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct TyporaParagraph {
+pub struct DocumentParagraph {
     pub gap_px: Option<u16>,
-    pub alignment: Option<TyporaParagraphAlignment>,
+    pub alignment: Option<ParagraphAlignment>,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(rename_all = "snake_case")]
-pub enum TyporaParagraphAlignment {
+pub enum ParagraphAlignment {
     Start,
     Justify,
 }
 
-impl TyporaParagraphAlignment {
+impl ParagraphAlignment {
     pub const fn css_value(self) -> &'static str {
         match self {
             Self::Start => "start",
@@ -817,13 +910,13 @@ impl TyporaParagraphAlignment {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct TyporaLayout {
+pub struct DocumentLayout {
     pub max_width_px: u16,
     pub padding_inline_min_px: u16,
     pub padding_inline_max_px: u16,
 }
 
-impl TyporaLayout {
+impl DocumentLayout {
     fn validate(&self, path: &Path) -> Result<(), String> {
         if self.max_width_px == 0
             || self.padding_inline_min_px > self.padding_inline_max_px
@@ -851,6 +944,270 @@ struct LanguageFile {
 #[serde(deny_unknown_fields)]
 struct EditorFile {
     colors: Mapping,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct ObsidianLineHeight {
+    #[serde(default)]
+    pub use_shared_line_height: bool,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct ObsidianCode {
+    #[serde(default)]
+    pub use_shared_line_height: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reading_border_width_px: Option<u16>,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub reading_horizontal_scroll: bool,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct ObsidianProseDetail {
+    pub letter_spacing_em: Option<f64>,
+    pub common_ligatures: Option<bool>,
+    pub small_caps: Option<bool>,
+    pub text_transform: Option<ProseTextTransform>,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ProseTextTransform {
+    None,
+    Capitalize,
+    Uppercase,
+    Lowercase,
+}
+
+impl ProseTextTransform {
+    pub const fn css_value(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::Capitalize => "capitalize",
+            Self::Uppercase => "uppercase",
+            Self::Lowercase => "lowercase",
+        }
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct ObsidianLinks {
+    pub internal_underline: Option<bool>,
+    pub internal_hover_underline: Option<bool>,
+    pub external_underline: Option<bool>,
+    pub external_hover_underline: Option<bool>,
+    #[serde(default)]
+    pub keyboard_focus_outline: bool,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct ObsidianBlockquote {
+    pub text_role: Option<String>,
+    pub border_role: Option<String>,
+    pub border_width_px: Option<u16>,
+    pub padding_start_em: Option<f64>,
+}
+
+impl ObsidianBlockquote {
+    fn validate(&self, file: &Path, theme: &Theme) -> Result<(), String> {
+        for (key, role) in [
+            ("blockquote.text_role", &self.text_role),
+            ("blockquote.border_role", &self.border_role),
+        ] {
+            if let Some(role) = role {
+                validate_role(file, key, role, theme)?;
+            }
+        }
+        if self
+            .padding_start_em
+            .is_some_and(|padding| !padding.is_finite() || padding < 0.0)
+        {
+            return Err(format!(
+                "{}: blockquote.padding_start_em: 0 이상의 유한한 값이어야 합니다",
+                file.display()
+            ));
+        }
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct ObsidianLivePreview {
+    pub highlight_active_line: bool,
+    pub use_focus_caret: bool,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct ObsidianSourceMode {
+    pub mute_markdown_markers: bool,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct ObsidianInternalLinks {
+    pub distinguish_unresolved: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub note_embed_border_width_px: Option<u16>,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct ObsidianTagsAndProperties {
+    pub style_inline_tags: bool,
+    pub style_properties: bool,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct ObsidianNavigationSidebar {
+    pub file_explorer: bool,
+    pub outline: bool,
+    pub backlinks: bool,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct ObsidianWorkspace {
+    pub style_active_tabs: bool,
+    pub shade_ribbon: bool,
+    pub shade_status_bar: bool,
+    pub style_split_dividers: bool,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct ObsidianDialogs {
+    pub style_settings: bool,
+    pub style_prompts: bool,
+    pub style_menus: bool,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct ObsidianSearch {
+    pub highlight_note_matches: bool,
+    pub highlight_vault_matches: bool,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct ObsidianGraph {
+    pub use_theme_palette: bool,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct ObsidianCanvas {
+    pub style_default_colors: bool,
+    pub highlight_selection: bool,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct ObsidianBases {
+    pub style_table: bool,
+    pub style_cards: bool,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct ObsidianMermaid {
+    pub use_theme_palette: bool,
+    pub scroll_wide_diagrams: bool,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct ObsidianIcons {
+    pub style_ribbon: bool,
+    pub style_note_header: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub size_px: Option<u16>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stroke_width: Option<f64>,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct ObsidianMobile {
+    pub style_toolbar: bool,
+    pub style_drawers: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub phone_padding_max_px: Option<u16>,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct ObsidianPrint {
+    pub wrap_code: bool,
+    pub paginate_tables: bool,
+}
+
+impl ObsidianIcons {
+    fn validate(&self, file: &Path) -> Result<(), String> {
+        if self.size_px.is_some_and(|size| !(12..=24).contains(&size)) {
+            return Err(format!(
+                "{}: icons.size_px: 12~24px 범위여야 합니다",
+                file.display()
+            ));
+        }
+        if self
+            .stroke_width
+            .is_some_and(|width| !(1.0..=3.0).contains(&width))
+        {
+            return Err(format!(
+                "{}: icons.stroke_width: 1~3 범위의 유한한 값이어야 합니다",
+                file.display()
+            ));
+        }
+        Ok(())
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ObsidianFile {
+    #[serde(default)]
+    colors: Mapping,
+    prose: Option<ObsidianLineHeight>,
+    prose_detail: Option<ObsidianProseDetail>,
+    code: Option<ObsidianCode>,
+    layout: Option<DocumentLayout>,
+    paragraph: Option<DocumentParagraph>,
+    headings: Option<DocumentHeadings>,
+    links: Option<ObsidianLinks>,
+    blockquote: Option<ObsidianBlockquote>,
+    emphasis: Option<DocumentEmphasis>,
+    footnotes: Option<DocumentFootnotes>,
+    horizontal_rule: Option<DocumentHorizontalRule>,
+    table: Option<DocumentTable>,
+    lists: Option<DocumentLists>,
+    task_lists: Option<DocumentTaskLists>,
+    images: Option<DocumentImages>,
+    math: Option<DocumentMath>,
+    callouts: Option<DocumentAlerts>,
+    live_preview: Option<ObsidianLivePreview>,
+    source_mode: Option<ObsidianSourceMode>,
+    internal_links: Option<ObsidianInternalLinks>,
+    tags_and_properties: Option<ObsidianTagsAndProperties>,
+    navigation_sidebar: Option<ObsidianNavigationSidebar>,
+    workspace: Option<ObsidianWorkspace>,
+    dialogs: Option<ObsidianDialogs>,
+    search: Option<ObsidianSearch>,
+    graph: Option<ObsidianGraph>,
+    canvas: Option<ObsidianCanvas>,
+    bases: Option<ObsidianBases>,
+    mermaid: Option<ObsidianMermaid>,
+    icons: Option<ObsidianIcons>,
+    mobile: Option<ObsidianMobile>,
+    print: Option<ObsidianPrint>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
@@ -897,6 +1254,8 @@ pub enum HelixModifier {
 struct HelixFile {
     colors: Mapping,
     styles: BTreeMap<String, HelixStyle>,
+    config: toml::Table,
+    languages: toml::Table,
 }
 
 impl HelixFile {
@@ -1054,18 +1413,18 @@ impl VimFile {
 struct TyporaFile {
     #[serde(default)]
     colors: Mapping,
-    layout: Option<TyporaLayout>,
-    paragraph: Option<TyporaParagraph>,
-    headings: Option<TyporaHeadings>,
-    emphasis: Option<TyporaEmphasis>,
-    footnotes: Option<TyporaFootnotes>,
-    horizontal_rule: Option<TyporaHorizontalRule>,
-    table: Option<TyporaTable>,
-    lists: Option<TyporaLists>,
-    task_lists: Option<TyporaTaskLists>,
-    images: Option<TyporaImages>,
-    math: Option<TyporaMath>,
-    alerts: Option<TyporaAlerts>,
+    layout: Option<DocumentLayout>,
+    paragraph: Option<DocumentParagraph>,
+    headings: Option<DocumentHeadings>,
+    emphasis: Option<DocumentEmphasis>,
+    footnotes: Option<DocumentFootnotes>,
+    horizontal_rule: Option<DocumentHorizontalRule>,
+    table: Option<DocumentTable>,
+    lists: Option<DocumentLists>,
+    task_lists: Option<DocumentTaskLists>,
+    images: Option<DocumentImages>,
+    math: Option<DocumentMath>,
+    alerts: Option<DocumentAlerts>,
     source_mode: Option<TyporaSourceMode>,
     toc: Option<TyporaToc>,
     sidebar: Option<TyporaSidebar>,
@@ -1154,7 +1513,7 @@ pub fn load(path: &Path) -> Result<Theme, String> {
                         headings.validate(&file)?;
                     }
                     if let Some(alerts) = &config.alerts {
-                        alerts.validate(&file, &theme)?;
+                        alerts.validate(&file, &theme, "alerts")?;
                     }
                     if let Some(source) = &config.source_mode {
                         source.validate(&file, &theme)?;
@@ -1197,10 +1556,80 @@ pub fn load(path: &Path) -> Result<Theme, String> {
                     theme.layers.typora_diagrams = config.diagrams;
                     theme.layers.typora_print = config.print;
                     config.colors
+                } else if id == "obsidian" {
+                    let config = read::<ObsidianFile>(&file)?;
+                    if let Some(callouts) = &config.callouts {
+                        callouts.validate(&file, &theme, "callouts")?;
+                    }
+                    if let Some(role) = config
+                        .task_lists
+                        .as_ref()
+                        .and_then(|tasks| tasks.checkbox_color.as_deref())
+                    {
+                        validate_role(&file, "task_lists.checkbox_color", role, &theme)?;
+                    }
+                    if let Some(blockquote) = &config.blockquote {
+                        blockquote.validate(&file, &theme)?;
+                    }
+                    if let Some(layout) = &config.layout {
+                        layout.validate(&file)?;
+                    }
+                    if let Some(headings) = &config.headings {
+                        headings.validate(&file)?;
+                    }
+                    if config
+                        .prose_detail
+                        .as_ref()
+                        .and_then(|detail| detail.letter_spacing_em)
+                        .is_some_and(|spacing| !(-0.5..=0.5).contains(&spacing))
+                    {
+                        return Err(format!(
+                            "{}: prose_detail.letter_spacing_em: -0.5~0.5 범위의 유한한 값이어야 합니다",
+                            file.display()
+                        ));
+                    }
+                    if let Some(icons) = &config.icons {
+                        icons.validate(&file)?;
+                    }
+                    theme.layers.obsidian_prose = config.prose;
+                    theme.layers.obsidian_prose_detail = config.prose_detail;
+                    theme.layers.obsidian_code = config.code;
+                    theme.layers.obsidian_layout = config.layout;
+                    theme.layers.obsidian_paragraph = config.paragraph;
+                    theme.layers.obsidian_headings = config.headings;
+                    theme.layers.obsidian_links = config.links;
+                    theme.layers.obsidian_blockquote = config.blockquote;
+                    theme.layers.obsidian_emphasis = config.emphasis;
+                    theme.layers.obsidian_footnotes = config.footnotes;
+                    theme.layers.obsidian_horizontal_rule = config.horizontal_rule;
+                    theme.layers.obsidian_table = config.table;
+                    theme.layers.obsidian_lists = config.lists;
+                    theme.layers.obsidian_task_lists = config.task_lists;
+                    theme.layers.obsidian_images = config.images;
+                    theme.layers.obsidian_math = config.math;
+                    theme.layers.obsidian_callouts = config.callouts;
+                    theme.layers.obsidian_live_preview = config.live_preview;
+                    theme.layers.obsidian_source_mode = config.source_mode;
+                    theme.layers.obsidian_internal_links = config.internal_links;
+                    theme.layers.obsidian_tags_and_properties = config.tags_and_properties;
+                    theme.layers.obsidian_navigation_sidebar = config.navigation_sidebar;
+                    theme.layers.obsidian_workspace = config.workspace;
+                    theme.layers.obsidian_dialogs = config.dialogs;
+                    theme.layers.obsidian_search = config.search;
+                    theme.layers.obsidian_graph = config.graph;
+                    theme.layers.obsidian_canvas = config.canvas;
+                    theme.layers.obsidian_bases = config.bases;
+                    theme.layers.obsidian_mermaid = config.mermaid;
+                    theme.layers.obsidian_icons = config.icons;
+                    theme.layers.obsidian_mobile = config.mobile;
+                    theme.layers.obsidian_print = config.print;
+                    config.colors
                 } else if id == "helix" {
                     let config = read::<HelixFile>(&file)?;
                     config.validate(&file, &theme)?;
                     theme.layers.helix_styles = config.styles;
+                    theme.layers.helix_config = config.config;
+                    theme.layers.helix_languages = config.languages;
                     config.colors
                 } else if id == "vim" {
                     let config = read::<VimFile>(&file)?;
@@ -1248,6 +1677,1750 @@ mod tests {
         resolve,
     };
     use std::io::Read;
+
+    #[test]
+    fn obsidian_prose_line_height_is_scoped_and_uses_common_value() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("theme.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        let source = include_str!("../themes/lbrx.toml");
+        let config = editors.join("obsidian.toml");
+        let render = || crate::obsidian::render(&resolve::resolve(&load(&path).unwrap()).unwrap());
+        fs::write(&path, source).unwrap();
+        fs::write(&config, "[colors]\n\"--text-muted\" = \"muted\"\n").unwrap();
+        let baseline = render();
+        fs::write(&config, "[prose]\nuse_shared_line_height = false\n").unwrap();
+        assert_eq!(render()[1], baseline[1]);
+
+        fs::write(&config, include_str!("../themes/editors/obsidian.toml")).unwrap();
+        let output = render();
+        assert!(output[1].1.contains(".markdown-rendered p,"));
+        assert!(output[1].1.contains(
+            r#".markdown-source-view.is-live-preview .cm-line:not([class*="HyperMD-"]) {"#
+        ));
+        assert!(output[1].1.contains("line-height: 1.65;"));
+        assert!(!output[1].1.contains("--font-text-size"));
+
+        fs::write(
+            &path,
+            source.replacen("line_height = 1.65", "line_height = 1.8", 1),
+        )
+        .unwrap();
+        assert!(render()[1].1.contains("line-height: 1.8;"));
+    }
+
+    #[test]
+    fn obsidian_number_and_error_use_common_live_colors_and_rendered_language_overrides() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let languages = tmp.path().join("languages");
+        fs::create_dir(&languages).unwrap();
+        fs::write(
+            languages.join("common.toml"),
+            "[tokens]\nnumber = 'function'\nerror = 'error'",
+        )
+        .unwrap();
+        fs::write(
+            languages.join("python.toml"),
+            "[tokens]\nnumber = 'keyword'\nerror = 'comment'",
+        )
+        .unwrap();
+        let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+        let [_, (_, css), _] = crate::obsidian::render(&theme);
+        for (class, mode) in [("light", &theme.light), ("dark", &theme.dark)] {
+            let rendered = format!(
+                ".theme-{class} :is(.markdown-reading-view, .markdown-source-view.is-live-preview) .markdown-rendered pre"
+            );
+            for (token, common, python) in [
+                ("number", "function", "keyword"),
+                ("error", "error", "comment"),
+            ] {
+                let base_rule = format!(
+                    "{rendered} code .token.{token} {{ color: {};",
+                    mode.roles[common]
+                );
+                let override_rule = format!(
+                    "{rendered} code.language-python .token.{token} {{ color: {};",
+                    mode.roles[python]
+                );
+                assert!(css.find(&base_rule).unwrap() < css.find(&override_rule).unwrap());
+                assert!(css.contains(&format!(
+                    ".theme-{class} .markdown-source-view.is-live-preview .HyperMD-codeblock:not(.HyperMD-codeblock-begin, .HyperMD-codeblock-end) span.cm-{token}:not(.cm-formatting) {{ color: {};",
+                    mode.roles[common]
+                )));
+            }
+        }
+        assert!(!css.contains("--code-value:"));
+    }
+
+    #[test]
+    fn obsidian_code_border_and_scroll_only_change_reading_view_blocks() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            css
+        };
+        let block = ".markdown-reading-view .markdown-rendered pre:has(> code)";
+        let border = format!(
+            "{block} {{ --code-border-width: 1px; --code-border-color: var(--text-muted); }}\n"
+        );
+        let scroll = format!(
+            "{block} {{ --code-white-space: pre; overflow-x: auto; }}\n{block} > code {{ white-space: pre; }}\n"
+        );
+        let enabled = render(stock);
+        assert!(enabled.contains(&border) && enabled.contains(&scroll));
+        let native_wrap = stock.replacen(
+            "reading_horizontal_scroll = true",
+            "reading_horizontal_scroll = false",
+            1,
+        );
+        assert_eq!(render(&native_wrap), enabled.replacen(&scroll, "", 1));
+        let native_border = stock.replacen("reading_border_width_px = 1", "", 1);
+        assert_eq!(render(&native_border), enabled.replacen(&border, "", 1));
+    }
+
+    #[test]
+    fn obsidian_code_line_height_uses_shared_mono_value_without_overriding_code_size() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("theme.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        let source = include_str!("../themes/lbrx.toml");
+        let config = editors.join("obsidian.toml");
+        let css = || {
+            crate::obsidian::render(&resolve::resolve(&load(&path).unwrap()).unwrap())[1]
+                .1
+                .clone()
+        };
+        let prose_only = "[prose]\nuse_shared_line_height = true\n";
+        fs::write(&path, source).unwrap();
+        fs::write(&config, prose_only).unwrap();
+        let baseline = css();
+        fs::write(
+            &config,
+            format!("{prose_only}\n[code]\nuse_shared_line_height = false\n"),
+        )
+        .unwrap();
+        assert_eq!(css(), baseline);
+
+        let selectors = concat!(
+            "\n.markdown-rendered pre,\n",
+            ".markdown-rendered pre > code,\n",
+            ".markdown-source-view.is-live-preview .HyperMD-codeblock {\n"
+        );
+        fs::write(
+            &config,
+            format!("{prose_only}\n[code]\nuse_shared_line_height = true\n"),
+        )
+        .unwrap();
+        assert_eq!(
+            css(),
+            format!("{baseline}{selectors}  line-height: 1.45;\n}}\n")
+        );
+        fs::write(
+            &path,
+            source.replacen("line_height = 1.45", "line_height = 1.6", 1),
+        )
+        .unwrap();
+        assert_eq!(
+            css(),
+            format!("{baseline}{selectors}  line-height: 1.6;\n}}\n")
+        );
+    }
+
+    #[test]
+    fn obsidian_layout_uses_native_width_gate_and_validates_padding() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("theme.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let css = || {
+            crate::obsidian::render(&resolve::resolve(&load(&path).unwrap()).unwrap())[1]
+                .1
+                .clone()
+        };
+        assert!(!css().contains("--file-line-width:"));
+        let layout = "[layout]\nmax_width_px = 920\npadding_inline_min_px = 12\npadding_inline_max_px = 36\n";
+        fs::write(&config, layout).unwrap();
+        let output = css();
+        assert_eq!(output.matches("--file-line-width:").count(), 1);
+        assert!(output.contains(concat!(
+            ".markdown-reading-view > .markdown-preview-view.is-readable-line-width,\n",
+            ".markdown-source-view.is-live-preview.is-readable-line-width {\n",
+            "  --file-line-width: calc(920px - var(--lbrx-file-padding-inline) * 2);"
+        )));
+        assert!(output.contains("--lbrx-file-padding-inline: clamp(12px, 4vw, 36px);"));
+        assert!(output.contains(".markdown-source-view.is-live-preview > .cm-editor > .cm-scroller {\n  padding-inline: var(--lbrx-file-padding-inline);"));
+        for invalid in [
+            layout.replace("12", "40"),
+            layout.replace("920", "72"),
+            layout.replace("920", "0"),
+        ] {
+            fs::write(&config, invalid).unwrap();
+            let err = load(&path)
+                .err()
+                .expect("invalid Obsidian layout was accepted");
+            assert!(
+                err.contains("obsidian.toml") && err.contains("layout"),
+                "{err}"
+            );
+        }
+    }
+
+    #[test]
+    fn obsidian_paragraph_gap_only_adds_rules_between_reading_view_paragraphs() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("theme.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let render = || {
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            css
+        };
+        let baseline = render();
+        for gap in [12, 0] {
+            fs::write(&config, format!("[paragraph]\ngap_px = {gap}\n")).unwrap();
+            let output = render();
+            let added = output.strip_prefix(&baseline).unwrap();
+            assert!(added.contains(".el-p:has(+ .el-p) > p {\n  margin-block-end: 0;"));
+            assert!(added.contains(&format!(
+                ".el-p + .el-p > p {{\n  margin-block-start: {gap}px;"
+            )));
+            assert_eq!(added.matches(".markdown-reading-view").count(), 2);
+            assert!(!added.contains(".markdown-source-view"));
+        }
+    }
+
+    #[test]
+    fn obsidian_paragraph_alignment_is_independent_of_gap_and_scoped_to_reading_view() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("theme.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let render = || {
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            css
+        };
+        let baseline = render();
+        let selector =
+            ".markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer > .el-p > p";
+        for alignment in ["start", "justify"] {
+            fs::write(&config, format!("[paragraph]\nalignment = '{alignment}'\n")).unwrap();
+            assert_eq!(
+                render(),
+                format!("{baseline}\n{selector} {{\n  text-align: {alignment};\n}}\n")
+            );
+        }
+        fs::write(&config, "[paragraph]\ngap_px = 12\n").unwrap();
+        let gap_only = render();
+        assert!(gap_only.contains("margin-block-start: 12px;"));
+        assert!(!gap_only.contains("text-align:"));
+        fs::write(&config, "[paragraph]\nalignment = 'left'\n").unwrap();
+        let err = load(&path)
+            .err()
+            .expect("unsupported alignment was accepted");
+        assert!(
+            err.contains("obsidian.toml") && err.contains("left"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn obsidian_print_options_only_affect_the_export_document() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            css
+        };
+        let full = render(stock);
+        let start = full.find("@media print {\n").unwrap();
+        let end = start + full[start..].find("\n}\n").unwrap() + 3;
+        let block = &full[start..end];
+        let scope = "body > .print > .markdown-preview-view.markdown-rendered";
+        assert!(
+            block
+                .lines()
+                .skip(1)
+                .take_while(|line| *line != "}")
+                .all(|line| { line.trim_start().starts_with(scope) })
+        );
+        assert!(block.contains("white-space: pre-wrap; overflow-wrap: anywhere;"));
+        assert!(block.contains("> thead { display: table-header-group;"));
+        assert!(
+            block.contains("min-inline-size: 0; white-space: normal; overflow-wrap: anywhere;")
+        );
+        let without_code = stock.replacen("\nwrap_code = true", "\nwrap_code = false", 1);
+        let tables_only = render(&without_code);
+        assert!(tables_only.contains("display: table-header-group;"));
+        assert!(!tables_only.contains(&format!("{scope} pre > code")));
+        let neither =
+            without_code.replacen("\npaginate_tables = true", "\npaginate_tables = false", 1);
+        assert_eq!(render(&neither), full.replacen(block, "", 1));
+    }
+
+    #[test]
+    fn obsidian_mobile_caps_phone_padding_without_replacing_native_layout() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            css
+        };
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        let css = render(stock);
+        let configured_padding = css
+            .split_once("--lbrx-file-padding-inline: clamp(")
+            .unwrap()
+            .1
+            .split_once(';')
+            .unwrap()
+            .0;
+        let start = css
+            .find("@media screen {\n  .is-mobile.is-phone .markdown-reading-view")
+            .unwrap();
+        let end = start + css[start..].find("\n}\n").unwrap() + 3;
+        let phone = &css[start..end];
+        assert!(phone.contains(".is-mobile.is-phone .markdown-source-view.is-live-preview"));
+        assert!(phone.contains(&format!("min(clamp({configured_padding}, 12px)")));
+        assert!(phone.contains("var(--safe-area-inline-start, 0px)"));
+        assert!(phone.contains("var(--safe-area-inline-end, 0px)"));
+        assert!(!phone.contains("padding-block") && !phone.contains("keyboard-height"));
+        let uncapped = render(&stock.replacen(
+            "\nphone_padding_max_px = 12",
+            "\n# phone_padding_max_px = 12",
+            1,
+        ));
+        assert_eq!(uncapped, css.replacen(phone, "", 1));
+        let without_layout = render("[mobile]\nphone_padding_max_px = 16");
+        assert!(without_layout.contains("min(var(--file-margins-x, 24px), 16px)"));
+
+        assert!(css.contains(".is-mobile:not(.is-floating-nav) .mobile-toolbar,"));
+        assert!(css.contains(".is-mobile .workspace-drawer { --mobile-sidebar-background:"));
+        for (setting, selector) in [
+            (
+                "style_toolbar",
+                ".is-mobile:not(.is-floating-nav) .mobile-toolbar",
+            ),
+            ("style_drawers", ".is-mobile .workspace-drawer {"),
+        ] {
+            let start = css.find(selector).unwrap();
+            let end = start + css[start..].find("}\n").unwrap() + 2;
+            let disabled = render(&stock.replacen(
+                &format!("\n{setting} = true"),
+                &format!("\n{setting} = false"),
+                1,
+            ));
+            assert_eq!(disabled, css.replacen(&css[start..end], "", 1));
+        }
+    }
+
+    #[test]
+    fn obsidian_icons_scope_state_colors_and_keep_native_dimensions_by_default() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            css
+        };
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        let base = render(stock);
+        for (setting, scope) in [
+            ("style_ribbon", ".workspace-ribbon .side-dock-ribbon-action"),
+            ("style_note_header", "> .view-header .view-action"),
+        ] {
+            let matches_scope = |line: &str| line.contains(&format!("{scope}.clickable-icon"));
+            for mode in ["light", "dark"] {
+                let prefix = format!(".theme-{mode}:not(.is-mobile)");
+                assert!(base.lines().any(|line| {
+                    line.starts_with(&prefix)
+                        && matches_scope(line)
+                        && line.contains(":focus-visible")
+                        && line.contains("color: var(--icon-color-focused)")
+                }));
+            }
+            assert!(
+                !base.lines().filter(|line| matches_scope(line)).any(|line| {
+                    line.contains("--icon-size:") || line.contains("--icon-stroke:")
+                })
+            );
+            let disabled = render(&stock.replacen(
+                &format!("\n{setting} = true"),
+                &format!("\n{setting} = false"),
+                1,
+            ));
+            assert_eq!(
+                disabled.lines().collect::<Vec<_>>(),
+                base.lines()
+                    .filter(|line| !matches_scope(line))
+                    .collect::<Vec<_>>()
+            );
+        }
+        let sized = render("[icons]\nstyle_ribbon = true\nsize_px = 18\nstroke_width = 1.75");
+        assert_eq!(
+            sized
+                .lines()
+                .filter(|line| line
+                    .contains("> svg.svg-icon { --icon-size: 18px; --icon-stroke: 1.75; }"))
+                .count(),
+            2
+        );
+        for (key, value) in [("size_px", "25"), ("stroke_width", "nan")] {
+            fs::write(&config, format!("[icons]\n{key} = {value}")).unwrap();
+            let error = load(&path).err().expect("invalid icon dimension accepted");
+            assert!(error.contains(&format!("icons.{key}")), "{error}");
+        }
+    }
+
+    #[test]
+    fn obsidian_mermaid_palette_and_screen_scroll_are_independent() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            css
+        };
+        let base = render("");
+        let palette = render("[mermaid]\nuse_theme_palette = true");
+        let scroll = render("[mermaid]\nscroll_wide_diagrams = true");
+        let both = render("[mermaid]\nuse_theme_palette = true\nscroll_wide_diagrams = true");
+        let scope = ":is(.markdown-reading-view .markdown-rendered, .markdown-source-view.is-live-preview .cm-embed-block) .mermaid";
+        let start = palette.find(scope).unwrap();
+        let end = start + palette[start..].find("}\n").unwrap() + 2;
+        let palette_rule = &palette[start..end];
+        assert!(palette_rule.contains("--mermaid-text-color: var(--text-normal)"));
+        assert!(!palette_rule.contains("fill:") && !palette_rule.contains("stroke:"));
+        let scroll_rule = format!(
+            "@media screen {{\n  {scope} {{ max-inline-size: 100%; overflow-x: auto; }}\n}}\n"
+        );
+        assert!(scroll.contains(&scroll_rule));
+        assert_eq!(palette.replacen(palette_rule, "", 1), base);
+        assert_eq!(scroll.replacen(&scroll_rule, "", 1), base);
+        assert_eq!(both.replacen(palette_rule, "", 1), scroll);
+    }
+
+    #[test]
+    fn obsidian_bases_options_only_change_their_own_views() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            css
+        };
+        let stock_css = render(stock);
+        for (setting, selector, expected) in [
+            (
+                "style_table",
+                ".bases-view[data-view-type=\"table\"]",
+                ".bases-table-container:focus .bases-table-selection",
+            ),
+            (
+                "style_cards",
+                ".bases-view .bases-cards-container",
+                "--bases-cards-shadow-hover:",
+            ),
+        ] {
+            let rules: Vec<_> = stock_css
+                .split_inclusive("}\n")
+                .filter(|rule| rule.contains(selector))
+                .collect();
+            for scheme in ["light", "dark"] {
+                let scope = format!(".theme-{scheme} {selector}");
+                assert!(
+                    rules
+                        .iter()
+                        .any(|rule| { rule.starts_with(&scope) && rule.contains(expected) })
+                );
+            }
+            let unchanged: String = stock_css
+                .split_inclusive("}\n")
+                .filter(|rule| !rule.contains(selector))
+                .collect();
+            let disabled = render(&stock.replacen(
+                &format!("\n{setting} = true"),
+                &format!("\n{setting} = false"),
+                1,
+            ));
+            assert_eq!(disabled, unchanged);
+        }
+    }
+
+    #[test]
+    fn obsidian_canvas_preserves_explicit_colors_and_can_toggle_selection_separately() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            css
+        };
+        let css = render(stock);
+        for scheme in ["light", "dark"] {
+            let scope = format!(".theme-{scheme} .canvas-wrapper .canvas");
+            let rules: Vec<_> = css
+                .lines()
+                .filter(|line| line.starts_with(&scope))
+                .collect();
+            for rule in &rules {
+                if rule.contains("--canvas-color:") {
+                    let selectors = rule.split_once(" {").unwrap().0;
+                    assert!(
+                        selectors
+                            .split(", ")
+                            .all(|selector| selector.contains(":not(.is-themed)")),
+                        "{rule}"
+                    );
+                }
+            }
+            assert!(rules.iter().any(|rule| {
+                rule.contains(":not(.is-themed, .canvas-node-group) > .canvas-node-container")
+                    && rule.contains("background-color: var(--background-secondary)")
+            }));
+            assert!(rules.iter().any(|rule| {
+                rule.contains(":is(.is-selected, .is-focused) > .canvas-node-container")
+                    && rule.contains("outline: 2px solid")
+                    && !rule.contains("border-color:")
+            }));
+        }
+        for (setting, declarations) in [
+            (
+                "style_default_colors",
+                ["--canvas-color: var(--text-muted)", "background-color:", ""],
+            ),
+            (
+                "highlight_selection",
+                [
+                    "outline: 2px solid",
+                    "border-color:",
+                    "g:not(.is-themed).is-focused",
+                ],
+            ),
+        ] {
+            let disabled = render(&stock.replacen(
+                &format!("\n{setting} = true"),
+                &format!("\n{setting} = false"),
+                1,
+            ));
+            let remaining: Vec<_> = css
+                .lines()
+                .filter(|rule| {
+                    !rule.contains(".canvas-wrapper .canvas")
+                        || !declarations
+                            .iter()
+                            .any(|value| !value.is_empty() && rule.contains(value))
+                })
+                .collect();
+            assert_eq!(disabled.lines().collect::<Vec<_>>(), remaining);
+        }
+    }
+
+    #[test]
+    fn obsidian_graph_palette_targets_shared_body_probes_and_is_optional() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            (theme, css)
+        };
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        let (theme, css) = render(stock);
+        let mut without_graph = css.clone();
+        for (scheme, mode) in [("light", &theme.light), ("dark", &theme.dark)] {
+            let probe = format!("body.theme-{scheme} > .graph-view");
+            let start = css.find(&format!("{probe} {{")).unwrap();
+            let last_rule = format!("{probe}:is(.color-fill-highlight, .color-line-highlight)");
+            let last = css.find(&last_rule).unwrap();
+            let end = last + css[last..].find("}\n").unwrap() + 2;
+            let rules = &css[start..end];
+            assert!(rules.contains("--graph-text: var(--text-normal);"));
+            assert!(rules.contains(&format!("--graph-node-focused: {};", mode.roles["accent"])));
+            assert!(css[last..end].contains(&format!("color: {};", mode.roles["accent"])));
+            assert!(!rules.contains("color-fill-1") && !rules.contains("workspace-leaf"));
+            without_graph = without_graph.replacen(rules, "", 1);
+        }
+        let (_, disabled) = render(&stock.replacen(
+            "\nuse_theme_palette = true",
+            "\nuse_theme_palette = false",
+            1,
+        ));
+        assert_eq!(disabled, without_graph);
+    }
+
+    #[test]
+    fn obsidian_search_distinguishes_native_matches_without_changing_selection() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            css
+        };
+        let base = render("[search]");
+        let note = render("[search]\nhighlight_note_matches = true");
+        let vault = render("[search]\nhighlight_vault_matches = true");
+        let both =
+            render("[search]\nhighlight_note_matches = true\nhighlight_vault_matches = true");
+        let note_rules = |line: &str| {
+            line.contains(".search-highlight > div")
+                || line.contains("span.obsidian-search-match-highlight")
+        };
+        let vault_rules =
+            |line: &str| line.contains(".mod-global-search .search-result-file-matched-text");
+        for scheme in ["light", "dark"] {
+            let reading = format!(
+                ".theme-{scheme} .markdown-reading-view .markdown-rendered .search-highlight > div"
+            );
+            assert!(note.lines().any(|line| {
+                line.starts_with(&format!("{reading} {{")) && !line.contains("inset")
+            }));
+            assert!(note.lines().any(|line| {
+                line.starts_with(&format!("{reading}.is-active {{"))
+                    && line.contains("box-shadow: inset 0 -2px")
+            }));
+            assert!(note.lines().any(|line| {
+                line.starts_with(&format!(
+                    ".theme-{scheme} .markdown-source-view.mod-cm6:has(> .document-search-container) "
+                )) && line.contains("span.obsidian-search-match-highlight {")
+                    && !line.contains("inset")
+            }));
+            assert!(vault.lines().any(|line| {
+                line.starts_with(&format!(".theme-{scheme} .search-result-container"))
+                    && vault_rules(line)
+            }));
+        }
+        assert_eq!(
+            note.lines()
+                .filter(|line| !note_rules(line))
+                .collect::<Vec<_>>(),
+            base.lines().collect::<Vec<_>>()
+        );
+        assert_eq!(
+            vault
+                .lines()
+                .filter(|line| !vault_rules(line))
+                .collect::<Vec<_>>(),
+            base.lines().collect::<Vec<_>>()
+        );
+        assert_eq!(
+            both.lines()
+                .filter(|line| !vault_rules(line))
+                .collect::<Vec<_>>(),
+            note.lines().collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn obsidian_dialogs_are_desktop_scoped_and_independently_configurable() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            css
+        };
+        let enabled = render(stock);
+        for (setting, scope, state) in [
+            (
+                "style_settings",
+                ".modal.mod-settings",
+                ".vertical-tab-nav-item.is-active",
+            ),
+            (
+                "style_prompts",
+                ".prompt:has(",
+                ".suggestion-item.is-selected",
+            ),
+            (
+                "style_menus",
+                ".menu:has(",
+                ".menu-item.selected:not(.is-label)",
+            ),
+        ] {
+            for scheme in ["light", "dark"] {
+                let prefix = format!(".theme-{scheme}:not(.is-mobile) {scope}");
+                let rules: Vec<_> = enabled
+                    .lines()
+                    .filter(|line| line.starts_with(&prefix))
+                    .collect();
+                assert!(rules.iter().any(|line| {
+                    line.contains(state)
+                        && line.contains(r#" [aria-disabled="true"]"#)
+                        && line.contains("linear-gradient(")
+                }));
+                assert!(rules.iter().any(|line| {
+                    line.contains(":focus-visible") && line.contains("outline: 2px solid")
+                }));
+                assert!(
+                    rules
+                        .iter()
+                        .any(|line| line.contains("color: var(--text-muted)"))
+                );
+            }
+            let disabled = render(&stock.replacen(
+                &format!("\n{setting} = true"),
+                &format!("\n{setting} = false"),
+                1,
+            ));
+            let remaining: Vec<_> = enabled
+                .lines()
+                .filter(|line| !line.contains(&format!(":not(.is-mobile) {scope}")))
+                .collect();
+            assert_eq!(disabled.lines().collect::<Vec<_>>(), remaining);
+        }
+    }
+
+    #[test]
+    fn obsidian_workspace_parts_can_be_disabled_independently() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            css
+        };
+        let enabled = render(stock);
+        let rules = [
+            (
+                "style_active_tabs",
+                ".workspace .workspace-tab-header-container .workspace-tab-header.is-active",
+                "linear-gradient(to top, var(--interactive-accent) 2px, transparent 2px)",
+            ),
+            (
+                "shade_ribbon",
+                ".workspace > .workspace-ribbon",
+                "--ribbon-background-collapsed: var(--background-secondary);",
+            ),
+            (
+                "shade_status_bar",
+                ".app-container .status-bar",
+                "--status-bar-background: var(--background-secondary);",
+            ),
+            (
+                "style_split_dividers",
+                ".workspace .workspace-leaf-resize-handle",
+                "--divider-color: color-mix(in srgb, var(--text-muted) 24%, var(--background-secondary));",
+            ),
+        ];
+        for (setting, selector, declaration) in rules {
+            let start = enabled.find(selector).unwrap();
+            let end = start + enabled[start..].find("}\n").unwrap() + 2;
+            let rule = &enabled[start..end];
+            assert!(rule.contains(declaration));
+            if setting == "style_active_tabs" {
+                assert!(rule.contains("--tab-font-weight: 700;"));
+            }
+            let disabled = render(&stock.replacen(
+                &format!("\n{setting} = true"),
+                &format!("\n{setting} = false"),
+                1,
+            ));
+            assert_eq!(disabled, enabled.replacen(rule, "", 1));
+        }
+    }
+
+    #[test]
+    fn obsidian_navigation_sidebar_can_disable_each_pane_independently() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            crate::obsidian::render(&theme)[1].1.clone()
+        };
+        let enabled = render(stock);
+        for (setting, pane, row) in [
+            ("file_explorer", "file-explorer", ".tree-item-self"),
+            ("outline", "outline", ".tree-item-self"),
+            (
+                "backlinks",
+                "backlink",
+                ":is(.search-result-file-title, .search-result-file-match)",
+            ),
+        ] {
+            for scheme in ["light", "dark"] {
+                let scope = format!(
+                    ".theme-{scheme} :is(.mod-left-split, .mod-right-split) .workspace-leaf-content[data-type=\"{pane}\"] .view-content {row}"
+                );
+                assert!(enabled.contains(&format!("{scope}:hover:not(")));
+                assert!(enabled.contains(&format!("{scope}:is(.is-active, .is-selected,")));
+                assert!(enabled.contains(&format!("{scope}:focus-visible {{ outline: 2px solid ")));
+            }
+            let disabled = render(&stock.replacen(
+                &format!("\n{setting} = true"),
+                &format!("\n{setting} = false"),
+                1,
+            ));
+            assert!(!disabled.contains(&format!("[data-type=\"{pane}\"]")));
+            for other in ["file-explorer", "outline", "backlink"]
+                .into_iter()
+                .filter(|&other| other != pane)
+            {
+                assert!(disabled.contains(&format!("[data-type=\"{other}\"]")));
+            }
+        }
+    }
+
+    #[test]
+    fn obsidian_tags_and_properties_are_independently_scoped() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            (theme, css)
+        };
+        let (theme, enabled) = render(stock);
+        let tag_selector = "a.tag:not(.metadata-container *)";
+        assert!(enabled.contains(tag_selector));
+        assert!(enabled.contains(".cm-line:not(.HyperMD-codeblock, .HyperMD-frontmatter) .cm-hashtag:not(.cm-inline-code)"));
+        let (_, tags_disabled) =
+            render(&stock.replacen("style_inline_tags = true", "style_inline_tags = false", 1));
+        assert!(!tags_disabled.contains("--tag-background:"));
+        let (_, properties_disabled) =
+            render(&stock.replacen("style_properties = true", "style_properties = false", 1));
+        assert!(properties_disabled.contains(tag_selector));
+        let mut expected = enabled;
+        for (scheme, mode) in [("light", &theme.light), ("dark", &theme.dark)] {
+            let rule = format!(
+                ".theme-{scheme} :is(.markdown-reading-view .markdown-preview-view, .markdown-source-view.is-live-preview) .metadata-container {{\n  --metadata-label-text-color: var(--text-muted);\n  --metadata-property-box-shadow-focus: 0 0 0 2px {};\n}}\n",
+                mode.roles["focus"]
+            );
+            assert!(expected.contains(&rule));
+            assert!(tags_disabled.contains(&rule));
+            expected = expected.replacen(&rule, "", 1);
+        }
+        assert_eq!(properties_disabled, expected);
+    }
+
+    #[test]
+    fn obsidian_internal_link_and_note_embed_styles_can_be_disabled_independently() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            css
+        };
+        let css = render(stock);
+        let unresolved_start =
+            ".markdown-reading-view .markdown-rendered a.internal-link.is-unresolved,";
+        let start = css.find(unresolved_start).unwrap();
+        let end = start + css[start..].find("}\n").unwrap() + 2;
+        let unresolved = &css[start..end];
+        assert!(unresolved.contains(".is-live-preview :is(.is-unresolved.cm-hmd-internal-link,"));
+        assert!(unresolved.contains("--link-unresolved-decoration-style: dotted;"));
+        assert!(unresolved.contains("--link-unresolved-color: var(--text-muted);"));
+        assert_eq!(
+            render(&stock.replacen(
+                "distinguish_unresolved = true",
+                "distinguish_unresolved = false",
+                1
+            )),
+            css.replacen(unresolved, "", 1)
+        );
+
+        let embed = ":is(.markdown-reading-view .markdown-rendered, .markdown-source-view.is-live-preview) .internal-embed.markdown-embed { --embed-border-start: 2px solid var(--interactive-accent); }\n";
+        assert!(css.contains(embed));
+        assert_eq!(
+            render(&stock.replacen("note_embed_border_width_px = 2", "", 1)),
+            css.replacen(embed, "", 1)
+        );
+        assert_eq!(
+            render(&stock.replacen(
+                "note_embed_border_width_px = 2",
+                "note_embed_border_width_px = 0",
+                1
+            )),
+            css.replacen(embed, &embed.replace("2px", "0px"), 1)
+        );
+    }
+
+    #[test]
+    fn obsidian_source_mode_mutes_only_markdown_markers() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            css
+        };
+        let rule = concat!(
+            ".markdown-source-view.mod-cm6:not(.is-live-preview) .cm-content ",
+            ".cm-line:not(.HyperMD-codeblock, .HyperMD-frontmatter) span.cm-formatting {\n",
+            "  color: var(--text-muted);\n",
+            "}\n"
+        );
+        let enabled = render(stock);
+        assert!(enabled.contains(rule));
+        let disabled = render(&stock.replacen(
+            "mute_markdown_markers = true",
+            "mute_markdown_markers = false",
+            1,
+        ));
+        assert_eq!(disabled, enabled.replacen(rule, "", 1));
+        assert_eq!(
+            disabled,
+            render(&stock.replacen("mute_markdown_markers = true", "", 1))
+        );
+    }
+
+    #[test]
+    fn obsidian_live_preview_settings_are_independent_and_preserve_other_views() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            (theme, css)
+        };
+        let (theme, enabled) = render(stock);
+        let active = ".markdown-source-view.is-live-preview .cm-editor.cm-focused .cm-line:is(.cm-active, .cm-activeLine) {";
+        let (_, without_highlight) = render(&stock.replacen(
+            "highlight_active_line = true",
+            "highlight_active_line = false",
+            1,
+        ));
+        let (_, without_caret) =
+            render(&stock.replacen("use_focus_caret = true", "use_focus_caret = false", 1));
+        let start = enabled.find(active).unwrap();
+        let end = start + enabled[start..].find("}\n").unwrap() + 2;
+        assert_eq!(
+            without_highlight,
+            format!("{}{}", &enabled[..start], &enabled[end..])
+        );
+        let mut expected = enabled;
+        for (scheme, mode) in [("light", &theme.light), ("dark", &theme.dark)] {
+            let editor =
+                format!(".theme-{scheme} .markdown-source-view.is-live-preview .cm-editor");
+            let color = &mode.roles["focus"];
+            let rule = format!(
+                "{editor} .cm-content {{ caret-color: {color}; }}\n{editor} .cm-cursor {{ --caret-color: {color}; }}\n"
+            );
+            assert!(expected.contains(&rule));
+            expected = expected.replacen(&rule, "", 1);
+        }
+        assert_eq!(without_caret, expected);
+    }
+
+    #[test]
+    fn obsidian_callouts_scope_aliases_and_validate_custom_title_contrast() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            (theme, css)
+        };
+        let (theme, css) = render(include_str!("../themes/editors/obsidian.toml"));
+        for (scheme, mode) in [("light", &theme.light), ("dark", &theme.dark)] {
+            let scope = format!(
+                ".theme-{scheme} :is(.markdown-reading-view .markdown-rendered, .markdown-source-view.is-live-preview)"
+            );
+            for (types, role) in [
+                (r#"[data-callout="tip"], [data-callout="hint"]"#, "success"),
+                (
+                    r#"[data-callout="warning"], [data-callout="attention"]"#,
+                    "warning",
+                ),
+                (r#"[data-callout="caution"]"#, "error"),
+            ] {
+                let callout = format!("{scope} .callout:is({types})");
+                let color = &mode.roles[role];
+                assert!(css.contains(&format!(
+                    "{callout} {{ border-inline-start: 3px solid {color}; background-color: var(--background-secondary); }}"
+                )));
+                assert!(css.contains(&format!(
+                    "{callout} > .callout-title,\n{callout} > .callout-title > .callout-icon .svg-icon {{ color: {color}; }}"
+                )));
+            }
+        }
+        assert!(!css.contains(r#"data-callout="bug""#));
+        let (theme, custom) =
+            render("[callouts]\nshaded_background = false\n[callouts.colors]\nnote = 'accent'");
+        assert!(custom.contains(&format!(
+            r#"[data-callout="note"]) {{ border-inline-start: 3px solid {}; }}"#,
+            theme.light.roles["accent"]
+        )));
+        assert!(!render("").1.contains("[data-callout="));
+
+        fs::write(
+            &config,
+            "[callouts]\nshaded_background = true\n[callouts.colors]\nnote = 'surface'",
+        )
+        .unwrap();
+        let Err(error) = resolve::check(&load(&path).unwrap()) else {
+            panic!("a callout title matching its background must fail contrast validation");
+        };
+        assert!(error.contains("callouts.colors.note") && error.contains("최소 4.5:1"));
+    }
+
+    #[test]
+    fn obsidian_math_styles_only_reading_view_blocks_and_scrolls_on_screen() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        let (before, remainder) = stock.split_once("[math]").unwrap();
+        let (_, after) = remainder.split_once("[images]").unwrap();
+        let disabled = format!("{before}[images]{after}");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            css
+        };
+        let block = ".markdown-reading-view .markdown-rendered .math-block";
+        let spacing = format!(
+            "{block} {{ box-sizing: border-box; max-inline-size: 100%; padding-block: 12px; padding-inline: 16px; }}\n"
+        );
+        let shade = format!("{block} {{ background-color: var(--background-secondary); }}\n");
+        let scrolling = format!(
+            "@media screen {{\n  {block} > mjx-container {{ max-inline-size: 100%; overflow-x: auto; }}\n}}\n"
+        );
+        let enabled = render(stock);
+        let rule = format!("{spacing}{shade}{scrolling}");
+        assert!(enabled.contains(&rule));
+        assert_eq!(render(&disabled), enabled.replacen(&rule, "", 1));
+
+        let customized = render(
+            "[math]\npadding_block_px = 8\npadding_inline_px = 12\nshaded_background = false",
+        );
+        assert!(customized.contains(&spacing.replace(
+            "padding-block: 12px; padding-inline: 16px;",
+            "padding-block: 8px; padding-inline: 12px;"
+        )));
+        assert!(customized.contains(&scrolling));
+        assert!(!customized.contains(&shade));
+    }
+
+    #[test]
+    fn obsidian_images_preserve_width_and_only_style_explicit_captions() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            css
+        };
+        let stock = render(include_str!("../themes/editors/obsidian.toml"));
+        let scope = ".markdown-reading-view .markdown-rendered";
+        assert!(stock.contains(&format!(
+            "{scope} .el-p > p > .image-embed:only-child > img,"
+        )));
+        assert!(stock.contains(
+            "img { display: block; max-inline-size: 100%; block-size: auto; margin-inline: auto; }"
+        ));
+        let caption = format!(
+            "{scope} figure:has(> img, > :is(a, picture, .image-embed) > img) > figcaption"
+        );
+        assert!(stock.contains(&format!(
+            "{caption} {{ margin-block-start: 8px; font-size: 90%; color: var(--text-muted); text-align: center; }}"
+        )));
+        assert!(!stock.contains("attr(alt)"));
+        let custom =
+            render("[images]\nalignment = 'end'\ncaption_size_percent = 100\ncaption_gap_px = 4");
+        assert!(custom.contains("margin-inline: auto 0;"));
+        assert!(custom.contains(&format!(
+            "{caption} {{ margin-block-start: 4px; font-size: 100%;"
+        )));
+        assert!(!render("").contains(&caption));
+    }
+
+    #[test]
+    fn obsidian_task_lists_keep_subtasks_out_of_completed_decoration() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            (theme, css)
+        };
+        let (theme, css) = render("[task_lists]\nstrike_completed = true");
+        let task = ".markdown-reading-view .markdown-rendered li.task-list-item[data-task=\"x\" i]";
+        for (scheme, mode) in [("light", &theme.light), ("dark", &theme.dark)] {
+            assert!(css.contains(&format!(
+                ".theme-{scheme} {task} > p > input.task-list-item-checkbox:checked {{ --checkbox-color: {}; }}",
+                mode.roles["accent"]
+            )));
+        }
+        assert!(css.contains(&format!("{task} {{ text-decoration: none;")));
+        assert!(css.contains(&format!("{task} > p,\n{task}:not(:has(> p, > :is(ul, ol,")));
+        assert!(css.contains(&format!("{task}:not(:has(> p)) > :is(ul, ol,")));
+        assert!(css.contains("text-decoration-line: line-through;"));
+
+        let (theme, css) =
+            render("[task_lists]\nstrike_completed = false\ncheckbox_color = 'warning'");
+        assert!(!css.contains("text-decoration-line: line-through;"));
+        assert!(css.contains(&format!(
+            "--checkbox-color: {};",
+            theme.dark.roles["warning"]
+        )));
+        let (_, disabled) = render("");
+        assert!(!disabled.contains("input.task-list-item-checkbox"));
+        assert!(!disabled.contains(task));
+    }
+
+    #[test]
+    fn obsidian_lists_style_only_ordinary_items_and_support_native_markers() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            css
+        };
+        let scope = ".markdown-reading-view .markdown-rendered :is(.el-ul, .el-ol)";
+        let item = "li:not(:where(.task-list-item, .task-list-item *, .footnotes *))";
+        let stock = render(include_str!("../themes/editors/obsidian.toml"));
+        assert!(stock.contains(&format!(
+            "{scope} :is(ol, ul) > {item} {{ margin-inline-start: 24px; }}"
+        )));
+        assert!(stock.contains(&format!(
+            "{scope} :is(ol, ul) > {item} + {item} {{ margin-block-start: 4px; }}"
+        )));
+        for (ancestors, radius, border) in [
+            ("", "50%", "none"),
+            (":is(ol, ul) ", "50%", "1px solid currentColor"),
+            (":is(ol, ul) :is(ol, ul) ", "0", "none"),
+        ] {
+            assert!(stock.contains(&format!(
+                "{scope} {ancestors}ul > {item} > .list-bullet {{ --list-bullet-radius: {radius}; --list-bullet-border: {border}; }}"
+            )));
+        }
+        assert!(stock.contains(
+            ":not(:where(.is-collapsed, .is-collapsed *)) > .list-bullet::after { background-color: transparent; }"
+        ));
+        let spacing = "[lists]\nindent_px = 20\nitem_gap_px = 0";
+        let spacing_only = render(spacing);
+        assert!(spacing_only.contains("margin-inline-start: 20px;"));
+        assert!(!spacing_only.contains(".list-bullet"));
+        let customized = render(&format!("{spacing}\n[lists.markers]\nlevel_1 = 'square'"));
+        assert!(customized.contains(&format!(
+            "{scope} ul > {item} > .list-bullet {{ --list-bullet-radius: 0;"
+        )));
+        assert!(!render("").contains(scope));
+    }
+
+    #[test]
+    fn obsidian_table_styles_are_opt_in_and_scoped_to_rendered_markdown_tables() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        let (without_table, _) = stock.split_once("[table]").unwrap();
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            css
+        };
+        let wrapper = ".markdown-reading-view .markdown-rendered .el-table";
+        let expected = format!(
+            "{wrapper} > table > :is(thead, tbody) > tr > :is(th, td) {{\n  padding: 8px 12px;\n  border: 0;\n  border-block-end: 1px solid var(--text-muted);\n}}\n\
+             {wrapper} > table > thead > tr > th {{ background-color: var(--background-secondary); font-weight: 700; }}\n\
+             @media screen {{\n  {wrapper}:has(> table) {{ max-width: 100%; overflow-x: auto; }}\n}}\n"
+        );
+        let enabled = render(stock);
+        assert!(enabled.contains(&expected));
+        assert_eq!(render(without_table), enabled.replacen(&expected, "", 1));
+        let customized = render(
+            "[table]\ncell_padding_block_px = 4\ncell_padding_inline_px = 8\nrow_rule_px = 2",
+        );
+        assert!(
+            customized.contains(
+                &expected
+                    .replace("8px 12px", "4px 8px")
+                    .replace("1px solid", "2px solid")
+            )
+        );
+    }
+
+    #[test]
+    fn obsidian_footnotes_and_rules_are_reading_only_and_independent() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let dir = tmp.path().join("editors");
+        fs::create_dir(&dir).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = dir.join("obsidian.toml");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            (theme, css)
+        };
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        let (theme, css) = render(stock);
+        for (class, mode) in [("light", &theme.light), ("dark", &theme.dark)] {
+            let scope = format!(".theme-{class} .markdown-reading-view .markdown-rendered");
+            assert!(css.contains(&format!(
+                "{scope} a.footnote-ref {{ color: {}; }}",
+                mode.roles["function"]
+            )));
+            assert!(css.contains(&format!(
+                "{scope} .footnotes {{ --footnote-size: 90%; color: var(--text-muted); }}"
+            )));
+            assert!(css.contains(&format!(
+                "{scope} hr:not(.footnotes *) {{ --hr-color: var(--text-muted); --hr-thickness: 1px; margin-block: 24px; }}"
+            )));
+        }
+        assert!(!css.contains("footnote-backref"));
+        let (_, disabled) = render(stock.split_once("[footnotes]").unwrap().0);
+        assert!(!disabled.contains("footnote-ref") && !disabled.contains("--hr-thickness:"));
+        let (theme, footnotes_only) = render(
+            "[colors]\n'--lbrx-footnote-reference' = 'link'\n[footnotes]\nbody_size_percent = 100",
+        );
+        assert!(footnotes_only.contains(&format!(
+            "a.footnote-ref {{ color: {}; }}",
+            theme.light.roles["link"]
+        )));
+        assert!(footnotes_only.contains("--footnote-size: 100%;"));
+        assert!(!footnotes_only.contains("--hr-thickness:"));
+        let (_, rule_only) = render("[horizontal_rule]\nthickness_px = 2\nmargin_block_px = 16");
+        assert!(rule_only.contains("hr:not(.footnotes *)"));
+        assert!(rule_only.contains("--hr-thickness: 2px; margin-block: 16px;"));
+        assert!(!rule_only.contains("footnote-ref"));
+    }
+
+    #[test]
+    fn obsidian_emphasis_is_scoped_and_validates_highlight_contrast() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        fs::write(&config, stock).unwrap();
+        let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+        let [_, (_, css), _] = crate::obsidian::render(&theme);
+        for (class, strong, italic, strike, highlight) in [
+            ("light", "#8B404B", "#684882", "#555A63", "#F4E7A3"),
+            ("dark", "#F2B9BE", "#D8C2F1", "#C5C8CF", "#51451D"),
+        ] {
+            let rules: Vec<_> = css
+                .lines()
+                .filter(|line| line.starts_with(&format!(".theme-{class} ")))
+                .filter(|line| line.contains("cm-formatting-"))
+                .collect();
+            assert_eq!(rules.len(), 4);
+            for (rule, (selector, color)) in rules.iter().zip([
+                (".cm-highlight", highlight),
+                (".cm-strong", strong),
+                (".cm-em", italic),
+                (".cm-strikethrough", strike),
+            ]) {
+                assert!(rule.contains(".markdown-source-view.is-live-preview"));
+                assert!(rule.contains(selector) && rule.contains(color));
+                assert!(rule.contains(".cm-inline-code") && rule.contains(".HyperMD-codeblock *"));
+            }
+            assert!(css.contains(&format!(
+                ".theme-{class} :is(.markdown-reading-view, .markdown-source-view.is-live-preview) .markdown-rendered mark:not([data-highlight]):not(:where(code *, pre *)) {{ background-color: {highlight}; color: inherit; }}"
+            )));
+        }
+
+        fs::write(&config, stock.split_once("[emphasis.light]").unwrap().0).unwrap();
+        let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+        let [_, (_, css), _] = crate::obsidian::render(&theme);
+        assert!(!css.contains(".cm-strikethrough") && !css.contains("mark:not([data-highlight])"));
+
+        fs::write(&config, stock.replacen("#F4E7A3", "#8B404B", 1)).unwrap();
+        let Err(error) = resolve::check(&load(&path).unwrap()) else {
+            panic!(
+                "highlight background matching an emphasis color should fail contrast validation"
+            );
+        };
+        assert!(error.contains("editors/obsidian.toml: emphasis.highlight_background"));
+        assert!(error.contains("최소 4.5:1"));
+    }
+
+    #[test]
+    fn obsidian_inline_code_color_keeps_code_blocks_and_source_mode_unchanged() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        let active = r#""--lbrx-inline-code-color" = "inline_code""#;
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            (theme, css)
+        };
+        let (theme, mut enabled) = render(stock);
+        let (_, disabled) = render(&stock.replacen(active, "", 1));
+        let (_, mut overridden) =
+            render(&stock.replacen(active, r#""--lbrx-inline-code-color" = "text""#, 1));
+        for (class, mode) in [("light", &theme.light), ("dark", &theme.dark)] {
+            for (css, role) in [(&mut enabled, "inline_code"), (&mut overridden, "text")] {
+                let rule = format!(
+                    concat!(
+                        ".theme-{0} .markdown-reading-view .markdown-rendered code:not(pre *),\n",
+                        ".theme-{0} .markdown-source-view.is-live-preview .markdown-rendered code:not(pre *),\n",
+                        ".theme-{0} .markdown-source-view.is-live-preview .cm-inline-code:not(.HyperMD-codeblock *) {{\n",
+                        "  color: {1};\n}}\n"
+                    ),
+                    class, mode.roles[role]
+                );
+                assert!(css.contains(&rule));
+                *css = css.replacen(&rule, "", 1);
+            }
+        }
+        assert_eq!(enabled, disabled);
+        assert_eq!(overridden, disabled);
+
+        fs::write(
+            &config,
+            stock.replacen(active, r#""--lbrx-inline-code-color" = "background""#, 1),
+        )
+        .unwrap();
+        let Err(error) = resolve::check(&load(&path).unwrap()) else {
+            panic!("inline code color matching the background should fail contrast validation");
+        };
+        assert!(error.contains("colors.--lbrx-inline-code-color"), "{error}");
+        assert!(error.contains("최소 4.5:1"), "{error}");
+    }
+
+    #[test]
+    fn obsidian_blockquote_styles_are_reading_only_and_independently_configurable() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        let (before, quote_section) = stock.split_once("[blockquote]").unwrap();
+        let (_, after) = quote_section.split_once("[colors]").unwrap();
+        let without_quote = format!("{before}[colors]{after}");
+        let render = |source: &str| {
+            fs::write(&config, source).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            (theme, css)
+        };
+        let (theme, mut stock_css) = render(stock);
+        let (_, base_css) = render(&without_quote);
+        let (_, mut width_css) = render(&format!(
+            "{without_quote}\n[blockquote]\nborder_width_px = 0"
+        ));
+        for (class, mode) in [("light", &theme.light), ("dark", &theme.dark)] {
+            let selector = format!(
+                ".theme-{class} .markdown-reading-view .markdown-rendered blockquote:not(.callout *)"
+            );
+            let color = &mode.roles["quote"];
+            let default = format!(
+                "{selector} {{\n  color: {color};\n  border-inline-start-color: {color};\n  border-inline-start-width: 3px;\n  padding-inline-start: 0.9em;\n}}\n:where({selector}) .callout:not(:where(.callout *)) {{ color: var(--text-normal); }}\n"
+            );
+            let width_only = format!("{selector} {{\n  border-inline-start-width: 0px;\n}}\n");
+            assert!(stock_css.contains(&default));
+            assert!(width_css.contains(&width_only));
+            stock_css = stock_css.replacen(&default, "", 1);
+            width_css = width_css.replacen(&width_only, "", 1);
+        }
+        assert_eq!(stock_css, base_css);
+        assert_eq!(width_css, base_css);
+
+        for (setting, key) in [
+            ("padding_start_em = -0.5", "padding_start_em"),
+            ("padding_start_em = inf", "padding_start_em"),
+            ("border_role = \"unknown_role\"", "border_role"),
+        ] {
+            fs::write(&config, format!("{without_quote}\n[blockquote]\n{setting}")).unwrap();
+            let Err(error) = load(&path) else {
+                panic!("{setting} should fail validation");
+            };
+            assert!(error.contains(&format!("blockquote.{key}")), "{error}");
+        }
+    }
+
+    #[test]
+    fn obsidian_keyboard_focus_outline_is_reading_only_and_can_be_disabled() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("lbrx.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        let render = || {
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            (theme, css)
+        };
+        fs::write(&config, stock).unwrap();
+        let (theme, enabled) = render();
+        fs::write(
+            &config,
+            stock.replace(
+                "keyboard_focus_outline = true",
+                "keyboard_focus_outline = false",
+            ),
+        )
+        .unwrap();
+        let (_, disabled) = render();
+        let mut expected = enabled;
+        for (class, mode) in [("light", &theme.light), ("dark", &theme.dark)] {
+            let rule = format!(
+                ".theme-{class} .markdown-reading-view .markdown-rendered a:is(.internal-link, .external-link):focus-visible {{\n  outline: 2px solid {};\n  outline-offset: 2px;\n}}\n",
+                mode.roles["focus"]
+            );
+            assert!(expected.contains(&rule));
+            expected = expected.replacen(&rule, "", 1);
+        }
+        assert_eq!(disabled, expected);
+    }
+
+    #[test]
+    fn obsidian_link_styles_keep_hover_colors_optional_and_underline_states_independent() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("theme.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        fs::write(&config, include_str!("../themes/editors/obsidian.toml")).unwrap();
+        let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+        let [_, (_, css), _] = crate::obsidian::render(&theme);
+        for key in [
+            "link-decoration",
+            "link-decoration-hover",
+            "link-external-decoration",
+            "link-external-decoration-hover",
+        ] {
+            assert_eq!(
+                css.split('}')
+                    .filter(|rule| {
+                        rule.contains(".internal-link:not(.is-unresolved)")
+                            || rule.contains("a.external-link,")
+                    })
+                    .filter(|rule| rule.contains(&format!("--{key}: underline;")))
+                    .count(),
+                2
+            );
+        }
+        assert!(!css.contains("--link-color-hover:"));
+        assert!(!css.contains("--link-external-color-hover:"));
+
+        fs::write(
+            &config,
+            r#"
+[links]
+internal_underline = false
+external_hover_underline = true
+[colors]
+"--link-color" = "function"
+"--link-external-color-hover" = "muted"
+"#,
+        )
+        .unwrap();
+        let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+        let [_, (_, css), _] = crate::obsidian::render(&theme);
+        for (class, mode) in [("light", &theme.light), ("dark", &theme.dark)] {
+            let internal = format!(
+                ".theme-{class} :is(.markdown-reading-view .markdown-rendered a.internal-link:not(.is-unresolved),"
+            );
+            let internal = css
+                .split_once(&internal)
+                .unwrap()
+                .1
+                .split_once("\n}")
+                .unwrap()
+                .0;
+            assert!(internal.contains(&format!("--link-color: {};", mode.roles["function"])));
+            assert!(internal.contains("--link-decoration: none;"));
+            assert!(!internal.contains("--link-decoration-hover:"));
+            let external = format!(
+                ".theme-{class} :is(.markdown-reading-view .markdown-rendered a.external-link,"
+            );
+            let external = css
+                .split_once(&external)
+                .unwrap()
+                .1
+                .split_once("\n}")
+                .unwrap()
+                .0;
+            assert!(external.contains(&format!(
+                "--link-external-color-hover: {};",
+                mode.roles["muted"]
+            )));
+            assert!(external.contains("--link-external-decoration-hover: underline;"));
+            assert!(!external.contains("--link-external-decoration:"));
+        }
+    }
+
+    #[test]
+    fn obsidian_heading_layout_applies_native_sizes_and_reading_only_spacing() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("theme.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let render = || {
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            css
+        };
+        assert!(!render().contains("--h1-size:"));
+        let stock = include_str!("../themes/editors/obsidian.toml");
+        fs::write(&config, stock).unwrap();
+        let css = render();
+        for (i, size) in [180, 150, 130, 115, 105, 100].into_iter().enumerate() {
+            let level = i + 1;
+            assert!(css.contains(&format!("--h{level}-size: {size}%;")));
+        }
+        assert!(
+            css.contains(
+                " > .el-h1 > h1,\n.markdown-source-view.is-live-preview .HyperMD-header-1,"
+            )
+        );
+        assert!(css.contains(".cm-header-1 {\n  --h1-size: 180%;\n  --h1-weight: 700;\n}"));
+        assert!(css.contains(" > .el-h1 > h1 {\n  margin-block: 32px 16px;\n  border-block-end: 1px solid var(--text-muted);"));
+        assert_eq!(
+            css.split('}')
+                .filter(|rule| rule.contains(" > .el-h") && rule.contains("border-block-end:"))
+                .count(),
+            1
+        );
+        assert!(!css.contains("--inline-title-size:"));
+        fs::write(&config, stock.replacen("weight = 700", "weight = 0", 1)).unwrap();
+        let err = load(&path)
+            .err()
+            .expect("invalid heading weight was accepted");
+        assert!(err.contains("obsidian.toml") && err.contains("headings.h1"));
+    }
+
+    #[test]
+    fn obsidian_heading_colors_default_to_shared_role_and_override_independently() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("theme.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        for overrides in [false, true] {
+            let settings = if overrides {
+                "[colors]\n\"--h3-color\" = \"accent\"\n\"--inline-title-color\" = \"muted\"\n"
+            } else {
+                include_str!("../themes/editors/obsidian.toml")
+            };
+            fs::write(&config, settings).unwrap();
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            for (class, mode) in [("light", &theme.light), ("dark", &theme.dark)] {
+                let (_, block) = css.split_once(&format!(".theme-{class} {{\n")).unwrap();
+                let (block, _) = block.split_once("\n}").unwrap();
+                for level in 1..=6 {
+                    let role = if overrides && level == 3 {
+                        "accent"
+                    } else {
+                        "heading"
+                    };
+                    assert!(block.contains(&format!("--h{level}-color: {};", mode.roles[role])));
+                }
+                if overrides {
+                    assert!(
+                        block.contains(&format!("--inline-title-color: {};", mode.roles["muted"]))
+                    );
+                } else {
+                    assert!(!block.contains("--inline-title-color:"));
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn obsidian_prose_detail_is_opt_in_and_leaves_code_paragraphs_untouched() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("theme.toml");
+        let editors = tmp.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        let config = editors.join("obsidian.toml");
+        let render = || {
+            let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
+            let [_, (_, css), _] = crate::obsidian::render(&theme);
+            css
+        };
+        let shipped = include_str!("../themes/editors/obsidian.toml");
+        fs::write(&config, shipped).unwrap();
+        let baseline = render();
+        assert!(!baseline.contains("font-variant-"));
+        fs::write(&config, format!("{shipped}\n[prose_detail]\n")).unwrap();
+        assert_eq!(render(), baseline);
+
+        fs::write(
+            &config,
+            format!(
+                "{shipped}\n[prose_detail]\nletter_spacing_em = 0.025\ncommon_ligatures = false\nsmall_caps = true\ntext_transform = 'uppercase'\n"
+            ),
+        )
+        .unwrap();
+        let output = render();
+        let selector = "\n.markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer > .el-p > p:not(:has(code)) {";
+        let (before, rule) = output.split_once(selector).unwrap();
+        let (added, after) = rule.split_once("\n}\n").unwrap();
+        assert_eq!(format!("{before}{after}"), baseline);
+        assert!(!added.contains(".markdown-source-view"));
+        for declaration in [
+            "letter-spacing: 0.025em;",
+            "font-variant-ligatures: no-common-ligatures;",
+            "font-variant-caps: small-caps;",
+            "text-transform: uppercase;",
+        ] {
+            assert!(added.contains(declaration), "{declaration}");
+        }
+
+        for value in ["nan", "0.51", "-0.51"] {
+            fs::write(
+                &config,
+                format!("[prose_detail]\nletter_spacing_em = {value}\n"),
+            )
+            .unwrap();
+            let err = load(&path)
+                .err()
+                .expect("invalid letter spacing was accepted");
+            assert!(err.contains("obsidian.toml") && err.contains("letter_spacing_em"));
+        }
+    }
 
     #[test]
     fn helix_styles_override_only_selected_fields_and_inherit_generated_parent() {

@@ -1,4 +1,4 @@
-# macOS Terminal.app에 LBRX 적용하기
+# macOS Terminal.app에 LBRX 적용
 
 Apple 기본 터미널용이며 iTerm2나 Windows Terminal 설정 파일이 아니다. 라이트·다크 `.terminal` 프로파일을 생성한다. 실제 Mac에서 가져오기와 표시 검증은 아직 하지 않았다.
 
@@ -8,7 +8,7 @@ cargo run --locked -- build --app macos-terminal
 
 저장소의 `themes/editors/macos-terminal.toml`에서 원하는 `[colors]` 항목을 주석 해제하고 공통 역할 이름을 지정한다. 기본 네 색과 ANSI 16색은 공통 원본에서 가져오며, `TextBoldColor`는 지정할 때만 생성한다. 글꼴·간격·창·탭은 앱에서 수동 설정한다.
 
-## 가져오기·원복
+## 설치·복구
 
 1. `dist/lbrx/macos-terminal/`의 `LBRX Light.terminal`, `LBRX Dark.terminal`을 사용한다. 먼저 **터미널 → 설정 → 프로파일**에서 기존 기본 프로파일 이름을 기록한다. 기존 프로파일을 편집할 계획이라면 동작 메뉴에서 **내보내기**로 백업한다.
 2. 프로파일 목록의 동작 메뉴 → **가져오기**에서 두 파일을 선택하거나 Finder에서 목록으로 끌어온다. **셸 → 새로운 윈도우**에서 가져온 프로파일로 시험한다. 가져오기와 기본값 변경은 별개다.

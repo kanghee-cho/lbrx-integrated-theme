@@ -614,6 +614,87 @@ mod tests {
     }
 
     #[test]
+    fn helix_exports_native_settings_without_changing_either_theme() {
+        let workspace = Workspace::new();
+        let input = tempfile::tempdir().unwrap();
+        let source = input.path().join("lbrx.toml");
+        let editors = input.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        fs::write(&source, include_str!("../themes/lbrx.toml")).unwrap();
+        let settings = editors.join("helix.toml");
+        let stock = include_str!("../themes/editors/helix.toml");
+        fs::write(&settings, stock).unwrap();
+        let dir = App::Helix.output_path(&workspace.0);
+        let read = |name| fs::read_to_string(dir.join(name)).unwrap();
+        let parse = |name| toml::from_str::<toml::Table>(&read(name)).unwrap();
+        super::build(
+            &crate::layers::load(&source).unwrap(),
+            &workspace.0,
+            &[App::Helix],
+        )
+        .unwrap();
+        let baseline = [read("lbrx_light.toml"), read("lbrx_dark.toml")];
+        assert!(parse("config.toml").is_empty());
+        assert!(parse("languages.toml").is_empty());
+
+        let languages = input.path().join("languages");
+        fs::create_dir(&languages).unwrap();
+        for id in ["rust", "csharp", "bash", "shell", "text"] {
+            fs::write(languages.join(format!("{id}.toml")), "[tokens]\n").unwrap();
+        }
+        let native = r#"
+[config]
+theme = "lbrx_dark"
+[config.editor]
+line-number = "relative"
+[config.keys.normal]
+C-s = ":write"
+[[languages.language]]
+name = "rust"
+auto-format = false
+indent = { tab-width = 8 }
+[[languages.language]]
+name = "toml"
+auto-format = true
+[languages.language-server.rust-analyzer.config.check]
+command = "clippy"
+"#;
+        fs::write(&settings, format!("{stock}\n{native}")).unwrap();
+        super::build(
+            &crate::layers::load(&source).unwrap(),
+            &workspace.0,
+            &[App::Helix],
+        )
+        .unwrap();
+        let expected: toml::Table = toml::from_str(native).unwrap();
+        assert_eq!(
+            parse("config.toml"),
+            *expected["config"].as_table().unwrap()
+        );
+        let output = parse("languages.toml");
+        assert_eq!(
+            output["language-server"],
+            expected["languages"]["language-server"]
+        );
+        let entries = output["language"].as_array().unwrap();
+        let names: Vec<_> = entries
+            .iter()
+            .map(|entry| entry["name"].as_str().unwrap())
+            .collect();
+        assert_eq!(names, ["rust", "toml", "bash", "c-sharp"]);
+        let rust = &entries[0];
+        assert_eq!(rust["indent"]["tab-width"].as_integer(), Some(8));
+        assert_eq!(rust["indent"]["unit"].as_str(), Some("    "));
+        assert_eq!(rust["auto-format"].as_bool(), Some(false));
+        assert_eq!(
+            rust["comment-tokens"].as_array().unwrap()[2].as_str(),
+            Some("//!")
+        );
+        assert_eq!(entries[3]["comment-token"].as_str(), Some("//"));
+        assert_eq!([read("lbrx_light.toml"), read("lbrx_dark.toml")], baseline);
+    }
+
+    #[test]
     fn vim_build_keeps_light_bytes_when_a_dark_code_role_changes() {
         let workspace = Workspace::new();
         let mut theme = sample();
