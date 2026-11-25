@@ -14,12 +14,13 @@
 | [Windows Terminal](06-windows-terminal.md) | 배색표 JSON + 글꼴 조각 · 생성 | 전경·배경·커서·선택 배경·ANSI 16색. 글꼴은 첫 패밀리와 pt 크기만 선택 적용 |
 | [macOS Terminal.app](15-macos-terminal-options.md) | `.terminal` 프로파일 · 생성 | 프로파일에 터미널 배색을 매핑. 글꼴·간격은 사용자 설정 안내 |
 | [iTerm2](21-iterm2-options.md) | `.itermcolors` 프리셋 · 생성 | 기존 프로파일의 배색만 변경. 선택 글자색 사용 여부와 글꼴·간격은 프로파일에서 설정 |
+| [LBRX Studio](25-lbrx-studio.md) | CSS 변수·HTML 구문색 + 설치 안내 | 앱 UI 역할·서체와 공통/언어별 토큰 생성. 레이아웃·테마 선택 저장·토큰 분류는 앱 소유 |
 
 ## 공통 옵션을 고르는 기준
 
 | 바꾸고 싶은 것 | 원본 또는 후보 | 함께 볼 대상 / 합치지 않을 대상 |
 |---|---|---|
-| 기본 배경·글자 | 문서·편집기 `background`, `text` / 터미널 `terminal_background`, `terminal_foreground` | 8개 앱 모두 관련되지만 역할은 분리한다. 같은 팔레트 키를 참조할 때만 그 키의 변경이 함께 전파된다. |
+| 기본 배경·글자 | 문서·편집기 `background`, `text` / 터미널 `terminal_background`, `terminal_foreground` | 9개 앱 모두 관련되지만 역할은 분리한다. 같은 팔레트 키를 참조할 때만 그 키의 변경이 함께 전파된다. |
 | 선택 영역 | `selection_background`, `selection_text` | 문서 앱·편집기에서는 선택 레이어를, 터미널에서는 프로파일 선택색을 본다. Windows Terminal의 현재 출력에는 선택 글자색이 없다. |
 | 포커스·커서 | `focus` / `terminal_cursor` | 링크 윤곽선, 편집기 커서, 터미널 블록 커서는 다른 대상이다. 터미널 커서색 변경으로 링크 포커스가 바뀌어서는 안 된다. |
 | 글꼴·크기·줄 높이 | `typography.prose`, `typography.mono` | 문서 앱은 본문과 코드를 분리한다. 터미널·편집기는 주로 고정폭 대상이다. CSS 줄 높이와 터미널 셀 간격은 동일 수치로 옮기지 않는다. |

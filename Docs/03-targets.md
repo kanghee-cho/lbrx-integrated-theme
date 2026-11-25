@@ -12,6 +12,7 @@
 | Windows Terminal | 두 배색표를 기존 `settings.json`의 `schemes`에 이름 기준으로 병합하고 프로필의 `colorScheme`에서 선택. [적용 방법](06-windows-terminal.md) | 배색표와 프로필의 `font` 설정 조각을 분리한다. 글꼴 크기는 pt로 변환(기준 px × 72/96). 현재 셀 높이는 출력하지 않는다. |
 | iTerm2 | [라이트·다크 `.itermcolors` 프리셋](20-iterm2.md)을 기존 프로필에 가져와 선택한다. | 글꼴과 프로필 설정은 수동이다. |
 | macOS Terminal.app | [라이트·다크 `.terminal` 프로파일](14-macos-terminal.md)을 가져와 새 창에서 선택. iTerm2 프리셋과 호환되지 않는다. | 글꼴·크기·행 간격은 프로필에서 수동 설정한다. |
+| LBRX Studio | [단일 `theme.css`와 적용 안내](25-lbrx-studio.md)를 생성. Studio에서 import하고 루트 `data-theme`로 모드 선택. HTML 토큰 클래스를 쓰는 구문 렌더러는 앱에서 구현 | 본문·고정폭 글꼴·px 크기·줄 높이 변수를 제공. 패널 크기·배치·사용자 설정은 앱 소유 |
 
 **검증 기준**
 

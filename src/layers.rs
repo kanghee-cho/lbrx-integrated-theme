@@ -203,6 +203,7 @@ pub const TYPORA_SIDEBAR_COLORS: &[(&str, &str, &str)] = &[
     ),
 ];
 const EDITORS: &[(&str, &[&str])] = &[
+    ("lbrx-studio", crate::lbrx_studio::COLOR_KEYS),
     ("windows-terminal", &["cursorColor", "selectionBackground"]),
     ("iterm2", crate::iterm2::COLOR_KEYS),
     ("macos-terminal", crate::macos_terminal::COLOR_KEYS),
@@ -3784,6 +3785,37 @@ external_hover_underline = true
                 .err()
                 .expect("invalid Vim override was accepted");
             assert!(err.contains("vim.toml") && err.contains(expected), "{err}");
+        }
+    }
+
+    #[test]
+    fn studio_sidecar_accepts_roles_and_rejects_unknown_keys_without_publishing() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path();
+        let source = root.join("theme.toml");
+        fs::write(&source, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::create_dir(root.join("editors")).unwrap();
+        let config = root.join("editors/lbrx-studio.toml");
+        fs::write(&config, "[colors]\n'--accent' = 'function'\n").unwrap();
+        let theme = load(&source).unwrap();
+        assert_eq!(theme.layers.editors["lbrx-studio"]["--accent"], "function");
+        let out = root.join("dist");
+        build::build(&theme, &out, &[App::LbrxStudio]).unwrap();
+        let output = App::LbrxStudio.output_path(&out).join("theme.css");
+        let baseline = fs::read(&output).unwrap();
+        for (text, message) in [
+            ("[colors]\n'--typo' = 'accent'", "지원하지 않는 키"),
+            ("[colors]\n'--accent' = 'missing'", "missing"),
+            ("[colors]\n'--accent' = '#123456'", "#123456"),
+            ("[layout]\nwidth = 240", "unknown field"),
+        ] {
+            fs::write(&config, text).unwrap();
+            let error = load(&source)
+                .err()
+                .expect("invalid Studio config was accepted");
+            assert!(error.contains("lbrx-studio.toml"), "{error}");
+            assert!(error.contains(message), "{error}");
+            assert_eq!(fs::read(&output).unwrap(), baseline);
         }
     }
 

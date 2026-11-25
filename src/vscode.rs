@@ -3,10 +3,7 @@ use crate::{
     resolve::{ResolvedMode, ResolvedTheme},
 };
 use serde_json::{Map, Value, json};
-use std::{
-    fmt::Write as _,
-    io::{Cursor, Read, Write as _},
-};
+use std::io::{Cursor, Read, Write as _};
 use zip::{ZipArchive, ZipWriter, write::SimpleFileOptions};
 
 pub const DIRECTORY: &str = "vscode";
@@ -560,80 +557,13 @@ fn color_theme(theme: &ResolvedTheme, name: &str, kind: &str, mode: &ResolvedMod
 }
 
 fn code_css(theme: &ResolvedTheme) -> String {
-    let mut css = String::from("/* LBRX - generated from the theme source. */\n");
-    for (selector, mode) in [
-        (".lbrx-code, .lbrx-code[data-theme=\"light\"]", &theme.light),
-        (".lbrx-code[data-theme=\"dark\"]", &theme.dark),
-    ] {
-        writeln!(css, "{selector} {{").unwrap();
-        writeln!(
-            css,
-            "  background-color: {};\n  color: {};",
-            mode.roles["background"], mode.roles["text"]
-        )
-        .unwrap();
-        for &role in crate::layers::TOKENS {
-            let slug = role.replace('.', "-");
-            writeln!(
-                css,
-                "  --lbrx-code-{slug}: {};",
-                theme.token(mode, "", role),
-            )
-            .unwrap();
-            let style = theme.token_style("", role);
-            let weight = if style.name() == "bold" {
-                "bold"
-            } else {
-                "normal"
-            };
-            let italic = if style.name() == "italic" {
-                "italic"
-            } else {
-                "normal"
-            };
-            writeln!(
-                css,
-                "  --lbrx-code-{slug}-weight: {weight};\n  --lbrx-code-{slug}-style: {italic};"
-            )
-            .unwrap();
-        }
-        css.push_str("}\n");
-        let container = selector.split(", ").next().unwrap();
-        for lang in theme.layers.languages.keys() {
-            for &token in crate::layers::TOKENS
-                .iter()
-                .filter(|&&token| theme.has_token_override(lang, token))
-            {
-                let slug = token.replace('.', "-");
-                let style = theme.token_style(lang, token);
-                let weight = if style.name() == "bold" {
-                    "bold"
-                } else {
-                    "normal"
-                };
-                let italic = if style.name() == "italic" {
-                    "italic"
-                } else {
-                    "normal"
-                };
-                writeln!(
-                    css,
-                    "{container} .language-{lang}, {container}.language-{lang} {{ --lbrx-code-{slug}: {}; --lbrx-code-{slug}-weight: {weight}; --lbrx-code-{slug}-style: {italic}; }}",
-                    theme.token(mode, lang, token)
-                )
-                .unwrap();
-            }
-        }
-    }
-    for &role in crate::layers::TOKENS {
-        let slug = role.replace('.', "-");
-        writeln!(
-            css,
-            ".lbrx-code .tok-{slug} {{ color: var(--lbrx-code-{slug}); font-weight: var(--lbrx-code-{slug}-weight); font-style: var(--lbrx-code-{slug}-style); }}"
-        )
-        .unwrap();
-    }
-    css
+    crate::css::code_css(
+        theme,
+        &[
+            (".lbrx-code, .lbrx-code[data-theme=\"light\"]", &theme.light),
+            (".lbrx-code[data-theme=\"dark\"]", &theme.dark),
+        ],
+    )
 }
 
 pub fn validate(bytes: &[u8]) -> Result<(), String> {

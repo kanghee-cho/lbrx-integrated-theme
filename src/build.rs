@@ -1,5 +1,5 @@
 use crate::{
-    helix, iterm2, macos_terminal,
+    helix, iterm2, lbrx_studio, macos_terminal,
     model::Theme,
     obsidian,
     resolve::{self, ResolvedTheme},
@@ -31,10 +31,11 @@ pub enum App {
     #[value(name = "vscode")]
     VsCode,
     Helix,
+    LbrxStudio,
 }
 
 impl App {
-    pub const ALL: [Self; 8] = [
+    pub const ALL: [Self; 9] = [
         Self::WindowsTerminal,
         Self::MacosTerminal,
         Self::Typora,
@@ -43,6 +44,7 @@ impl App {
         Self::Vim,
         Self::VsCode,
         Self::Helix,
+        Self::LbrxStudio,
     ];
 
     pub fn label(self) -> &'static str {
@@ -55,6 +57,7 @@ impl App {
             Self::Vim => "Vim",
             Self::VsCode => "VS Code",
             Self::Helix => "Helix",
+            Self::LbrxStudio => "LBRX Studio",
         }
     }
 
@@ -82,6 +85,7 @@ impl App {
             Self::Vim => (vim::DIRECTORY, vim::FILES),
             Self::VsCode => (vscode::DIRECTORY, vscode::FILES),
             Self::Helix => (helix::DIRECTORY, helix::FILES),
+            Self::LbrxStudio => (lbrx_studio::DIRECTORY, lbrx_studio::FILES),
         }
     }
 
@@ -101,6 +105,7 @@ impl App {
                 return Ok((self, files.into()));
             }
             Self::Helix => helix::render(theme)?.into(),
+            Self::LbrxStudio => lbrx_studio::render(theme).into(),
         };
         Ok((
             self,
@@ -138,6 +143,7 @@ impl App {
                     Self::Vim if vim::has_language_groups(id, theme) => "언어별 Vim 문법 그룹",
                     Self::Vim => "공통 Vim 문법 그룹",
                     Self::Helix => "공통 Tree-sitter 캡처; 언어별 색 재정의 미적용",
+                    Self::LbrxStudio => "HTML 토큰 클래스; Studio 렌더러의 토큰 분류 필요",
                     Self::Typora => "코드 펜스 CodeMirror 클래스가 있는 경우만",
                     Self::Obsidian => "읽기 뷰 Prism 클래스가 있는 경우만",
                     Self::WindowsTerminal | Self::MacosTerminal | Self::Iterm2 => unreachable!(),
@@ -570,6 +576,70 @@ mod tests {
             fs::read_dir(workspace.0.join(OUTPUT)).unwrap().count(),
             App::ALL.len() + 1
         );
+    }
+
+    #[test]
+    fn studio_exports_ui_fonts_and_language_tokens_without_changing_other_apps() {
+        let workspace = Workspace::new();
+        let mut theme = sample();
+        theme
+            .layers
+            .common
+            .insert("function".into(), "keyword".into());
+        theme
+            .layers
+            .languages
+            .insert("python".into(), [("function".into(), "text".into())].into());
+        theme.layers.language_styles.insert(
+            "python".into(),
+            [("function".into(), crate::layers::TokenStyle::Italic)].into(),
+        );
+        theme.typography.prose.size_px = 18.0;
+        theme.typography.mono.line_height = 1.6;
+        super::build(&theme, &workspace.0, &[App::VsCode, App::LbrxStudio]).unwrap();
+        let vscode_dir = App::VsCode.output_path(&workspace.0);
+        let vscode_before = vscode::FILES
+            .iter()
+            .map(|name| fs::read(vscode_dir.join(name)).unwrap())
+            .collect::<Vec<_>>();
+        let studio_dir = App::LbrxStudio.output_path(&workspace.0);
+        let read = || fs::read_to_string(studio_dir.join("theme.css")).unwrap();
+        let baseline = read();
+        assert!(baseline.contains("--border: #52655B40;"));
+        assert!(baseline.contains("--border: #A3B5A940;"));
+        assert!(baseline.contains("--font-prose-size: 18px;"));
+        assert!(baseline.contains("--font-mono-line-height: 1.6;"));
+        assert!(baseline.contains("--font-mono: \"D2Coding ligature\", monospace;"));
+        assert!(baseline.contains("--lbrx-code-function: #80516A;"));
+        assert!(baseline.contains(
+            ":root .lbrx-code.language-python { --lbrx-code-function: #24362F; --lbrx-code-function-weight: normal; --lbrx-code-function-style: italic; }"
+        ));
+        assert!(baseline.contains(
+            ":root[data-theme=\"dark\"] .lbrx-code.language-python { --lbrx-code-function: #DCE6DB;"
+        ));
+        assert!(baseline.contains(
+            "@media (prefers-color-scheme: dark) {\n:root:not([data-theme=\"light\"]):not([data-theme=\"dark\"])"
+        ));
+        theme.layers.editors.insert(
+            "lbrx-studio".into(),
+            [("--accent".into(), "function".into())].into(),
+        );
+        super::build(&theme, &workspace.0, &[App::LbrxStudio]).unwrap();
+        let customized = read();
+        assert!(customized.contains("--accent: #43617B;"));
+        assert!(customized.contains("--accent: #97BBD6;"));
+        assert_eq!(
+            vscode_before,
+            vscode::FILES
+                .iter()
+                .map(|name| fs::read(vscode_dir.join(name)).unwrap())
+                .collect::<Vec<_>>()
+        );
+        super::build(&theme, &workspace.0, &[App::LbrxStudio]).unwrap();
+        assert_eq!(read(), customized);
+        theme.dark.roles.insert("accent".into(), "ink".into());
+        super::build(&theme, &workspace.0, &[App::LbrxStudio]).unwrap();
+        assert_eq!(read(), customized);
     }
 
     #[test]

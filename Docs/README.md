@@ -1,6 +1,6 @@
 # LBRX 통합 테마
 
-하나의 TOML 원본에서 8개 앱의 라이트·다크 테마를 생성한다. 생성기는 설치된 앱이나 사용자 설정을 수정하지 않는다.
+하나의 TOML 원본에서 9개 앱의 라이트·다크 테마를 생성한다. 생성기는 설치된 앱이나 사용자 설정을 수정하지 않는다. V1.0 배포 파일은 Studio 추가 전의 8개 앱을 포함한다.
 
 ## V1.0 정식 배포
 
@@ -34,6 +34,7 @@ cargo run --locked -- build .\themes\lbrx.toml
 | Vim | [설치·복구](12-vim.md) | [하이라이트 그룹](13-vim-options.md) | [언어별 그룹](23-vim-language-highlighting.md) |
 | VS Code | [설치·복구](18-vscode.md) | [작업 화면 색](19-vscode-options.md) | [언어별 토큰·HTML CSS](22-vscode-language-highlighting.md) |
 | Helix | [설치·복구·설정 내보내기](16-helix.md) | [테마 스코프](17-helix-options.md) | — |
+| LBRX Studio | [출력·적용·결정사항](25-lbrx-studio.md) | [전용 TOML](../themes/editors/lbrx-studio.toml) | [HTML 토큰 계약](25-lbrx-studio.md#공통언어별-구문-토큰) |
 
 옵션 대장에서 `생성`은 빌드 결과를, `선택 생성`은 설정했을 때만 출력하는 항목을 뜻한다. 둘 다 실제 앱에서 표시가 확인됐다는 뜻은 아니다. [검증 버전과 범위](05-languages-and-dependencies.md#대상-앱과-외부-도구-버전)를 별도로 관리한다.
 

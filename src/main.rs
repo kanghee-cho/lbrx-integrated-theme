@@ -3,6 +3,7 @@ mod css;
 mod helix;
 mod iterm2;
 mod layers;
+mod lbrx_studio;
 mod macos_terminal;
 mod model;
 mod obsidian;

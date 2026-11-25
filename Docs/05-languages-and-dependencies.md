@@ -59,5 +59,6 @@ Rust 의존성은 [Cargo.toml](../Cargo.toml)의 버전 요구식과 [Cargo.lock
 | Windows Terminal | `1.25.3131.0` x64 Portable: 라이트·다크 프로필 스키마 검증 및 두 창 실행 확인 (2026-11-19) | 사용자가 미리보기 화면을 직접 확인하고 긍정적으로 평가함. 항목별 결과는 별도 기록하지 않음. |
 | macOS Terminal.app | 미검증 | macOS·Terminal.app 버전, 색상 데이터와 프로필 가져오기 |
 | iTerm2 | 미검증 | macOS·iTerm2 버전, `.itermcolors` 가져오기와 실제 배색 |
+| LBRX Studio | 개발 중인 React/Tauri 앱의 CSS 변수 계약 기준, 실제 앱 화면 미검증 | [루트 모드 선택·HTML 토큰·글꼴 변수](25-lbrx-studio.md). 앱 파일은 자동 수정하지 않음 |
 
 VSIX는 Rust에서 직접 생성하며 `@vscode/vsce`는 필요하지 않다. [package.json](../package.json)과 [pnpm-lock.yaml](../pnpm-lock.yaml)은 별도의 아이콘 자산 버전을 관리하며, Rust CLI나 테마 설치의 요구 사항이 아니다. LINE Seed EN·KR·JP와 D2Coding ligature는 사용자가 설치하는 글꼴이다.
