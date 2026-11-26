@@ -1,0 +1,5 @@
+# Regex: 독립 문법 또는 호스트 언어가 제공하는 정규식 토큰만 스타일링한다.
+[tokens]
+"string.escape" = "syntax_escape" # 이스케이프·문자 클래스.
+operator = "syntax_operator" # 수량자·대안 및 앵커.
+punctuation = "syntax_punctuation" # 그룹과 클래스의 구분 기호.

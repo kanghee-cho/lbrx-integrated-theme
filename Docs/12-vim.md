@@ -8,13 +8,13 @@ cargo run --locked -- build --app vim
 
 ## 설치·복구
 
-1. Vim에서 `:set runtimepath?`로 사용자 설정 경로를 확인한다. 그 아래 `colors` 폴더에 `dist/orange-type/lbrx/vim/colors/`의 `lbrx_light.vim`, `lbrx_dark.vim`을 복사한다. 일반적인 위치는 Unix `~/.vim/colors`, Windows `~/vimfiles/colors`다. 시스템 `$VIMRUNTIME`에는 복사하지 않는다.
+1. Vim에서 `:set runtimepath?`로 사용자 설정 경로를 확인한다. 그 아래 `colors` 폴더에 `dist/lavender-type/lbrx/vim/colors/`의 `lbrx_light.vim`, `lbrx_dark.vim`을 복사한다. 일반적인 위치는 Unix `~/.vim/colors`, Windows `~/vimfiles/colors`다. 시스템 `$VIMRUNTIME`에는 복사하지 않는다.
 2. `:echo get(g:, 'colors_name', 'default')`로 기존 이름을 기록한다. 현재 세션에서 `:colorscheme lbrx_dark` 또는 `:colorscheme lbrx_light`로 시험한다. 원하는 경우에만 자신의 vimrc에 `colorscheme lbrx_dark`처럼 한 줄을 추가한다.
 3. 갱신하려면 두 파일만 교체한 뒤 `:colorscheme`에 이름을 다시 주어 읽힌다. 되돌릴 때는 기록한 테마(없으면 `:colorscheme default`)를 선택하고 추가한 vimrc 줄을 복원한다.
 
 ## Vim 전용 옵션
 
-저장소의 `themes/orange-type/editors/vim.toml`에서 `[highlights]` 아래 원하는 행만 주석 해제하고 다시 빌드한다. 예를 들어 세로 가이드와 맞춤법 오류의 표시를 지정하려면 다음 두 줄을 활성화한다.
+저장소의 `themes/lavender-type/editors/vim.toml`에서 `[highlights]` 아래 원하는 행만 주석 해제하고 다시 빌드한다. 예를 들어 세로 가이드와 맞춤법 오류의 표시를 지정하려면 다음 두 줄을 활성화한다.
 
 ```toml
 [highlights]

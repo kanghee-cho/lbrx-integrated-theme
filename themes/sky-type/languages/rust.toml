@@ -1,0 +1,10 @@
+# Rust 전용 구문색. 활성화한 키만 common.toml의 값을 덮어쓴다.
+# 값에는 lbrx.toml의 라이트·다크 roles 이름을 사용한다.
+[tokens]
+# keyword = "heading" # 예시: Rust 키워드를 문서 헤딩색으로 표시.
+"function.macro" = "syntax_macro" # 매크로 이름 및 구분 가능한 후행 !.
+attribute = "syntax_attribute" # 라이프타임·라벨·어트리뷰트.
+type = "syntax_type" # 분류 가능한 derive 트레잇 및 타입.
+punctuation = "syntax_punctuation" # 경로 구분자 :: 등.
+operator = "syntax_operator" # & 등 연산 기호.
+"keyword.declaration" = "syntax_declaration" # mut·가시성·선언.

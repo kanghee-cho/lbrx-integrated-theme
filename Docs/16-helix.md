@@ -1,6 +1,6 @@
 # Helix에 LBRX 적용
 
-라이트·다크 테마와 편집기·언어 설정을 생성한다. 색상은 저장소의 `themes/orange-type/lbrx.toml`에서 수정한다. 테마 스코프는 저장소의 `Docs/17-helix-options.md`에서 확인한다.
+라이트·다크 테마와 편집기·언어 설정을 생성한다. 색상은 저장소의 `themes/lavender-type/lbrx.toml`에서 수정한다. 테마 스코프는 저장소의 `Docs/17-helix-options.md`에서 확인한다.
 
 ```powershell
 cargo run --locked -- build --app helix
@@ -8,15 +8,15 @@ cargo run --locked -- build --app helix
 
 ## 설치·복구
 
-1. `dist\orange-type\lbrx\helix`의 `lbrx_light.toml`, `lbrx_dark.toml`을 사용자 Helix 설정 디렉터리의 `themes`에 복사한다. 기본 위치는 Unix `~/.config/helix/themes`(사용자 지정 시 `$XDG_CONFIG_HOME/helix/themes`), Windows `%APPDATA%\helix\themes`다.
+1. `dist\lavender-type\lbrx\helix`의 `lbrx_light.toml`, `lbrx_dark.toml`을 사용자 Helix 설정 디렉터리의 `themes`에 복사한다. 기본 위치는 Unix `~/.config/helix/themes`(사용자 지정 시 `$XDG_CONFIG_HOME/helix/themes`), Windows `%APPDATA%\helix\themes`다.
 2. Helix에서 확장자 없이 `:theme lbrx_dark` 또는 `:theme lbrx_light`로 현재 세션에서 시험한다. 지속 적용하려면 기존 `config.toml`의 **최상위** `theme` 값만 바꾼다. `[editor]` 안에 넣거나 전체 설정을 교체하지 않는다.
 3. 갱신하려면 두 테마 파일을 교체하고 다시 선택한다. 복구하려면 `:theme`에 기존 테마 이름을 주고, 영구 설정도 바꿨다면 원래 값으로 복원한다.
 
 ## 편집기·언어 설정 내보내기
 
-저장소의 `themes/orange-type/editors/helix.toml`에서 원하는 예시의 표 제목과 값의 주석을 해제하거나, 다음 규칙대로 Helix 설정을 추가한 뒤 다시 빌드한다.
+저장소의 `themes/lavender-type/editors/helix.toml`에서 원하는 예시의 표 제목과 값의 주석을 해제하거나, 다음 규칙대로 Helix 설정을 추가한 뒤 다시 빌드한다.
 
-| 원본 | 출력 (`dist\orange-type\lbrx\helix`) | 예시 |
+| 원본 | 출력 (`dist\lavender-type\lbrx\helix`) | 예시 |
 |---|---|---|
 | `[config]` 아래 | `config.toml` | `theme`, `[config.editor]`, `[config.keys.normal]` |
 | `[languages]` 아래 | `languages.toml` | `[[languages.language]]`, `[languages.language-server.rust-analyzer.config]` |
@@ -35,7 +35,7 @@ cargo run --locked -- build --app helix
 
 ### 공통·합일·Helix 전용 옵션 조정
 
-저장소의 `themes/orange-type/editors/helix.toml`에서 `[styles]`에 옵션 대장의 스코프를 지정한다. 모드별 커서·상태줄, 버퍼줄, 가상 문자, 디버거, 진단 등 전용 항목은 주석 처리된 예시로 제공한다. 원하는 줄 앞의 `#`를 제거하고 `cargo run --locked -- build --app helix`로 두 테마를 다시 생성한다.
+저장소의 `themes/lavender-type/editors/helix.toml`에서 `[styles]`에 옵션 대장의 스코프를 지정한다. 모드별 커서·상태줄, 버퍼줄, 가상 문자, 디버거, 진단 등 전용 항목은 주석 처리된 예시로 제공한다. 원하는 줄 앞의 `#`를 제거하고 `cargo run --locked -- build --app helix`로 두 테마를 다시 생성한다.
 
 ```toml
 [styles]

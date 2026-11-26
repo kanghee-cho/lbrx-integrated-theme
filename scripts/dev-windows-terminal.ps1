@@ -1,7 +1,7 @@
 #Requires -Version 7.0
 param(
     [ValidatePattern('^[a-z][a-z0-9-]*$')]
-    [string] $Style = 'orange-type',
+    [string] $Style = 'lavender-type',
     [ValidateSet('Light', 'Dark')]
     [string] $Mode = 'Light',
     [switch] $NoLaunch

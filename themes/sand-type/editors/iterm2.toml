@@ -1,0 +1,15 @@
+# LBRX Sand Petrol: 이 파일의 앱 전용 설정. 공통 색은 ../lbrx.toml 참조.
+# iTerm2 색 프리셋 전용. 값은 lbrx.toml의 라이트·다크 roles 이름.
+# 기본 배색은 생략 시 공통 역할을 사용한다. 추가 배색은 주석 해제할 때만 출력한다.
+[colors]
+# "Foreground Color" = "terminal_foreground" # 기본 글자색.
+# "Background Color" = "terminal_background" # 기본 배경.
+"Cursor Color" = "terminal_cursor" # 터미널 커서색.
+# "Selection Color" = "selection_background" # 선택 배경.
+"Selected Text Color" = "selection_text" # 선택 영역 안의 글자색.
+# "Cursor Text Color" = "terminal_background" # 블록 커서 위 글자색.
+# "Bold Color" = "terminal_foreground" # 굵은 글자색.
+# "Link Color" = "link" # 터미널 링크 표시색.
+# "Cursor Guide Color" = "selection_background" # 커서 가이드 색. 알파는 프로파일에서 조정.
+# ANSI 16색은 공통 원본의 모드별 ansi 표를 사용한다.
+# 표시 옵션·글꼴·간격은 iTerm2 프로파일에서 수동 선택한다.

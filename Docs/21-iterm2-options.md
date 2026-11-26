@@ -16,7 +16,7 @@
 | `Link Color` | 공통 `link` | 터미널 링크 표시용. 쉘이 출력한 임의 글자색이 아님 | 선택 생성 |
 | `Cursor Guide Color` | iTerm2 전용 | 색상 값만 출력. 표시 여부와 알파는 앱에서 조정 | 선택 생성 |
 
-선택 생성 항목은 [iterm2.toml](../themes/orange-type/editors/iterm2.toml)의 `[colors]`에서 활성화한다. 생략하면 기본 21개 키만 생성한다.
+선택 생성 항목은 [iterm2.toml](../themes/lavender-type/editors/iterm2.toml)의 `[colors]`에서 활성화한다. 생략하면 기본 21개 키만 생성한다.
 
 | 공통 ANSI 슬롯 → iTerm2 키 | 일반색 생성 | 밝은 슬롯 → iTerm2 키 | 밝은색 생성 |
 |---|---|---|---|

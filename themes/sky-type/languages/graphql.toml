@@ -1,0 +1,6 @@
+# GraphQL: 연산 선언, 타입과 필드 및 @ 지시어를 구분한다.
+[tokens]
+"keyword.declaration" = "syntax_declaration" # query·mutation 등 선언.
+type = "syntax_type" # 스키마 타입.
+property = "syntax_property" # 필드명.
+attribute = "syntax_attribute" # @ 지시어.

@@ -238,7 +238,7 @@ mod tests {
         let orange = style(
             &inputs,
             "orange-type",
-            include_str!("../themes/orange-type/lbrx.toml"),
+            include_str!("../tests/fixtures/lbrx.toml"),
         );
         fs::create_dir(orange.join("editors")).unwrap();
         fs::write(

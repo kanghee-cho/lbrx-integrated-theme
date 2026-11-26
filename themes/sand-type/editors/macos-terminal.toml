@@ -1,0 +1,11 @@
+# LBRX Sand Petrol: 이 파일의 앱 전용 설정. 공통 색은 ../lbrx.toml 참조.
+# Apple Terminal.app 프로파일 전용. 값은 lbrx.toml의 라이트·다크 roles 이름.
+# 주석 상태에서 기본 색상은 공통 역할을 사용하고 굵은 글자색은 별도 출력하지 않는다.
+[colors]
+# TextColor = "terminal_foreground" # 일반 글자색.
+# BackgroundColor = "terminal_background" # 배경색.
+# CursorColor = "terminal_cursor" # 커서색.
+# SelectionColor = "selection_background" # 선택 배경.
+# TextBoldColor = "terminal_foreground" # 굵은 글자색.
+# ANSI 16색은 공통 원본의 모드별 ansi 표를 사용한다.
+# 글꼴·간격·창과 탭·커서 동작은 Terminal.app 프로파일에서 수동으로 설정한다.

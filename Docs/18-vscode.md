@@ -1,12 +1,12 @@
 # VS Code에 LBRX 적용
 
-라이트·다크 색 테마를 담은 VSIX를 생성한다. 공통 색은 [공통 TOML](../themes/orange-type/lbrx.toml)에서 수정한다.
+라이트·다크 색 테마를 담은 VSIX를 생성한다. 공통 색은 [공통 TOML](../themes/lavender-type/lbrx.toml)에서 수정한다.
 
 ```powershell
 cargo run --locked -- build --app vscode
 ```
 
-`dist\orange-type\lbrx\vscode`에 다음 파일이 생성된다.
+`dist\lavender-type\lbrx\vscode`에 다음 파일이 생성된다.
 
 | 파일 | 용도 |
 |---|---|
@@ -22,7 +22,7 @@ cargo run --locked -- build --app vscode
 
 ## 작업 화면 색상
 
-저장소의 `themes/orange-type/editors/vscode.toml`에서 `[colors]` 아래 원하는 줄만 주석 해제한다. 값은 라이트·다크의 공통 역할 이름이며, 탭·탐색기·상태줄·검색·diff·자동완성·줄 번호·진단·통합 터미널 색을 각각 조정할 수 있다.
+저장소의 `themes/lavender-type/editors/vscode.toml`에서 `[colors]` 아래 원하는 줄만 주석 해제한다. 값은 라이트·다크의 공통 역할 이름이며, 탭·탐색기·상태줄·검색·diff·자동완성·줄 번호·진단·통합 터미널 색을 각각 조정할 수 있다.
 
 ```toml
 [colors]

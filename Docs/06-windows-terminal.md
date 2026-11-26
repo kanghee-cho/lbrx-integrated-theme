@@ -1,6 +1,6 @@
 # Windows Terminal에 LBRX 적용
 
-저장소 루트에서 `cargo run --locked -- build --app windows-terminal`을 실행하면 `dist\orange-type\lbrx\windows-terminal`에 배색표와 선택 적용용 글꼴 설정 조각이 생성된다.
+저장소 루트에서 `cargo run --locked -- build --app windows-terminal`을 실행하면 `dist\lavender-type\lbrx\windows-terminal`에 배색표와 선택 적용용 글꼴 설정 조각이 생성된다.
 
 ## 설치·복구
 
@@ -18,7 +18,7 @@
 PowerShell 기본 디렉터리 표시는 파랑 **배경**(`44;1m`)을 지정하므로 파스텔 파랑 위의 밝은 기본 글자가 안 보일 수 있다. 생성되는 `powershell-colors.ps1`을 원하는 PowerShell 7.2 이상 세션에서 명시적으로 dot-source하면 디렉터리에 밝은 시안 **전경만** 지정한다. 프로필이나 다른 FileInfo 설정은 수정하지 않는다.
 
 ```powershell
-. .\dist\orange-type\lbrx\windows-terminal\powershell-colors.ps1
+. .\dist\lavender-type\lbrx\windows-terminal\powershell-colors.ps1
 ```
 
 SSH의 ANSI 색은 접속에 사용한 로컬 터미널 배색표로 표시된다. 반면 원격 셸의 `$PSStyle`, `LS_COLORS`, 프롬프트·TUI 색 설정은 원격에서 관리한다. 로컬 스니펫은 SSH로 전파되지 않는다. 배색표 적용 후에도 특정 출력만 흐리면 해당 프로그램의 배경·dim·직접 RGB 지정도 확인한다.

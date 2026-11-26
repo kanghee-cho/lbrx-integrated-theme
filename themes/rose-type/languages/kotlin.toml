@@ -1,0 +1,5 @@
+# Kotlin: 널 안전 타입과 문자열 템플릿을 별도 분류할 수 있는 문법에 적용한다.
+[tokens]
+type = "syntax_type" # 타입 이름. ?는 호스트 문법을 따른다.
+"string.escape" = "syntax_escape" # 템플릿 경계와 이스케이프.
+attribute = "syntax_attribute" # 어노테이션.

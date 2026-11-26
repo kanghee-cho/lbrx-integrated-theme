@@ -1,0 +1,20 @@
+# LBRX Lavender Mint: 이 파일의 앱 전용 설정. 공통 색은 ../lbrx.toml 참조.
+# LBRX Studio 전용 CSS 변수 매핑. 공통 themes/lbrx.toml의 라이트·다크 roles 이름을 참조한다.
+# 생략한 키는 어댑터의 같은 역할 기본값을 사용한다. HEX와 임의 CSS는 허용하지 않는다.
+# 글꼴·크기(px)·줄 높이(배수)는 공통 typography.prose/mono에서 가져온다.
+# 테마 모드와 패널 크기·배치는 Studio 사용자 설정에 남기며 이 파일에서 변경하지 않는다.
+# 구문색·스타일은 languages/common.toml과 languages/<언어 ID>.toml에서 설정한다.
+[colors]
+"--background" = "background" # 앱 기본 배경.
+"--surface" = "surface" # 패널·사이드바·입력 컨트롤의 보조 배경.
+"--text" = "text" # 기본 전경색.
+"--muted" = "muted" # 설명·보조 글자색.
+"--accent" = "accent" # UI 강조색.
+"--selection-background" = "selection_background" # 일반 UI·코드 텍스트 선택 배경.
+"--selection-text" = "selection_text" # 선택한 텍스트의 전경색.
+"--error" = "error" # 오류 메시지와 오류 상태.
+"--warning" = "warning" # 경고 상태.
+"--success" = "success" # 성공 상태.
+"--border" = "muted" # 경계선의 기준색. 출력 시 HEX 알파 40(64/255)을 붙여 기존 Studio 투명도를 유지한다.
+"--focus" = "focus" # 키보드 포커스 윤곽선. 투명 테두리와 별도로 사용한다.
+"--link" = "link" # 링크 전경색.

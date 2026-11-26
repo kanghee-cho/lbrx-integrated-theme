@@ -1,10 +1,10 @@
 # VS Code 옵션 대장
 
-[적용 가이드](18-vscode.md) · [공통 원본](../themes/orange-type/lbrx.toml) · [공식 색 ID 목록 고정본](https://github.com/microsoft/vscode-docs/blob/d1e499c3abac3a4d3fb28e18b0e7e9f72c0d17f9/api/references/theme-color.md)
+[적용 가이드](18-vscode.md) · [공통 원본](../themes/lavender-type/lbrx.toml) · [공식 색 ID 목록 고정본](https://github.com/microsoft/vscode-docs/blob/d1e499c3abac3a4d3fb28e18b0e7e9f72c0d17f9/api/references/theme-color.md)
 
 `tokenColors`와 `semanticTokenColors`의 언어별 적용 상태 및 HTML 코드 블록용 동반 CSS는 [언어별 구문 강조](22-vscode-language-highlighting.md)에서 추적한다.
 
-`[x]`는 두 모드에서 기본 생성, `[x] 선택 생성`은 [vscode.toml](../themes/orange-type/editors/vscode.toml)의 `[colors]`에 설정할 때 두 모드에 생성한다는 뜻이다. 체크는 실제 화면 확인을 뜻하지 않는다. 생성기가 아래 공식 색인에 있는 ID만 받으므로 오타나 색인에 없는 확장 전용 ID는 오류로 표시된다.
+`[x]`는 두 모드에서 기본 생성, `[x] 선택 생성`은 [vscode.toml](../themes/lavender-type/editors/vscode.toml)의 `[colors]`에 설정할 때 두 모드에 생성한다는 뜻이다. 체크는 실제 화면 확인을 뜻하지 않는다. 생성기가 아래 공식 색인에 있는 ID만 받으므로 오타나 색인에 없는 확장 전용 ID는 오류로 표시된다.
 
 | 적용 경로 | 설정 가능한 값 | 공통 / 합일 / 전용 |
 |---|---|---|

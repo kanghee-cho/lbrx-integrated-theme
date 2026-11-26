@@ -1,0 +1,5 @@
+# Swift: 어트리뷰트와 # 지시어, 문자열 보간 경계를 구분한다.
+[tokens]
+attribute = "syntax_attribute" # 어트리뷰트.
+"string.escape" = "syntax_escape" # 인식된 보간 경계와 이스케이프.
+type = "syntax_type" # 타입과 프로토콜.

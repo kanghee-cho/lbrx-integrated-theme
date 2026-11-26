@@ -1,0 +1,5 @@
+# CSV: 전용 문법이 구별하는 경우에만 적용. 인용된 쉼표는 필드 구분자가 아니다.
+[tokens]
+property = "syntax_property" # 문법이 실제로 구분하는 헤더.
+punctuation = "syntax_punctuation" # 필드 구분자.
+string = "string" # 문자열/인용 필드.

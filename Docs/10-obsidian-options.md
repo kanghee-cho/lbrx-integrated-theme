@@ -41,7 +41,7 @@ D20의 코드 토큰 매핑과 언어별 읽기 뷰·라이브 프리뷰 검증�
 
 ## Obsidian 전용
 
-Obsidian 전용 기능의 적용 범위다. 실제 설정 키와 예시는 [obsidian.toml](../themes/orange-type/editors/obsidian.toml)에 있다.
+Obsidian 전용 기능의 적용 범위다. 실제 설정 키와 예시는 [obsidian.toml](../themes/lavender-type/editors/obsidian.toml)에 있다.
 
 - [x] **O01 패키지·모드** — manifest 이름과 폴더 일치, 단일 CSS에서 모드 분리. 다크 역할 하나를 바꿔도 라이트 선언은 그대로여야 한다.
 - [x] **O02 라이브 프리뷰 편집 상태** — `[live_preview]`로 활성 줄 배경과 입력 커서 색을 각각 설정. Markdown 기호와 접기 노출 방식은 앱 소유. 실제 앱 화면 미검증.

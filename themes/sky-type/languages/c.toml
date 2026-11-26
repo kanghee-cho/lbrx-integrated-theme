@@ -1,0 +1,6 @@
+# C: 전처리기와 매크로 이름을 일반 함수와 구분한다. *와 &는 문법 분류를 따른다.
+[tokens]
+"function.macro" = "syntax_macro" # 매크로 이름으로 식별된 심볼.
+attribute = "syntax_attribute" # 전처리기 지시어.
+type = "syntax_type" # 기본형·사용자 정의 타입.
+operator = "syntax_operator" # 연산자로 분류된 기호.

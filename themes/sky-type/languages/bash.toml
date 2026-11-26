@@ -1,0 +1,6 @@
+# Bash 전용 ID를 내놓는 렌더러용. VS Code의 공유 shellscript ID는 shell.toml을 사용한다.
+[tokens]
+variable = "text" # 일반 변수와 $ 접두사.
+"constant.builtin" = "syntax_builtin" # 위치·특수 매개변수로 분류된 토큰.
+"string.escape" = "syntax_escape" # 확장·명령 치환 경계.
+"keyword.control" = "keyword" # 조건·반복.

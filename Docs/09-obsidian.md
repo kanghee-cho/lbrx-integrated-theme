@@ -1,6 +1,6 @@
 # Obsidian에 LBRX 적용
 
-저장소 루트에서 `cargo run --locked -- build --app obsidian`을 실행한다. 본문, 앱 UI, 인쇄 옵션은 `themes/orange-type/editors/obsidian.toml`에서 관리한다. 기능별 검증 기록은 저장소의 `Docs/10-obsidian-options.md`를 참고한다.
+저장소 루트에서 `cargo run --locked -- build --app obsidian`을 실행한다. 본문, 앱 UI, 인쇄 옵션은 `themes/lavender-type/editors/obsidian.toml`에서 관리한다. 기능별 검증 기록은 저장소의 `Docs/10-obsidian-options.md`를 참고한다.
 
 ## 설치·복구
 
@@ -8,8 +8,8 @@ Typora는 모드별 CSS 두 개를 선택하지만, Obsidian에는 `LBRX` 테마
 
 | 산출물 | 역할 |
 |---|---|
-| `dist\orange-type\lbrx\obsidian\LBRX\manifest.json` | 이름 `LBRX`, 생성기 버전, 제작자, 최소 앱 버전. `1.10.6`은 공식 샘플 manifest의 기준이며 실측한 최소 버전은 아니다. |
-| `dist\orange-type\lbrx\obsidian\LBRX\theme.css` | 공통 토큰을 Obsidian의 색·서체 변수에 매핑한다. 스니펫이나 커뮤니티 플러그인 설치를 전제로 하지 않는다. |
+| `dist\lavender-type\lbrx\obsidian\LBRX\manifest.json` | 이름 `LBRX`, 생성기 버전, 제작자, 최소 앱 버전. `1.10.6`은 공식 샘플 manifest의 기준이며 실측한 최소 버전은 아니다. |
+| `dist\lavender-type\lbrx\obsidian\LBRX\theme.css` | 공통 토큰을 Obsidian의 색·서체 변수에 매핑한다. 스니펫이나 커뮤니티 플러그인 설치를 전제로 하지 않는다. |
 
 1. **시험용 보관함**에서 먼저 확인한다. 기본 설정 폴더를 쓰는 경우 `<보관함>\.obsidian\themes\LBRX\`에 두 파일이 바로 들어가도록 `LBRX` 폴더를 복사한다. 설정 폴더 이름을 바꿨다면 그 위치를 사용한다.
 2. **설정 → 테마/외형(Appearance) → 테마(Themes)**에서 `LBRX`를 선택한다. 목록에 없으면 `LBRX\LBRX`로 이중 복사하지 않았는지, 폴더명과 manifest 이름이 일치하는지 확인하고 앱을 다시 연다.
@@ -26,7 +26,7 @@ Typora는 모드별 CSS 두 개를 선택하지만, Obsidian에는 `LBRX` 테마
 | `accent` | 모드별 RGB를 Obsidian 기본 강조색의 HSL 입력(`--accent-h`, `--accent-s`, `--accent-l`)으로 변환한다. 버튼·토글의 파생 상태색은 앱이 계산한다. |
 | `typography.prose`, `typography.mono` | 본문은 LINE Seed EN → KR → JP → `sans-serif`, 코드는 D2Coding ligature → `monospace`. 글자 크기는 앱 설정을 유지한다. UI 아이콘과 수식 글꼴은 대상이 아니다. |
 
-**D03 본문 줄 높이:** 저장소의 `themes/orange-type/editors/obsidian.toml`에서 `[prose].use_shared_line_height = true`이면 읽기 뷰의 문단과 라이브 프리뷰의 일반 본문 줄에 공통 `typography.prose.line_height`(현재 `1.65`배)를 적용한다. `false`로 바꾸거나 생략하면 앱 기본값을 사용한다. 제목·코드 블록·소스 모드·앱 UI에는 별도 줄 높이를 지정하지 않는다. 변경 후 `cargo run --locked -- build --app obsidian`으로 다시 생성한다.
+**D03 본문 줄 높이:** 저장소의 `themes/lavender-type/editors/obsidian.toml`에서 `[prose].use_shared_line_height = true`이면 읽기 뷰의 문단과 라이브 프리뷰의 일반 본문 줄에 공통 `typography.prose.line_height`(현재 `1.65`배)를 적용한다. `false`로 바꾸거나 생략하면 앱 기본값을 사용한다. 제목·코드 블록·소스 모드·앱 UI에는 별도 줄 높이를 지정하지 않는다. 변경 후 `cargo run --locked -- build --app obsidian`으로 다시 생성한다.
 
 `obsidian.toml`의 주석 처리된 변경 예시는 활성 설정을 **교체**할 때 사용한다. 같은 키의 활성 설정과 예시를 동시에 켜지 않는다.
 

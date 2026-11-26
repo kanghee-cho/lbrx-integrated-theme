@@ -542,7 +542,7 @@ mod tests {
     fn sample() -> Theme {
         toml::from_str(include_str!(concat!(
             env!("CARGO_MANIFEST_DIR"),
-            "/themes/orange-type/lbrx.toml"
+            "/tests/fixtures/lbrx.toml"
         )))
         .unwrap()
     }
@@ -690,7 +690,7 @@ mod tests {
         let source = input.path().join("lbrx.toml");
         let editors = input.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&source, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
+        fs::write(&source, include_str!("../tests/fixtures/lbrx.toml")).unwrap();
         let settings = editors.join("helix.toml");
         let stock = r#"
 [colors]

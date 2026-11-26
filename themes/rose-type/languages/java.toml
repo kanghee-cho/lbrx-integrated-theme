@@ -1,0 +1,6 @@
+# Java: 클래스/기본형과 어노테이션, 문자열 이스케이프를 구분한다.
+[tokens]
+type = "syntax_type" # 클래스·원시 타입.
+attribute = "syntax_attribute" # @ 및 어노테이션 이름.
+"keyword.declaration" = "syntax_declaration" # 선언·가시성.
+"string.escape" = "syntax_escape" # 이스케이프.

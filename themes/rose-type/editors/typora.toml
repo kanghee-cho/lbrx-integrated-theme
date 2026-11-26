@@ -1,0 +1,236 @@
+# LBRX Rose Slate: 이 파일의 앱 전용 설정. 공통 색은 ../lbrx.toml 참조.
+# Typora 전용 문서 스타일. 조판 값은 라이트·다크에 공통 적용한다.
+# 본문·코드 글꼴, 제목색, 선택색, 코드 블록 배경은 ../lbrx.toml에서 관리한다.
+# [colors]는 Typora에서만 공통 색 연결을 바꿀 때 사용한다. 오른쪽에는 양쪽 모드에 있는 roles 이름을 쓴다.
+# 아래는 모두 비활성 예시다. 필요한 줄의 #만 제거하면 적용된다. 생략 시 각 줄에 적힌 기본 동작을 유지한다.
+[colors]
+# "--lbrx-quote" = "muted" # 블록 인용문 글자색과 강조선 (기본: quote).
+# "--lbrx-link" = "accent" # 문서 링크 글자색 (기본: link).
+# "--lbrx-footnote-reference" = "accent" # 본문 각주 번호 (기본: function, 언어별 토큰 매핑 미적용).
+# "--blur-text-color" = "muted" # T02: Typora 집중 모드의 비활성 글자색. 생략하면 앱 기본값. 모드 자체를 켜지는 않음.
+# "--lbrx-live-edit-marker" = "muted" # T03: 편집 중 드러나는 강조·링크 Markdown 기호의 색. 표시 여부는 유지.
+# "--lbrx-live-edit-link-text" = "accent" # T03: 펼친 Markdown 링크의 표시 텍스트색. 일반 링크색은 유지.
+# "--lbrx-live-edit-link-url" = "function" # T03: 펼친 Markdown 링크에서 드러난 목적지 URL의 색.
+# "--lbrx-code-selection-background" = "surface" # T05: 코드 펜스 편집 중 드래그 선택 배경. 생략하면 기존 선택색 유지.
+# "--lbrx-code-selection-text" = "text" # T05: 코드 펜스 편집 중 선택된 글자색. 생략하면 기존 동작 유지.
+# "--lbrx-code-active-line-background" = "selection_background" # T05: 커서가 놓인 코드 줄의 배경. 드래그 선택과 별개.
+# "--lbrx-code-matching-bracket" = "success" # T05: 앱이 짝이 맞는 괄호를 표시할 때의 글자색.
+# "--lbrx-code-nonmatching-bracket" = "error" # T05: 앱이 짝이 없는 괄호를 표시할 때의 글자색.
+
+# T06: Markdown 소스 모드 전용. 각 항목을 생략하면 기존 스타일을 유지한다.
+# [source_mode] # 글꼴·크기를 변경하려면 이 표와 필요한 줄을 주석 해제.
+# font = "mono" # 공통 typography의 글꼴 목록만 사용. "mono"는 코드용, "prose"는 본문용.
+# size_px = 15 # 일반 텍스트의 기본 글자 크기(px, 양의 정수). Typora의 제목 등 별도 크기 규칙은 유지.
+
+# [source_mode.colors] # 표와 필요한 색만 주석 해제. 값은 양쪽 모드에 있는 roles 이름.
+# background = "surface" # 소스 편집기 배경.
+# text = "text" # 별도 구문 강조가 없는 일반 글자색.
+# selection_background = "selection_background" # 드래그로 선택한 영역의 배경.
+# selection_text = "selection_text" # 드래그로 선택한 글자의 색.
+# active_line_background = "background" # 커서가 놓인 줄의 배경. 드래그 선택과 별개.
+# cursor = "focus" # 텍스트 입력 커서 색.
+# line_number = "muted" # 앱이 표시한 줄 번호의 색. 표시 여부는 바꾸지 않음.
+# heading = "heading" # 제목·속성으로 강조되는 구문의 색.
+# link = "link" # 링크 구문 색.
+# code = "inline_code" # 앱이 코드 구문으로 분류한 부분의 색.
+# comment = "comment" # 앱이 주석으로 분류한 부분의 색.
+# number = "number" # 숫자·리터럴로 강조되는 구문의 색.
+# string = "string" # 문자열로 강조되는 구문의 색.
+# tag = "keyword" # HTML 태그 구문 색.
+
+# T07: 문서 안의 [TOC]만 변경한다. 생략하면 기존 스타일을 유지한다.
+# [toc] # 이 표와 필요한 설정 줄을 주석 해제.
+# max_depth = 3 # 표시할 가장 깊은 제목 단계(1–6). 3이면 H1–H3만 표시.
+# item_gap_px = 4 # 표시되는 항목 사이 간격(px). 0은 추가 간격 없음.
+# link_color = "link" # 목차 링크의 기본색. 양쪽 모드에 있는 roles 이름.
+# hover_color = "accent" # 포인터를 올리거나 키보드 포커스가 보일 때의 색. 양쪽 모드에 있는 roles 이름.
+# underline = true # 기본·호버 상태 모두 밑줄 표시. false는 모두 제거. 생략하면 기존 동작 유지.
+# numbered = true # 각 목차에서 보이는 항목을 1, 2, 3…으로 표시. false 또는 생략은 번호 추가 없음.
+
+# [toc.indent_px] # 이 표와 변경할 제목 단계만 주석 해제. 시작 쪽 들여쓰기(px).
+# h1 = 0 # H1 항목.
+# h2 = 16 # H2 항목.
+# h3 = 32 # H3 항목.
+# h4 = 48 # H4 항목.
+# h5 = 64 # H5 항목.
+# h6 = 80 # H6 항목.
+
+# T08: 문서 탐색 사이드바 전용. 필요한 표와 설정 줄만 주석 해제.
+# 색 값은 양쪽 모드에 있는 roles 이름. 생략하면 기존 스타일 유지.
+[sidebar]
+background = "surface" # 사이드바 바탕색·선택·호버·포커스 변수를 공통 역할에 연결.
+text = "text" # 탭·파일 목록 기본 글자색. 활성 탭은 focus, 선택 파일은 selection_text 사용.
+muted = "muted" # 파일 요약·폴더·시간·확장자 글자색. 중첩 투명도를 제거해 대비 확보.
+
+# [sidebar.outline]
+# indent_step_px = 12 # 제목 단계당 추가 들여쓰기(px). H1은 0, H2는 12, … H6은 60.
+# numbered = true # 사이드바에서 보이는 제목에만 일련번호 표시. false 또는 생략은 번호 추가 없음.
+
+# [sidebar.outline.colors]
+# text = "text" # 개요 항목의 기본 글자색.
+# hover_background = "surface" # 포인터가 올라간 개요 항목의 배경.
+# active_background = "selection_background" # 현재 본문 위치에 대응하는 개요 항목의 배경.
+# active_text = "selection_text" # 현재 본문 위치에 대응하는 개요 항목의 글자색.
+# selection_border = "focus" # 앱이 선택 테두리를 표시할 때의 색.
+
+# [sidebar.file_tree] # 트리 보기만 적용. 파일 목록 보기와 검색 결과는 제외.
+# text = "text" # 파일·폴더 이름의 기본 글자색.
+# hover_background = "surface" # 열린 파일이 아닌 항목에 포인터가 올라갔을 때의 배경.
+# active_background = "selection_background" # 현재 열린 파일 행의 배경.
+# active_text = "selection_text" # 현재 열린 파일 이름의 색.
+# active_border = "accent" # 현재 열린 파일 행의 왼쪽 강조선.
+# selection_border = "focus" # 앱이 선택한 항목의 테두리. 열린 파일 강조와 별개.
+# expander = "muted" # 앱이 표시하는 폴더 펼치기·접기 화살표 색.
+
+# T09: 편집 보조 영역별 색. 필요한 표와 줄만 주석 해제. 값은 양쪽 모드에 있는 roles 이름.
+[editing_aids.yaml] # 문서 첫머리 YAML 속성. 문법·표시 여부는 유지.
+background = "surface" # YAML 속성과 내부 편집기·거터의 모드별 배경.
+text = "text" # YAML 속성과 내부 편집기의 일반 글자색.
+placeholder = "muted" # 빈 YAML 속성 안내 글자색.
+
+# [editing_aids.search] # 문서 편집 화면에서 찾기 결과에만 적용. 일반 드래그 선택과 별개.
+# match_background = "prose_selection_background" # 현재 선택하지 않은 검색 결과의 배경 역할 예시.
+# active_background = "selection_background" # 현재 검색 결과의 배경.
+# active_text = "selection_text" # 현재 검색 결과의 글자색.
+
+# [editing_aids.link] # 편집 중 Typora가 펼쳐 보여 주는 인라인 링크 입력 영역.
+# destination_background = "surface" # 목적지 URL의 배경. URL 글자색은 T03에서 설정.
+# title_background = "surface" # 선택적인 Markdown 링크 제목의 배경. 일반 링크에는 적용하지 않음.
+
+# T10–T11: Mermaid 렌더러 기본값과 편집 화면 미리보기. 필요한 표와 줄만 주석 해제.
+# [diagrams.mermaid]
+# light_theme = "neutral" # 라이트 CSS의 Mermaid 배색 프리셋. base/default/dark/forest/neutral/night 중 선택.
+# dark_theme = "dark" # 다크 CSS의 Mermaid 배색 프리셋. 미지정 모드는 Typora 기본 동작 유지.
+# alignment = "center" # Mermaid 미리보기 정렬: start(시작), center(가운데), end(끝).
+# sequence_numbers = false # Mermaid 시퀀스 메시지 자동 번호. true는 켜기, 생략하면 렌더러 기본 동작 유지.
+# flowchart_curve = "basis" # Mermaid 흐름도 연결선: linear(직선), basis·natural(곡선), step(계단).
+# gantt_left_padding_px = 75 # Mermaid 간트 도식 왼쪽 여백(px, 0 이상 정수).
+
+# T12: Mermaid가 아닌 sequence·flow 코드 펜스의 미리보기.
+# [diagrams.sequence]
+# theme = "simple" # sequence 렌더러 스타일. "hand"는 손그림 스타일, 생략하면 앱 기본값.
+# alignment = "center" # sequence 미리보기 정렬: start/center/end.
+
+# [diagrams.flow]
+# alignment = "start" # flow 미리보기 정렬: start/center/end. 노드·연결선별 스타일은 문서 구문에서 설정.
+
+# X01–X02: 인쇄·Typora 기본 PDF 전용. 필요한 표와 줄만 주석 해제.
+# [print]
+# paper_color = "#FFFFFF" # 종이 배경색(#RRGGBB). 생략하면 기존 인쇄 배경 유지.
+# text_color = "text" # 본문·제목 색. 양쪽 모드에 있는 roles 이름을 쓰며 출력에는 라이트 값을 사용.
+# link_color = "link" # 링크 색. 양쪽 모드에 있는 roles 이름을 쓰며 출력에는 라이트 값을 사용.
+# keep_heading_with_next = true # H1–H6을 다음 블록과 같은 페이지에 두도록 시도. false 또는 생략 시 기존 동작.
+# keep_figure_with_caption = true # 명시적인 이미지 figure와 figcaption을 한 페이지에 두도록 시도. 표·코드 제외.
+
+[layout] # D05 본문 폭과 좌우 여백. 생략하면 Typora 기본 조판을 유지한다.
+max_width_px = 860 # 좌우 여백을 포함한 본문 컨테이너 최대 폭(px).
+padding_inline_min_px = 16 # 좁은 창에서 좌우 각각의 최소 안쪽 여백(px).
+padding_inline_max_px = 32 # 넓은 창에서 좌우 각각의 최대 안쪽 여백(px). 중간은 창 너비의 4%를 사용.
+
+[paragraph] # D06–D07: 최상위 일반 문단의 간격과 정렬.
+gap_px = 12 # 연속 문단 사이 간격(px). 원문의 빈 줄이나 본문 줄 높이는 바꾸지 않음.
+alignment = "start" # 시작 쪽 정렬. "justify"는 양쪽 정렬, 생략하면 앱 기본값 유지. 쓰기 방향은 강제하지 않음.
+
+# D08: 본문 자간·합자와 작은 대문자는 기본값을 유지하고 제목의 대소문자를 변환하지 않음. 별도 TOML 키 없음.
+
+# D10: 제목 단계별 조판. 앱 기본값을 쓰려면 headings의 H1–H6 표를 모두 생략.
+[headings.h1]
+size_percent = 180 # 본문 대비 제목 크기(%).
+weight = 700 # 제목 굵기(CSS font-weight).
+margin_before_px = 32 # 제목 위 바깥 여백(px).
+margin_after_px = 16 # 제목 아래 바깥 여백(px).
+divider = true # 제목 아래에 muted 역할 색의 1px 구분선을 표시.
+
+[headings.h2]
+size_percent = 150 # 본문 대비 제목 크기(%).
+weight = 700 # 제목 굵기(CSS font-weight).
+margin_before_px = 28 # 제목 위 바깥 여백(px).
+margin_after_px = 12 # 제목 아래 바깥 여백(px).
+divider = false # 제목 아래 구분선을 표시하지 않음.
+
+[headings.h3]
+size_percent = 130 # 본문 대비 제목 크기(%).
+weight = 600 # 제목 굵기(CSS font-weight).
+margin_before_px = 24 # 제목 위 바깥 여백(px).
+margin_after_px = 10 # 제목 아래 바깥 여백(px).
+divider = false # 제목 아래 구분선을 표시하지 않음.
+
+[headings.h4]
+size_percent = 115 # 본문 대비 제목 크기(%).
+weight = 600 # 제목 굵기(CSS font-weight).
+margin_before_px = 20 # 제목 위 바깥 여백(px).
+margin_after_px = 8 # 제목 아래 바깥 여백(px).
+divider = false # 제목 아래 구분선을 표시하지 않음.
+
+[headings.h5]
+size_percent = 105 # 본문 대비 제목 크기(%).
+weight = 600 # 제목 굵기(CSS font-weight).
+margin_before_px = 16 # 제목 위 바깥 여백(px).
+margin_after_px = 8 # 제목 아래 바깥 여백(px).
+divider = false # 제목 아래 구분선을 표시하지 않음.
+
+[headings.h6]
+size_percent = 100 # 본문 대비 제목 크기(%).
+weight = 600 # 제목 굵기(CSS font-weight).
+margin_before_px = 16 # 제목 위 바깥 여백(px).
+margin_after_px = 8 # 제목 아래 바깥 여백(px).
+divider = false # 제목 아래 구분선을 표시하지 않음.
+
+# D11: 테마는 제목에 자동 번호를 붙이지 않음. Markdown에 직접 적은 번호는 유지. 별도 TOML 키 없음.
+
+[emphasis.light] # D17: 라이트 본문 강조. 색상은 #RRGGBB이며 코드 구문색에는 적용하지 않음.
+strong = "#A34768" # 굵은 글자의 스타일 주 강조색(#RRGGBB).
+italic = "#426B8D" # 기울임 글자의 스타일 보조 강조색(#RRGGBB).
+strikethrough = "#70535F" # 취소선 글자와 선의 보조 글자색(#RRGGBB).
+highlight_background = "#F5E5EB" # 형광펜 배경색(#RRGGBB). 글자 대비 확보, 드래그 선택과 별개.
+
+[emphasis.dark] # D17: 다크 본문 강조. 색상은 #RRGGBB이며 코드 구문색에는 적용하지 않음.
+strong = "#F0ADC5" # 굵은 글자의 스타일 주 강조색(#RRGGBB).
+italic = "#A9CCE8" # 기울임 글자의 스타일 보조 강조색(#RRGGBB).
+strikethrough = "#C2AAB6" # 취소선 글자와 선의 보조 글자색(#RRGGBB).
+highlight_background = "#3D303A" # 형광펜 배경색(#RRGGBB). 글자 대비 확보, 드래그 선택과 별개.
+
+[footnotes] # D18: 문서 각주 스타일. 표를 생략하면 각주에 별도 CSS를 적용하지 않음.
+body_size_percent = 90 # 본문 대비 각주 글자 크기(%). 글자색은 보조 글자 역할(muted)을 사용.
+
+[horizontal_rule] # D18: Markdown 수평 구분선. 각주 영역의 자동 구분선은 제외.
+thickness_px = 1 # 구분선 두께(px). 보조 글자 역할(muted)의 색을 사용.
+margin_block_px = 24 # 구분선 위아래 각각의 바깥 여백(px).
+
+[table] # D21: 헤더는 surface 배경과 굵은 글씨, 본문은 가로선만 사용. 생략하면 앱 기본 표 스타일 유지.
+cell_padding_block_px = 8 # 셀 위아래 각각의 안쪽 여백(px).
+cell_padding_inline_px = 12 # 셀 좌우 각각의 안쪽 여백(px).
+row_rule_px = 1 # 행 아래 구분선 두께(px). 보조 글자 역할(muted)의 색을 사용.
+
+[lists] # D22: 일반 목록. 비순서 표식은 ● → ○ → ■(3단계 이상), 순서 목록 번호는 유지. 생략하면 앱 기본값.
+indent_px = 24 # 일반 항목이 있는 목록의 단계별 시작 쪽 들여쓰기(px).
+item_gap_px = 4 # 같은 단계에서 연달아 오는 일반 항목 사이의 추가 위쪽 여백(px).
+
+# [lists.markers] # 비순서 목록 글머리표. 제목 줄과 바꿀 값의 #을 제거. disc(●), circle(○), square(■) 중 선택.
+# level_1 = "disc" # 1단계 글머리표. 생략하면 disc(●).
+# level_2 = "circle" # 2단계 글머리표. 생략하면 circle(○).
+# level_3 = "square" # 3단계 이상 글머리표. 생략하면 square(■).
+
+[task_lists] # D23: 체크박스는 테마 강조색(accent), 완료 문단은 보조 글자색(muted). 생략하면 앱 기본값.
+strike_completed = true # 완료 항목의 바로 아래 문단에만 취소선을 표시. 하위 목록과 미완료 문단은 유지.
+# checkbox_color = "warning" # 체크된 상자의 강조색. 양쪽 모드에 존재하는 roles 이름 사용. 생략하면 accent(녹색).
+
+[images] # D24: 독립 이미지는 본문 폭 안에서 가운데 정렬. 명시적 이미지 캡션만 꾸밈. 생략하면 앱 기본값.
+caption_size_percent = 90 # 본문 대비 캡션 크기(%). 보조 글자 역할(muted)의 색을 사용.
+caption_gap_px = 8 # 이미지와 캡션 사이 간격(px).
+# alignment = "start" # 독립 이미지 정렬: "start"(시작), "center"(가운데), "end"(끝). 생략하면 기존 정렬 유지.
+
+[math] # D25: 독립 수식만 꾸미고 화면에서는 렌더링 영역 안에서 가로 스크롤. 생략하면 앱 기본값.
+padding_block_px = 12 # 독립 수식 블록 위아래 각각의 안쪽 여백(px).
+padding_inline_px = 16 # 독립 수식 블록 좌우 각각의 안쪽 여백(px).
+shaded_background = true # 보조 배경 역할(surface)을 적용. false면 테마가 수식 배경을 추가하지 않음.
+
+[alerts] # D26: Typora 알림의 강조선·제목색. 기본 아이콘·라벨과 일반 인용문은 유지. 생략하면 앱 기본값.
+shaded_background = true # 모든 알림에 보조 배경 역할(surface)을 적용. false면 유형별 강조선·제목색만 적용.
+
+[alerts.colors] # 제목과 왼쪽 강조선의 역할을 Typora에서만 변경. 양쪽 모드에 존재하는 roles 이름을 사용.
+# note = "accent" # NOTE (기본: function, 파랑).
+# tip = "function" # TIP (기본: success, 녹색).
+# important = "accent" # IMPORTANT (기본: keyword, 보라).
+# warning = "error" # WARNING (기본: warning, 황색).
+# caution = "warning" # CAUTION (기본: error, 붉은색).

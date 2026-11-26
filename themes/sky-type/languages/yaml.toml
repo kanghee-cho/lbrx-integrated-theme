@@ -1,0 +1,9 @@
+# YAML: 문법이 제공하는 분류만 사용한다. 스키마를 테마가 변경하지 않는다.
+[tokens]
+attribute = "syntax_attribute" # 앵커와 별칭.
+"keyword.control" = "keyword" # 인식된 병합 키.
+"keyword.declaration" = "syntax_declaration" # 블록 스칼라 헤더.
+string = "string" # 문자열 및 블록 내용.
+property = "syntax_property" # 매핑 키.
+"constant.builtin" = "syntax_builtin" # 스키마가 분류한 리터럴.
+punctuation = "syntax_punctuation" # 문서 경계·구분자.

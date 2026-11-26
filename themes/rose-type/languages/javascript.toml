@@ -1,0 +1,7 @@
+# JavaScript/JSX: 문자열과 보간 식, 내장 태그와 컴포넌트를 분리한다.
+[tokens]
+"string.escape" = "syntax_escape" # ${…} 경계·정규식.
+function = "function" # 함수 및 JSX 값 기반 컴포넌트.
+"keyword.declaration" = "syntax_declaration" # 선언 및 JSX 내장 태그.
+attribute = "syntax_attribute" # JSX 속성명.
+property = "syntax_property" # 객체 속성.

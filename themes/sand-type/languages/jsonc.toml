@@ -1,0 +1,7 @@
+# JSONC: JSON의 구분을 유지하고 주석도 적용한다.
+[tokens]
+property = "syntax_property" # 객체 키.
+string = "string" # 문자열 값.
+number = "number" # 숫자 리터럴.
+"constant.builtin" = "syntax_builtin" # true·false·null.
+comment = "comment" # 줄·블록 주석.

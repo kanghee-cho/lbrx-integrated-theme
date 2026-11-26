@@ -1,0 +1,312 @@
+# LBRX Rose Slate: 이 파일의 앱 전용 설정. 공통 색은 ../lbrx.toml 참조.
+# Obsidian 테마 CSS 설정. 색과 본문·코드 블록 조판을 조정한다.
+# 변경 예시는 기존 활성 줄을 교체할 때 사용한다. 같은 키를 두 번 선언하지 않는다.
+[prose] # D03: 읽기 뷰·라이브 프리뷰의 일반 본문. 글자 크기는 Obsidian 설정 유지.
+use_shared_line_height = true # 합의한 기본값: lbrx.toml의 typography.prose.line_height 사용(배율, 현재 1.65).
+# use_shared_line_height = false # Obsidian 기본 줄 높이를 사용한다. 키를 생략해도 동일하다.
+# 배율 자체를 변경하려면 lbrx.toml의 [typography.prose]에서 line_height를 수정한다. 이 공통값을 쓰는 다른 앱에도 반영된다.
+
+[code] # D04·D19: 여러 줄 코드 블록의 줄 높이와 읽기 뷰 표시. 글자 크기는 앱 설정 유지.
+use_shared_line_height = true # lbrx.toml의 typography.mono.line_height 사용(배율, 현재 1.45).
+# use_shared_line_height = false # Obsidian 기본 코드 블록 줄 높이를 사용한다. 키를 생략해도 동일하다.
+# 배율 자체를 변경하려면 lbrx.toml의 [typography.mono]에서 line_height를 수정한다. 이 공통값을 쓰는 다른 앱에도 반영된다.
+reading_border_width_px = 1 # 읽기 뷰의 코드 블록 테두리 두께(px). 색은 보조 텍스트색(--text-muted). 생략하면 기존 테두리 유지.
+# reading_border_width_px = 0 # 변경 예시: 읽기 뷰 코드 블록의 테두리 숨김(px). 위 줄을 대체.
+reading_horizontal_scroll = true # 읽기 뷰에서 긴 코드 줄을 줄바꿈하지 않고 필요할 때 가로 스크롤.
+# reading_horizontal_scroll = false # 기존 줄바꿈·스크롤 동작 유지. 위 줄을 대체하거나 키를 생략.
+
+[layout] # D05: 읽기 뷰·라이브 프리뷰 본문 폭과 좌우 여백. 표 전체를 생략하면 앱 기본값.
+max_width_px = 860 # '읽기 편한 줄 길이'를 켰을 때의 좌우 여백 포함 최대 폭(px).
+# max_width_px = 960 # 넓은 본문을 선호할 때의 최대 폭(px).
+padding_inline_min_px = 16 # 양쪽 각각의 최소 안쪽 여백(px). 중간 구간은 창 너비의 4%.
+# padding_inline_min_px = 12 # 좁은 창에서 양쪽 여백을 줄이는 예시(px).
+padding_inline_max_px = 32 # 양쪽 각각의 최대 안쪽 여백(px).
+# padding_inline_max_px = 40 # 넓은 창에서 양쪽 여백을 늘리는 예시(px).
+
+[paragraph] # D06–D07: 읽기 뷰의 최상위 일반 문단. 키를 생략하면 해당 앱 기본값 유지.
+gap_px = 12 # 연속 문단 사이 간격(px). 라이브 프리뷰와 원문의 빈 줄은 그대로 유지.
+# gap_px = 8 # 문단을 더 촘촘하게 배치하는 예시(px).
+# gap_px = 16 # 문단을 더 여유 있게 배치하는 예시(px).
+# gap_px = 0 # 연속 문단 사이에 추가 여백을 두지 않는 예시(px).
+alignment = "start" # 글이 시작되는 쪽으로 정렬(LTR은 왼쪽, RTL은 오른쪽). 방향 자체는 바꾸지 않음.
+# alignment = "justify" # 문단을 양쪽 정렬하는 예시. 키를 생략하면 앱 기본 정렬.
+
+# [prose_detail] # D08: 읽기 뷰의 최상위 일반 문단. 인라인 코드가 있는 문단은 제외하며, 기본값은 앱에 맡긴다.
+# letter_spacing_em = 0.025 # 자간(em, -0.5~0.5). 음수는 좁게, 양수는 넓게.
+# common_ligatures = false # 일반 합자 사용 여부. true로 바꾸면 활성화.
+# small_caps = true # 작은 대문자로 표시. false는 일반 대소문자 표시.
+# text_transform = "none" # 화면의 대소문자 변환: none, capitalize, uppercase, lowercase. 원문은 수정하지 않는다.
+
+# D10: H1–H6 크기·굵기는 두 뷰에서, 위아래 여백·구분선은 읽기 뷰에서만 적용한다.
+# headings 전체를 생략하면 앱 기본 조판을 사용한다. 노트의 인라인 제목은 제외한다.
+[headings.h1]
+size_percent = 180 # 본문 크기 대비 제목 크기(%).
+# size_percent = 170 # H1을 조금 작게 조정하는 예시(%).
+weight = 700 # 제목 굵기(CSS font-weight, 1–1000).
+# weight = 650 # H1 굵기를 줄이는 예시.
+margin_before_px = 32 # 제목 위 바깥 여백(px).
+# margin_before_px = 28 # H1 위 여백을 줄이는 예시(px).
+margin_after_px = 16 # 제목 아래 바깥 여백(px).
+# margin_after_px = 12 # H1 아래 여백을 줄이는 예시(px).
+divider = true # 제목 아래에 보조 글자색으로 1px 구분선을 추가한다.
+# divider = false # 이 단계에 구분선을 추가하지 않는다.
+
+[headings.h2]
+size_percent = 150 # 본문 대비 크기(%).
+weight = 700 # 제목 굵기(CSS font-weight, 1–1000).
+margin_before_px = 28 # 제목 위 바깥 여백(px).
+margin_after_px = 12 # 제목 아래 바깥 여백(px).
+divider = false # 이 단계에 구분선을 추가하지 않는다. true로 바꾸면 1px 구분선 추가.
+
+[headings.h3]
+size_percent = 130 # 본문 대비 크기(%).
+weight = 600 # 제목 굵기(CSS font-weight, 1–1000).
+margin_before_px = 24 # 제목 위 바깥 여백(px).
+margin_after_px = 10 # 제목 아래 바깥 여백(px).
+divider = false # 이 단계에 구분선을 추가하지 않는다. true로 바꾸면 1px 구분선 추가.
+
+[headings.h4]
+size_percent = 115 # 본문 대비 크기(%).
+weight = 600 # 제목 굵기(CSS font-weight, 1–1000).
+margin_before_px = 20 # 제목 위 바깥 여백(px).
+margin_after_px = 8 # 제목 아래 바깥 여백(px).
+divider = false # 이 단계에 구분선을 추가하지 않는다. true로 바꾸면 1px 구분선 추가.
+
+[headings.h5]
+size_percent = 105 # 본문 대비 크기(%).
+weight = 600 # 제목 굵기(CSS font-weight, 1–1000).
+margin_before_px = 16 # 제목 위 바깥 여백(px).
+margin_after_px = 8 # 제목 아래 바깥 여백(px).
+divider = false # 이 단계에 구분선을 추가하지 않는다. true로 바꾸면 1px 구분선 추가.
+
+[headings.h6]
+size_percent = 100 # 본문 대비 크기(%).
+weight = 600 # 제목 굵기(CSS font-weight, 1–1000).
+margin_before_px = 16 # 제목 위 바깥 여백(px).
+margin_after_px = 8 # 제목 아래 바깥 여백(px).
+divider = false # 이 단계에 구분선을 추가하지 않는다. true로 바꾸면 1px 구분선 추가.
+
+# D11: 제목에 자동 번호를 붙이지 않는다. Markdown에 직접 쓴 번호와 개요는 그대로 유지한다.
+
+[links] # D12–D13: 내부·외부 링크의 밑줄과 키보드 포커스. 키를 생략하면 앱 설정 사용.
+internal_underline = true # 일반 내부 링크에 밑줄 표시.
+# internal_underline = false # 일반 내부 링크 밑줄 끄기.
+internal_hover_underline = true # 내부 링크에 마우스를 올렸을 때 밑줄 표시.
+# internal_hover_underline = false # 내부 링크의 호버 밑줄 끄기.
+external_underline = true # 일반 외부 링크에 밑줄 표시.
+# external_underline = false # 일반 외부 링크 밑줄 끄기.
+external_hover_underline = true # 외부 링크에 마우스를 올렸을 때 밑줄 표시.
+# external_hover_underline = false # 외부 링크의 호버 밑줄 끄기.
+keyboard_focus_outline = true # 읽기 뷰의 키보드 포커스에 공통 focus 색 2px 윤곽선과 2px 간격 적용.
+# keyboard_focus_outline = false # 테마 윤곽선을 추가하지 않고 앱 기본 포커스 표시 유지.
+
+[blockquote] # D14: 읽기 뷰의 일반·중첩 인용문. 각 키를 생략하면 해당 항목의 앱 기본값 유지.
+text_role = "quote" # 인용문 글자색. lbrx.toml의 각 모드 roles 이름.
+# text_role = "text" # 변경 예시: 인용문 글자를 일반 본문과 같은 색으로 표시.
+border_role = "quote" # 시작 방향 실선의 색. lbrx.toml의 각 모드 roles 이름.
+# border_role = "muted" # 변경 예시: 시작 방향 실선에 보조 글자색 사용.
+border_width_px = 3 # 시작 방향 실선의 두께(px).
+# border_width_px = 0 # 변경 예시: 시작 방향 실선을 숨김(px).
+padding_start_em = 0.9 # 시작 방향 안쪽 여백(인용문 글자 크기 기준 em).
+# padding_start_em = 0.6 # 변경 예시: 시작 방향 안쪽 여백을 줄임(em).
+
+[colors]
+# 값은 lbrx.toml의 라이트·다크 roles 이름. 키를 생략하면 어댑터 기본 매핑을 사용한다.
+# D15: 읽기 뷰·라이브 프리뷰의 인라인 코드 글자색만 설정. 생략하면 기존 Obsidian 표시 유지.
+"--lbrx-inline-code-color" = "inline_code" # 공통 인라인 코드 역할색. 코드 배경과 최소 4.5:1 대비 필요.
+# "--lbrx-inline-code-color" = "text" # 변경 예시: 인라인 코드를 일반 본문과 같은 색으로 표시.
+# "--link-color" = "function" # 일반 내부 링크의 글자색. 생략하면 공통 link.
+# "--link-color-hover" = "accent" # 내부 링크 호버 색. 생략하면 앱의 호버 색.
+"--link-external-color" = "link" # 외부 링크의 글자색. 내부 노트 링크와는 별개.
+# "--link-external-color" = "function" # 변경 예시: 외부 링크에 함수 역할색을 사용한다.
+# "--link-external-color-hover" = "accent" # 외부 링크 호버 색. 생략하면 앱의 호버 색.
+"--text-muted" = "muted" # 보조 텍스트의 글자색.
+# "--text-muted" = "text" # 변경 예시: 보조 텍스트에 본문과 같은 글자색을 사용한다.
+# D09: H1–H6의 기본색은 모두 공통 heading. 각 줄을 켜면 해당 단계의 색만 바뀐다.
+# "--h1-color" = "accent" # H1 제목에 강조색 사용.
+# "--h2-color" = "accent" # H2 제목에 강조색 사용.
+# "--h3-color" = "accent" # H3 제목에 강조색 사용.
+# "--h4-color" = "accent" # H4 제목에 강조색 사용.
+# "--h5-color" = "accent" # H5 제목에 강조색 사용.
+# "--h6-color" = "accent" # H6 제목에 강조색 사용.
+# "--inline-title-color" = "heading" # 노트 이름으로 표시되는 인라인 제목에 공통 제목색 사용. 생략하면 앱 기본색.
+# "--lbrx-footnote-reference" = "link" # D18: [footnotes] 사용 시 각주 참조 번호에 공통 링크 역할색 사용. 생략하면 function.
+
+[live_preview] # O02: 포커스를 받은 라이브 프리뷰의 편집 표시. 읽기 뷰와 소스 모드는 제외.
+highlight_active_line = true # 활성 줄에 공통 surface 역할을 60% 불투명도의 배경으로 겹쳐 표시.
+# highlight_active_line = false # 변경 예시: 활성 줄은 기존 표시 유지. 위 줄을 대체하거나 키를 생략.
+use_focus_caret = true # 텍스트 입력 커서에 공통 focus 역할색 적용.
+# use_focus_caret = false # 변경 예시: 입력 커서는 기존 색 유지. 위 줄을 대체하거나 키를 생략.
+
+[source_mode] # O03: Markdown 소스 모드의 편집 기호. 읽기 뷰와 라이브 프리뷰는 제외.
+mute_markdown_markers = true # 앱이 Markdown 기호로 식별한 요소에 보조 텍스트색(--text-muted) 적용. 코드 블록·YAML 속성 영역은 제외.
+# mute_markdown_markers = false # 기호는 기존 색을 유지. 위 줄을 대체하거나 키를 생략.
+
+[internal_links] # O04: 읽기 뷰·라이브 프리뷰의 미생성 링크와 노트 임베드. 소스 모드는 제외.
+distinguish_unresolved = true # 미생성 내부 링크에 보조 텍스트색(--text-muted)과 점선 밑줄 적용. 앱의 흐림 효과는 해제.
+# distinguish_unresolved = false # 변경 예시: 미생성 링크를 기존 스타일로 표시. 위 줄을 대체하거나 키를 생략.
+note_embed_border_width_px = 2 # 노트 임베드의 시작 방향 강조선 두께(px). 색은 앱의 테마 강조색(--interactive-accent).
+# note_embed_border_width_px = 0 # 변경 예시: 시작 방향 강조선을 숨김(px). 키를 생략하면 기존 테두리 유지.
+
+[tags_and_properties] # O05: 읽기 뷰·라이브 프리뷰의 본문 태그와 노트 속성. YAML 원문·사이드바는 제외.
+style_inline_tags = true # 본문 태그에 공통 surface 배경과 테마 accent 글자색 적용.
+# style_inline_tags = false # 기존 태그 색을 유지. 위 줄을 대체하거나 키를 생략.
+style_properties = true # 노트 속성 이름에 보조 텍스트색, 편집 포커스에 공통 focus 색 2px 테두리 적용.
+# style_properties = false # 기존 속성 이름색과 포커스 표시를 유지. 위 줄을 대체하거나 키를 생략.
+
+[navigation_sidebar] # O06: 사이드바 탐색 행의 호버·현재/선택·키보드 포커스 표시. 본문과 다른 패널은 제외.
+file_explorer = true # 파일 탐색기에 공통 accent 혼합 배경과 focus 윤곽선 적용.
+# file_explorer = false # 파일 탐색기는 기존 스타일 유지. 위 줄을 대체하거나 키를 생략.
+outline = true # 개요에 공통 accent 혼합 배경과 focus 윤곽선 적용.
+# outline = false # 개요는 기존 스타일 유지. 위 줄을 대체하거나 키를 생략.
+backlinks = true # 백링크 패널 결과에 공통 accent 혼합 배경과 focus 윤곽선 적용.
+# backlinks = false # 백링크 패널은 기존 스타일 유지. 위 줄을 대체하거나 키를 생략.
+
+[workspace] # O07: 작업 공간의 탭·리본·상태 표시줄·분할 경계. 크기와 조작 방식은 변경하지 않음.
+style_active_tabs = true # 활성 탭에 surface 배경, accent 색의 2px 아래 표시선, 굵은 제목을 적용.
+# style_active_tabs = false # 활성 탭은 기존 표시 유지. 위 줄을 대체하거나 키를 생략.
+shade_ribbon = true # 리본이 접혔을 때도 공통 surface 배경을 적용.
+# shade_ribbon = false # 리본의 기존 배경을 유지. 위 줄을 대체하거나 키를 생략.
+shade_status_bar = true # 상태 표시줄에 공통 surface 배경을 적용.
+# shade_status_bar = false # 상태 표시줄의 기존 배경을 유지. 위 줄을 대체하거나 키를 생략.
+style_split_dividers = true # 분할 경계에 surface와 보조 텍스트색(24%)을 섞은 색을 적용.
+# style_split_dividers = false # 분할 경계의 기존 색을 유지. 위 줄을 대체하거나 키를 생략.
+
+[dialogs] # O08: 데스크톱 설정 창과 Obsidian 공용 팔레트·메뉴의 색 및 상태 표시. 키보드 조작은 변경하지 않음.
+style_settings = true # 설정 왼쪽에 surface, 오른쪽·입력에 background 적용. 선택에 accent 표시선, 포커스에 focus 색 2px 윤곽선 사용.
+# style_settings = false # 설정 창의 기존 스타일 유지. 위 줄을 대체하거나 키를 생략.
+style_prompts = true # 명령 팔레트와 같은 공용 창에 background와 surface 적용. 선택에 accent 표시선, 포커스에 focus 색 2px 윤곽선 사용.
+# style_prompts = false # 공용 팔레트의 기존 스타일 유지. 위 줄을 대체하거나 키를 생략.
+style_menus = true # 공용 메뉴에 surface 배경 적용. 선택에 accent 표시선, 기존 포커스 대상에 focus 색 2px 윤곽선 사용.
+# style_menus = false # 공용 메뉴의 기존 스타일 유지. 위 줄을 대체하거나 키를 생략.
+
+[search] # O09: 노트 내 검색과 보관함 검색 결과의 일치 부분. 드래그 선택과 결과 행은 변경하지 않음.
+highlight_note_matches = true # 공통 accent의 16% 배경, 읽기 뷰의 현재 일치에는 30% 배경과 2px 아래 표시선 적용.
+# highlight_note_matches = false # 노트 내 일치의 기존 스타일 유지. 위 줄을 대체하거나 키를 생략.
+highlight_vault_matches = true # 보관함 검색 결과에서 일치한 글자만 공통 accent 18%와 background를 섞어 강조.
+# highlight_vault_matches = false # 보관함 검색의 기존 스타일 유지. 위 줄을 대체하거나 키를 생략.
+
+[graph] # O10: Obsidian 전체·로컬 그래프 공용 색상. 사용자 색상 그룹·물리·필터는 변경하지 않음.
+use_theme_palette = true # 노드·연결선에는 muted(선 불투명도 80%), 레이블에는 text, 강조에는 accent 사용. 태그는 keyword, 첨부는 warning, 미생성 링크는 function(불투명도 85%) 사용.
+# use_theme_palette = false # 두 그래프 모두 기존 팔레트를 유지. 위 줄을 대체하거나 키를 생략.
+
+[canvas] # O11: 캔버스의 기본색과 선택 표시. 사용자 지정색·배치·드래그는 변경하지 않음.
+style_default_colors = true # 기본색 카드에 surface 배경, 기본색 카드·그룹의 테두리와 연결선에 muted 적용.
+# style_default_colors = false # 카드·그룹·연결선의 기본색 유지. 위 줄을 대체하거나 키를 생략.
+highlight_selection = true # 선택·포커스 카드와 그룹에 focus 색 2px 바깥 윤곽선, 선택 영역과 기본색 포커스 연결선에 focus 색 적용.
+# highlight_selection = false # 기존 선택·포커스 표시 유지. 위 줄을 대체하거나 키를 생략.
+
+[bases] # O12: Bases 표와 카드 뷰의 표시. 일반 Markdown 표, 정렬·필터·편집은 변경하지 않음.
+style_table = true # 열 제목에 surface 배경과 굵은 기본 글자색, 앱이 표시하는 셀·행 범위 선택에 accent 22% 배경 적용.
+# style_table = false # Bases 표의 기존 제목·선택 표시 유지. 위 줄을 대체하거나 키를 생략.
+style_cards = true # 카드 바깥에 muted를 섞은 1px 경계선을 적용하고 마우스를 올리면 muted로 강조.
+# style_cards = false # Bases 카드의 기존 경계 표시 유지. 위 줄을 대체하거나 키를 생략.
+
+[mermaid] # O13: 읽기 뷰·라이브 프리뷰의 Mermaid 기본 배색과 화면 가로 넘침. 원문과 문서 지정색은 변경하지 않음.
+use_theme_palette = true # 지원 렌더러의 기본 라벨에 text, 도형 배경에 surface, 선·경계에 muted 적용.
+# use_theme_palette = false # 앱의 기본 배색 유지. 위 줄을 대체하거나 키를 생략.
+scroll_wide_diagrams = true # 화면에서 블록 폭을 넘는 다이어그램만 블록 안에서 가로 스크롤. 앱의 자동 맞춤과 확대는 유지.
+# scroll_wide_diagrams = false # 앱의 기존 넘침 처리 유지. 위 줄을 대체하거나 키를 생략.
+
+[icons] # O14: 데스크톱 리본·노트 상단 버튼의 내장 SVG. 모바일, 아이콘 폰트, OS 앱 아이콘은 제외.
+style_ribbon = true # 리본 버튼에 muted 기본색, text 호버색, accent 활성색, focus 포커스색 적용.
+# style_ribbon = false # 리본 아이콘은 기존 표시 유지. 위 줄을 대체하거나 키를 생략.
+style_note_header = true # 노트 상단 버튼에 같은 상태색 적용. 북마크 활성 표시 유지.
+# style_note_header = false # 노트 상단 아이콘은 기존 표시 유지. 위 줄을 대체하거나 키를 생략.
+# size_px = 18 # 활성화한 범위의 SVG 가로·세로 크기 예시(12~24px). 생략하면 앱 크기 유지.
+# stroke_width = 1.75 # 활성화한 범위의 SVG 선 굵기 예시(1~3, SVG 좌표 단위). 생략하면 앱 굵기 유지.
+
+[mobile] # O15: 모바일 앱의 터치 도구막대·서랍과 휴대폰 본문 여백. 데스크톱과 키보드 레이아웃은 제외.
+style_toolbar = true # 터치 도구막대에 surface 배경과 기본 글자색 적용. 떠 있는 도구막대의 바깥은 투명하게 유지.
+# style_toolbar = false # 터치 도구막대의 기존 색 유지. 위 줄을 대체하거나 키를 생략.
+style_drawers = true # 좌우 서랍에 surface 배경과 기본 글자색 적용.
+# style_drawers = false # 서랍의 기존 색 유지. 위 줄을 대체하거나 키를 생략.
+phone_padding_max_px = 12 # 휴대폰의 읽기 뷰·라이브 프리뷰에서 각 측면의 본문 여백 상한(px). 기기 안전 영역이 더 크면 우선.
+# phone_padding_max_px = 16 # 여백을 더 남기는 예시(px). 위 줄을 대체. 키를 생략하면 상한을 적용하지 않음.
+
+[print] # OX01: Obsidian 인쇄·PDF의 코드와 Markdown 표. 화면 스타일과 용지 설정은 변경하지 않음.
+wrap_code = true # 인쇄에서만 코드의 공백·들여쓰기를 유지하며 긴 줄을 줄바꿈하고 페이지 분할을 허용.
+# wrap_code = false # 인쇄 코드의 기존 줄바꿈과 넘침 처리 유지. 위 줄을 대체하거나 키를 생략.
+paginate_tables = true # 인쇄에서만 Markdown 표 셀의 긴 텍스트를 줄바꿈하고 페이지가 나뉠 때 열 제목 반복을 허용.
+# paginate_tables = false # 인쇄 표의 기존 줄바꿈과 페이지 처리 유지. 위 줄을 대체하거나 키를 생략.
+
+[callouts] # D26: 읽기 뷰·라이브 프리뷰의 지정 유형에 3px 시작 방향 강조선과 제목·아이콘 색을 적용. 섹션을 생략하면 기존 스타일 유지.
+shaded_background = true # 공통 surface 역할을 콜아웃 배경으로 사용.
+# shaded_background = false # 변경 예시: 앱 배경을 유지하고 강조선·제목·아이콘 색만 변경. 위 줄을 대체.
+
+# [callouts.colors] # 아래에서 바꿀 유형만 활성화. 값은 lbrx.toml의 라이트·다크 roles 이름.
+# note = "accent" # NOTE의 강조선·제목·아이콘에 accent 사용. 기본값은 function.
+# tip = "function" # TIP·HINT의 강조선·제목·아이콘에 function 사용. 기본값은 success.
+# important = "accent" # IMPORTANT의 강조선·제목·아이콘에 accent 사용. 기본값은 keyword.
+# warning = "error" # WARNING·ATTENTION의 강조선·제목·아이콘에 error 사용. 기본값은 warning.
+# caution = "warning" # CAUTION의 강조선·제목·아이콘에 warning 사용. 기본값은 error.
+
+[math] # D25: 읽기 뷰의 블록 수식과 화면 가로 스크롤. 섹션을 생략하면 Obsidian 기본값 유지.
+padding_block_px = 12 # 블록 수식의 위아래 각각 안쪽 여백(px).
+# padding_block_px = 8 # 변경 예시: 위아래 여백을 줄임(px). 위 줄을 대체.
+padding_inline_px = 16 # 블록 수식의 좌우 각각 안쪽 여백(px).
+# padding_inline_px = 12 # 변경 예시: 좌우 여백을 줄임(px). 위 줄을 대체.
+shaded_background = true # 공통 surface 역할의 보조 배경색 적용.
+# shaded_background = false # 변경 예시: 추가 배경색 없이 여백과 스크롤만 적용. 위 줄을 대체.
+
+[images] # D24: 읽기 뷰의 독립 이미지·명시적 figcaption. 섹션을 생략하면 Obsidian 기본값 유지.
+alignment = "center" # 이미지 가운데 정렬. 생략해도 가운데 정렬.
+# alignment = "start" # 변경 예시: 문장 시작 방향에 정렬. 위 줄을 대체.
+# alignment = "end" # 변경 예시: 문장 끝 방향에 정렬. 위 줄을 대체.
+caption_size_percent = 90 # 명시적 이미지 캡션의 상위 글자 크기 대비 크기(%). 보조 텍스트색 사용.
+# caption_size_percent = 100 # 변경 예시: 상위 글자와 같은 크기(%). 위 줄을 대체.
+caption_gap_px = 8 # 명시적 캡션 위 간격(px).
+# caption_gap_px = 4 # 변경 예시: 캡션과 이미지의 간격을 줄임(px). 위 줄을 대체.
+
+[task_lists] # D23: 읽기 뷰의 완료 작업만 꾸민다. 섹션을 생략하면 Obsidian 기본값 유지.
+strike_completed = true # 완료 항목의 독립 문단·자식 블록 없는 항목에 취소선 적용. 하위 목록은 제외.
+# strike_completed = false # 변경 예시: 완료 항목의 보조 글자색은 유지하고 취소선은 제거. 위 줄을 대체.
+# checkbox_color = "warning" # 변경 예시: 완료 체크박스에 양쪽 모드에 있는 warning 역할색 사용. 생략하면 accent.
+
+[lists] # D22: 읽기 뷰의 일반 순서·비순서 목록. 섹션을 모두 생략하면 기존 스타일 유지.
+indent_px = 24 # 단계별 목록 항목 시작 방향 들여쓰기(px). 작업 목록은 제외.
+# indent_px = 20 # 변경 예시: 단계별 들여쓰기를 줄임(px). 위 줄을 대체.
+item_gap_px = 4 # 같은 단계에서 연달아 오는 일반 항목 사이의 추가 위쪽 여백(px).
+# item_gap_px = 0 # 변경 예시: 추가 간격을 없앰(px). 위 줄을 대체.
+
+[lists.markers] # D22: 읽기 뷰의 비순서 글머리표. disc(●), circle(○), square(■) 중 선택. 이 하위 섹션을 생략하면 앱 글머리표 유지.
+level_1 = "disc" # 1단계 글머리표는 채운 원(●).
+# level_1 = "square" # 변경 예시: 1단계에 채운 사각형(■) 사용. 위 줄을 대체.
+level_2 = "circle" # 2단계 글머리표는 빈 원(○).
+# level_2 = "disc" # 변경 예시: 2단계에 채운 원(●) 사용. 위 줄을 대체.
+level_3 = "square" # 3단계 이상 글머리표는 채운 사각형(■).
+# level_3 = "circle" # 변경 예시: 3단계 이상에 빈 원(○) 사용. 위 줄을 대체.
+
+[emphasis.light] # D17: 읽기 뷰·라이브 프리뷰의 라이트 강조(#RRGGBB). 끄려면 light·dark 표를 모두 제거하거나 주석 처리.
+strong = "#A34768" # 굵은 글자의 스타일 주 강조색(#RRGGBB).
+# strong = "#A34768" # 굵은 글자의 스타일 주 강조색(#RRGGBB).
+italic = "#426B8D" # 기울임 글자의 스타일 보조 강조색(#RRGGBB).
+strikethrough = "#70535F" # 취소선 글자와 선의 보조 글자색(#RRGGBB).
+highlight_background = "#F5E5EB" # 형광펜 배경색(#RRGGBB). 글자 대비 확보, 드래그 선택과 별개.
+# highlight_background = "#F5E5EB" # 형광펜 배경색(#RRGGBB). 글자 대비 확보, 드래그 선택과 별개.
+
+[emphasis.dark] # D17: 읽기 뷰·라이브 프리뷰의 다크 강조(#RRGGBB). 코드·소스 모드는 제외.
+strong = "#F0ADC5" # 굵은 글자의 스타일 주 강조색(#RRGGBB).
+# strong = "#F0ADC5" # 굵은 글자의 스타일 주 강조색(#RRGGBB).
+italic = "#A9CCE8" # 기울임 글자의 스타일 보조 강조색(#RRGGBB).
+strikethrough = "#C2AAB6" # 취소선 글자와 선의 보조 글자색(#RRGGBB).
+highlight_background = "#3D303A" # 형광펜 배경색(#RRGGBB). 글자 대비 확보, 드래그 선택과 별개.
+# highlight_background = "#3D303A" # 형광펜 배경색(#RRGGBB). 글자 대비 확보, 드래그 선택과 별개.
+
+[footnotes] # D18: 읽기 뷰의 각주 글자와 참조 번호. 표를 생략하면 기존 표시 유지.
+body_size_percent = 90 # 각주 본문의 상위 글자 크기 대비 크기(%). 글자색은 보조 텍스트색.
+# body_size_percent = 100 # 변경 예시: 본문과 같은 크기(%). 위 줄을 대체.
+
+[horizontal_rule] # D18: 읽기 뷰의 Markdown 수평선. 각주의 자동 구분선 제외. 표를 생략하면 기존 표시 유지.
+thickness_px = 1 # 수평선 두께(px). 색은 보조 텍스트색.
+# thickness_px = 2 # 변경 예시: 수평선 두께를 2px로 변경. 위 줄을 대체.
+margin_block_px = 24 # 수평선 위아래 각각의 바깥 여백(px).
+# margin_block_px = 16 # 변경 예시: 위아래 각각 16px로 여백을 줄임. 위 줄을 대체.
+
+[table] # D21: 읽기 뷰의 Markdown 표. 헤더는 공통 surface 배경과 굵은 글씨. 섹션을 생략하면 기존 스타일 유지.
+cell_padding_block_px = 8 # 셀 위아래 각각의 안쪽 여백(px).
+# cell_padding_block_px = 4 # 변경 예시: 위아래 여백을 줄임(px). 위 줄을 대체.
+cell_padding_inline_px = 12 # 셀 좌우 각각의 안쪽 여백(px).
+# cell_padding_inline_px = 8 # 변경 예시: 좌우 여백을 줄임(px). 위 줄을 대체.
+row_rule_px = 1 # 행 아래 가로선 두께(px). 보조 텍스트색(--text-muted)을 사용.
+# row_rule_px = 2 # 변경 예시: 행 구분선을 더 굵게 표시(px). 위 줄을 대체.

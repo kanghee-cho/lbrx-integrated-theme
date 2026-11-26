@@ -1,0 +1,39 @@
+# 전체 언어의 기본 구문색. 값은 lbrx.toml의 라이트·다크 roles 이름.
+# 개별 언어 파일에 같은 토큰이 있으면 그 값이 우선한다.
+[tokens]
+comment = "comment" # 코드 주석.
+keyword = "keyword" # 언어 예약어·키워드.
+string = "string" # 문자열 리터럴.
+function = "function" # 함수명으로 식별된 토큰.
+number = "number" # 숫자 리터럴.
+error = "error" # 문법이 식별한 오류 토큰. 진단 밑줄과는 별개.
+"keyword.control" = "keyword" # 분기·반복·반환.
+"keyword.declaration" = "syntax_declaration" # 선언·접근 제어.
+"string.escape" = "syntax_escape" # 이스케이프·보간 경계·정규식.
+"constant.builtin" = "syntax_builtin" # 불리언·널·내장 상수.
+"function.macro" = "syntax_macro" # 매크로·특수 함수.
+type = "syntax_type" # 자료형과 타입 매개변수.
+variable = "text" # 일반 식별자.
+"variable.parameter" = "syntax_parameter" # 매개변수.
+property = "syntax_property" # 객체 속성·설정 키.
+operator = "syntax_operator" # 연산자.
+attribute = "syntax_attribute" # 데코레이터·메타정보.
+punctuation = "syntax_punctuation" # 괄호·구분자.
+
+[styles] # 색과 독립적으로 적용. 지원 값: normal, bold, italic.
+"keyword.control" = "bold" # 실행 흐름.
+"keyword.declaration" = "bold" # 선언.
+string = "normal" # 일반 문자열.
+"string.escape" = "bold" # 문자열 안 특수 구문.
+number = "normal" # 숫자.
+"constant.builtin" = "bold" # 내장 리터럴.
+function = "normal" # 함수.
+"function.macro" = "bold" # 매크로.
+type = "bold" # 자료형.
+variable = "normal" # 일반 변수.
+"variable.parameter" = "italic" # 매개변수.
+property = "normal" # 키·속성.
+operator = "normal" # 연산자.
+attribute = "italic" # 메타정보.
+comment = "italic" # 주석.
+punctuation = "normal" # 구분 기호.

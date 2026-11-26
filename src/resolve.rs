@@ -517,7 +517,7 @@ mod tests {
     fn sample() -> Theme {
         toml::from_str(include_str!(concat!(
             env!("CARGO_MANIFEST_DIR"),
-            "/themes/orange-type/lbrx.toml"
+            "/tests/fixtures/lbrx.toml"
         )))
         .unwrap()
     }

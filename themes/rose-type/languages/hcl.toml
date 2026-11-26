@@ -1,0 +1,5 @@
+# HCL/Terraform: 블록 레이블과 속성명을 분리한다.
+[tokens]
+"keyword.declaration" = "syntax_declaration" # 문법이 구분한 블록 시작.
+property = "syntax_property" # 설정 속성명.
+"string.escape" = "syntax_escape" # 템플릿 보간과 지시 경계.

@@ -1,0 +1,5 @@
+# Ruby: 심볼은 문법이 속성 키로 구분할 때만 property를 적용한다.
+[tokens]
+property = "syntax_property" # 해시 키·속성.
+"string.escape" = "syntax_escape" # 이스케이프와 보간 경계.
+"constant.builtin" = "syntax_builtin" # nil·true·false.

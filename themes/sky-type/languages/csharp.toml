@@ -1,0 +1,6 @@
+# C#: 타입·어트리뷰트·전처리기와 문자열 보간을 구분한다.
+[tokens]
+type = "syntax_type" # 내장·사용자 정의 타입.
+attribute = "syntax_attribute" # 어트리뷰트 및 전처리기.
+"string.escape" = "syntax_escape" # 이스케이프와 보간 경계.
+"keyword.declaration" = "syntax_declaration" # 접근 제어 및 선언.

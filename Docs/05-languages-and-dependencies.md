@@ -7,7 +7,7 @@ Rust 의존성은 [Cargo.toml](../Cargo.toml)의 버전 요구식과 [Cargo.lock
 | 구분 | 언어 / 형식 | 사용 범위와 기준 |
 |---|---|---|
 | 프로그램 | Rust, Edition 2024 | CLI, 토큰 검증, 앱별 변환을 단일 Cargo 패키지로 구현한다. 최소 Rust 버전 목표는 `1.85.0`이다. |
-| 테마 원본 | TOML | `themes\orange-type\lbrx.toml`의 팔레트·역할·서체·옵션. 원본 계약은 `schema_version = 1`부터 시작하며 TOML 라이브러리 버전과 별개다. |
+| 테마 원본 | TOML | `themes\lavender-type\lbrx.toml`의 팔레트·역할·서체·옵션. 원본 계약은 `schema_version = 1`부터 시작하며 TOML 라이브러리 버전과 별개다. |
 | 문서형 앱 출력 | CSS | Typora와 Obsidian 테마. 대상 앱에서 확인한 선택자·속성만 사용한다. 별도 Sass·PostCSS 빌드는 두지 않는다. |
 | 구조화된 출력 | JSON / TOML | VS Code 테마·manifest와 Windows Terminal 설정 조각은 JSON, Helix 테마 및 편집기·언어 설정은 TOML로 생성한다. |
 | Vim 출력 | Vim script | 터미널 Vim 색상 정의만 생성한다. Vim9 전용 문법이나 Neovim Lua를 전제로 하지 않는다. |

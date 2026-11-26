@@ -1,0 +1,159 @@
+# LBRX Rose Slate: 이 파일의 앱 전용 설정. 공통 색은 ../lbrx.toml 참조.
+# Helix 테마와 편집기·언어 설정. 테마 색은 lbrx.toml의 역할 이름 또는 터미널 기본색 "default".
+# [colors]는 기존 줄 번호 전경색 설정. [styles]에서 같은 항목을 지정하면 [styles]가 우선한다.
+[colors]
+"ui.linenr" = "muted" # 일반 줄 번호의 글자색.
+"ui.linenr.selected" = "text" # 커서가 놓인 줄 번호의 글자색.
+
+# ── config.toml: 편집기 동작·키맵 ──
+# 시작 테마·줄 번호·현재 줄 강조는 앱 기본값 유지로 결정했다.
+# 아래 값은 비활성 예시다. 필요한 표와 값만 함께 주석 해제한다.
+# [config]
+# theme = "lbrx_dark" # 시작 테마. "lbrx_light" 또는 내장 테마 "tokyonight", "catppuccin_mocha", "gruvbox", "nord"도 선택 가능.
+# [config.editor]
+# line-number = "relative" # 상대 줄 번호. absolute는 절대 줄 번호.
+# mouse = true # 마우스로 커서 이동·선택 허용. false는 끄기.
+# scrolloff = 5 # 스크롤 시 커서 위아래에 유지할 화면 여백(줄).
+# rulers = [80, 120] # 80열과 120열에 세로 안내선 표시. []는 표시하지 않음.
+# cursorline = true # 현재 줄 강조 사용. false는 끄기.
+# cursorcolumn = true # 현재 열 강조 표시.
+# true-color = true # 터미널이 24비트 색상을 지원하지만 자동 감지에 실패할 때 강제 사용.
+# bufferline = "multiple" # 버퍼가 여러 개일 때만 버퍼줄 표시. always 또는 never도 선택 가능.
+# color-modes = true # 상태줄의 모드 표시기에 모드별 색을 적용. HEX 색상 미리보기 기능은 아님.
+#
+# [config.editor.auto-save]
+# focus-lost = false # Helix가 포커스를 잃을 때 자동 저장할지 설정.
+# [config.editor.auto-save.after-delay]
+# enable = false # 마지막 편집 후 일정 시간이 지나면 자동 저장할지 설정.
+# timeout = 3000 # 지연 자동 저장을 켰을 때 마지막 편집 이후 대기 시간(ms).
+#
+# [config.editor.soft-wrap]
+# enable = true # 화면 너비에 맞춰 표시만 줄바꿈. 파일에 새 줄을 넣지 않음.
+#
+# [config.editor.cursor-shape]
+# insert = "bar" # 삽입 모드 커서는 세로 막대.
+# normal = "block" # 일반 모드 커서는 블록.
+# select = "underline" # 선택 모드 커서는 밑줄.
+#
+# [config.editor.whitespace.render]
+# space = "all" # 공백을 모두 표시.
+# tab = "all" # 탭을 모두 표시.
+# newline = "none" # 줄바꿈 문자는 표시하지 않음.
+#
+# [config.editor.indent-guides]
+# render = true # 들여쓰기 안내선 표시.
+# character = "╎" # 안내선에 사용할 문자.
+#
+# [config.editor.statusline]
+# left = ["mode", "spinner", "file-name", "read-only-indicator", "file-modification-indicator"] # 왼쪽: 모드, 작업 표시, 파일명, 읽기 전용·수정 상태.
+# center = [] # 가운데에 표시할 항목 없음.
+# right = ["diagnostics", "selections", "position", "file-encoding", "file-line-ending", "file-type"] # 오른쪽: 진단, 선택 수, 위치, 인코딩, 줄 끝 형식, 파일 유형.
+#
+# [config.editor.lsp]
+# display-inlay-hints = true # 언어 서버가 제공하는 인레이 힌트 표시.
+# display-messages = true # 언어 서버의 window/showMessage 알림을 상태줄 아래에 표시.
+#
+# [config.keys.normal]
+# esc = ["collapse_selection", "keep_primary_selection"] # 일반 모드에서 Esc 한 번으로 선택을 축소하고 주 선택만 남김.
+# C-s = ":w" # 일반 모드에서 Ctrl+S로 현재 파일 저장.
+#
+# [config.keys.insert]
+# j = { k = "normal_mode" } # 삽입 모드에서 j → k를 입력하면 일반 모드로 전환.
+
+# ── languages.toml: Helix 기본값에 대한 수동 재정의 ──
+# 등록 언어의 들여쓰기·주석 기호는 Helix 25.07 기준으로 자동 출력한다.
+# 언어별 값을 바꾸려면 [[languages.language]]를 반복한다. name은 Helix의 언어 이름.
+[[languages.language]]
+name = "rust" # 설정을 덮어쓸 기존 언어 이름.
+auto-format = true
+
+[[languages.language]]
+name = "python"
+auto-format = true
+indent = { tab-width = 4, unit = "    " }
+# language-servers = ["pyright", "ruff"]  # ruff나 pyright 등 사용할 LSP 지정
+
+[styles]
+# Docs/17-helix-options.md의 공통·합일 후보·Helix 전용 스코프를 지정할 수 있다. 예시는 기본 비활성.
+# fg/bg: 전경/배경. underline.color: 밑줄 역할, underline.style: line, curl, dashed, dotted, double_line.
+# modifiers: bold, dim, italic, slow_blink, rapid_blink, reversed, hidden, crossed_out. []는 스타일 목록을 비운다.
+# "type.builtin" = { fg = "syntax_type", modifiers = ["bold"] } # 기본 자료형.
+# "variable.other.member" = { fg = "syntax_property" } # 객체 멤버와 필드.
+# "keyword.control.return" = { fg = "keyword", modifiers = ["bold"] } # 반환 키워드.
+# "markup.heading.1" = { fg = "heading", modifiers = ["bold"] } # Markdown 1단계 제목.
+# "markup.link.url" = { underline = { color = "link", style = "line" } } # 링크 전경을 유지하고 밑줄 추가.
+# "diff.plus.gutter" = { fg = "success" } # 추가 줄의 거터 표식.
+# "diff.minus.gutter" = { fg = "error" } # 삭제 줄의 거터 표식.
+# "diff.delta.gutter" = { fg = "warning" } # 변경 줄의 거터 표식.
+# "ui.linenr.selected" = { fg = "focus", modifiers = ["bold"] } # 현재 줄 번호 강조.
+# "ui.selection.primary" = { fg = "selection_text", bg = "selection_background" } # 주 선택 영역.
+# "diagnostic.warning" = { underline = { color = "warning", style = "curl" } } # 경고 밑줄.
+
+# Helix 전용 예시
+# 자동완성 및 호버 문서
+# "markup.normal.completion" = { fg = "text" } # 자동완성 문서의 본문.
+# "markup.normal.hover" = { fg = "text" } # 호버 문서의 본문.
+# "markup.heading.completion" = { modifiers = ["bold"] } # 자동완성 문서의 제목.
+# "markup.heading.hover" = { modifiers = ["bold"] } # 호버 문서의 제목.
+# "markup.raw.inline.completion" = { fg = "inline_code" } # 자동완성 문서의 인라인 코드.
+# "markup.raw.inline.hover" = { fg = "inline_code" } # 호버 문서의 인라인 코드.
+
+# 편집 영역, 커서, 디버거 및 거터
+# "ui.background.separator" = { fg = "muted" } # 분할 창의 배경 구분선.
+# "ui.cursor.normal" = { bg = "focus" } # 일반 모드의 커서.
+# "ui.cursor.insert" = { bg = "success" } # 삽입 모드의 커서.
+# "ui.cursor.select" = { bg = "keyword" } # 선택 모드의 커서.
+# "ui.cursor.match" = { fg = "focus", modifiers = ["bold"] } # 커서와 짝을 이루는 괄호.
+# "ui.cursor.primary.normal" = { bg = "focus" } # 일반 모드의 주 커서.
+# "ui.cursor.primary.insert" = { bg = "success" } # 삽입 모드의 주 커서.
+# "ui.cursor.primary.select" = { bg = "keyword" } # 선택 모드의 주 커서.
+# "ui.debug.breakpoint" = { fg = "error" } # 디버거 중단점 표식.
+# "ui.debug.active" = { fg = "warning", modifiers = ["bold"] } # 현재 디버깅 위치 표식.
+# "ui.gutter" = { bg = "surface" } # 편집 영역 왼쪽 거터의 배경.
+# "ui.gutter.selected" = { bg = "selection_background" } # 커서 줄에 해당하는 거터의 배경.
+
+# 상태줄, 버퍼줄, 팝업 및 파일 선택기
+# "ui.statusline.normal" = { fg = "focus" } # 상태줄의 일반 모드 표시.
+# "ui.statusline.insert" = { fg = "success", modifiers = ["bold"] } # 상태줄의 삽입 모드 표시.
+# "ui.statusline.select" = { fg = "keyword", modifiers = ["bold"] } # 상태줄의 선택 모드 표시.
+# "ui.statusline.separator" = { fg = "muted" } # 상태줄의 구분 기호.
+# "ui.bufferline" = { fg = "muted", bg = "surface" } # 비활성 버퍼 항목.
+# "ui.bufferline.active" = { fg = "text", bg = "selection_background", modifiers = ["bold"] } # 현재 버퍼 항목.
+# "ui.bufferline.background" = { bg = "surface" } # 버퍼줄의 배경.
+# "ui.popup.info" = { fg = "text", bg = "surface" } # 정보 팝업.
+# "ui.picker.header" = { fg = "muted", bg = "surface" } # 선택기 머리글 영역.
+# "ui.picker.header.column" = { fg = "text" } # 선택기 열 제목.
+# "ui.picker.header.column.active" = { fg = "focus", modifiers = ["bold"] } # 선택기의 활성 열 제목.
+# "ui.window" = { fg = "muted" } # 창 사이 경계선.
+# "ui.help" = { fg = "text", bg = "surface" } # 명령·키 입력 안내 영역.
+# "ui.text.focus" = { fg = "focus", modifiers = ["bold"] } # 포커스를 받은 UI 텍스트.
+# "ui.text.inactive" = { fg = "muted" } # 비활성 UI 텍스트.
+# "ui.text.info" = { fg = "function" } # 정보 메시지 텍스트.
+# "ui.text.directory" = { fg = "link" } # 선택기에서 디렉터리 이름.
+# "ui.menu.scroll" = { fg = "muted", bg = "surface" } # 메뉴 스크롤바의 손잡이와 배경.
+
+# 가상 문자 및 편집기 위치 강조
+# "ui.virtual.ruler" = { bg = "surface" } # 열 너비 안내선.
+# "ui.virtual.whitespace" = { fg = "muted" } # 공백·탭·줄바꿈 표시 문자.
+# "ui.virtual.indent-guide" = { fg = "muted" } # 들여쓰기 안내선.
+# "ui.virtual.inlay-hint" = { fg = "muted" } # LSP 인레이 힌트의 기본색.
+# "ui.virtual.inlay-hint.parameter" = { fg = "syntax_parameter" } # 인레이 매개변수명 힌트.
+# "ui.virtual.inlay-hint.type" = { fg = "syntax_type" } # 인레이 자료형 힌트.
+# "ui.virtual.wrap" = { fg = "muted" } # 소프트 줄바꿈 표식.
+# "ui.virtual.jump-label" = { fg = "background", bg = "focus", modifiers = ["bold"] } # 점프 명령의 대상 레이블.
+# "ui.highlight" = { bg = "selection_background" } # 선택기의 미리 보기 등에서 강조된 항목.
+# "ui.highlight.frameline" = { bg = "selection_background" } # 디버거가 보여 주는 실행 프레임의 줄.
+# "ui.cursorline.primary" = { bg = "surface" } # 주 커서가 있는 줄.
+# "ui.cursorline.secondary" = { bg = "surface" } # 보조 커서가 있는 줄.
+# "ui.cursorcolumn.primary" = { bg = "surface" } # 주 커서가 있는 열.
+# "ui.cursorcolumn.secondary" = { bg = "surface" } # 보조 커서가 있는 열.
+
+# 진단과 스니펫
+# "info" = { fg = "function" } # 정보 등급 메시지·표식.
+# "hint" = { fg = "muted" } # 힌트 등급 메시지·표식.
+# "diagnostic" = { underline = { color = "muted", style = "curl" } } # 진단 밑줄의 기본 스타일.
+# "diagnostic.hint" = { underline = { color = "muted", style = "dotted" } } # 힌트 진단 범위.
+# "diagnostic.info" = { underline = { color = "function", style = "line" } } # 정보 진단 범위.
+# "diagnostic.unnecessary" = { modifiers = ["dim"] } # 불필요 코드로 분류된 범위.
+# "diagnostic.deprecated" = { modifiers = ["crossed_out"] } # 사용이 권장되지 않는 API 등의 범위.
+# "tabstop" = { bg = "selection_background" } # 스니펫 탭 이동 대상.

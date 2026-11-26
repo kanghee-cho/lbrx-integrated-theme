@@ -1,0 +1,5 @@
+# Julia: @ 매크로와 일반 함수, 타입 표시와 값을 구분한다.
+[tokens]
+"function.macro" = "syntax_macro" # 분류된 매크로 이름.
+type = "syntax_type" # 타입.
+"string.escape" = "syntax_escape" # 보간 경계와 이스케이프.

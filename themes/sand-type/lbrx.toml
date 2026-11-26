@@ -1,0 +1,198 @@
+# LBRX Sand Petrol: 글꼴, 모드별 색상 팔레트, 역할, 터미널 ANSI 슬롯.
+# 샌드와 페트롤 블루의 차분한 종이·서재 배색. ANSI·오류·경고·성공의 의미는 유지한다.
+# 팔레트 또는 역할 키를 추가할 때는 라이트·다크 양쪽에 둔다.
+schema_version = 1 # 원본 형식 버전. 현재는 1만 지원.
+
+[typography.prose] # 본문용 글꼴
+families = ["LINE Seed Sans", "LINE Seed Sans KR", "LINE Seed JP_TTF", "sans-serif"] # 왼쪽부터 글리프 폴백, 마지막은 일반 글꼴 계열.
+size_px = 16 # 본문 글자 크기(px).
+line_height = 1.65 # 본문 줄 높이. 글자 크기에 곱하는 배율(단위 없음).
+
+[typography.mono] # 코드·고정폭 글꼴
+families = ["D2Coding ligature", "monospace"] # 코드 글꼴 우선순위. 마지막은 일반 고정폭 계열.
+size_px = 14 # 코드 글자 크기(px). 일부 앱은 다른 단위로 변환.
+line_height = 1.45 # 코드 줄 높이. 글자 크기에 곱하는 배율(단위 없음).
+
+[light.palette] # 라이트 실제 색상. 각 값은 #RRGGBB 문자열.
+accent = "#286B73" # 스타일 주 강조·링크·포커스 색(불투명 sRGB #RRGGBB).
+paper = "#F8F4EB" # 문서·편집기·터미널 기본 배경(불투명 sRGB #RRGGBB).
+ink = "#343830" # 본문·편집기·터미널 기본 글자색(불투명 sRGB #RRGGBB).
+pine = "#246958" # 성공 상태·ANSI 초록의 의미색. UI 강조와 분리.
+muted = "#5E6153" # 보조 글자·주석·줄 번호 색(불투명 sRGB #RRGGBB).
+slate = "#865B34" # 스타일 보조 강조·문자열 색(불투명 sRGB #RRGGBB).
+plum = "#286B73" # 키워드·인라인 코드 색(불투명 sRGB #RRGGBB).
+ochre = "#815919" # 숫자·경고 등에 쓰는 황토색.
+clay = "#A44540" # 오류 등에 쓰는 적갈색.
+surface = "#EDE7D9" # 패널·사이드바·코드 블록 배경(불투명 sRGB #RRGGBB).
+syntax_declaration = "#286B73" # 구문 토큰 색(불투명 sRGB #RRGGBB).
+syntax_escape = "#865B34" # 구문 토큰 색(불투명 sRGB #RRGGBB).
+syntax_builtin = "#795814" # 구문 토큰 색(불투명 sRGB #RRGGBB).
+syntax_macro = "#286B73" # 구문 토큰 색(불투명 sRGB #RRGGBB).
+syntax_type = "#865B34" # 구문 토큰 색(불투명 sRGB #RRGGBB).
+syntax_parameter = "#865B34" # 구문 토큰 색(불투명 sRGB #RRGGBB).
+syntax_property = "#865B34" # 구문 토큰 색(불투명 sRGB #RRGGBB).
+syntax_operator = "#5E6153" # 구문 토큰 색(불투명 sRGB #RRGGBB).
+syntax_attribute = "#865B34" # 구문 토큰 색(불투명 sRGB #RRGGBB).
+syntax_punctuation = "#5E6153" # 구문 토큰 색(불투명 sRGB #RRGGBB).
+selection = "#D3E3E0" # 코드·UI 선택 배경(불투명 sRGB #RRGGBB).
+prose_selection = "#EADCC5" # 일반 본문 선택 배경(불투명 sRGB #RRGGBB).
+ansi_blue = "#245E8A" # ANSI 4 파랑 전경. 스타일 보조 강조와 분리.
+ansi_magenta = "#805074" # ANSI 5 마젠타 전경. 스타일 키워드와 분리.
+ansi_black = "#343830" # 터미널 ANSI 전경색(불투명 sRGB #RRGGBB).
+ansi_cyan = "#28646A" # 일반 ANSI 시안.
+ansi_white = "#5E6153" # 터미널 ANSI 전경색(불투명 sRGB #RRGGBB).
+ansi_bright_black = "#5E6153" # 터미널 ANSI 전경색(불투명 sRGB #RRGGBB).
+ansi_bright_red = "#B44C3B" # ANSI 9 빨강. 기본 배경 대비 4.5:1 이상.
+ansi_bright_green = "#39734D" # ANSI 10 초록. 기본 배경 대비 4.5:1 이상.
+ansi_bright_yellow = "#876419" # ANSI 11 노랑. 라이트에서는 황토색으로 대비 확보.
+ansi_bright_blue = "#3274A5" # ANSI 12 파랑. 기본 배경 대비 4.5:1 이상.
+ansi_bright_magenta = "#8F5E85" # ANSI 13 마젠타. 기본 배경 대비 4.5:1 이상.
+ansi_bright_cyan = "#307889" # ANSI 14 시안. 기본 배경 대비 4.5:1 이상.
+ansi_bright_white = "#343830" # 터미널 ANSI 전경색(불투명 sRGB #RRGGBB).
+
+[light.roles] # 라이트의 용도별 색상. 오른쪽은 light.palette 키.
+background = "paper" # 문서·편집기의 기본 배경.
+code_block_background = "surface" # Typora·Obsidian의 여러 줄 코드 블록 바탕. 인라인 코드와 편집기 전체 배경은 제외.
+surface = "surface" # 패널·사이드바 등의 보조 배경.
+text = "ink" # 본문·편집기의 기본 글자색.
+accent = "accent" # 앱 UI의 기본 강조색.
+muted = "muted" # 보조 텍스트·줄 번호 등에 쓰는 색.
+focus = "accent" # 포커스 경계 등의 강조색.
+selection_text = "ink" # 선택 영역 안의 글자색.
+selection_background = "selection" # 선택 영역의 배경색.
+prose_selection_background = "prose_selection" # Typora·Obsidian 일반 본문 선택 배경. 코드 선택에는 적용하지 않음.
+heading = "ink" # 문서 제목·헤딩 색.
+link = "accent" # 링크 글자색.
+quote = "muted" # 인용문 글자색.
+inline_code = "plum" # 문단 안 인라인 코드 글자색.
+comment = "muted" # 코드 주석의 기본 역할색.
+string = "slate" # 문자열 리터럴의 스타일 보조 강조색.
+keyword = "plum" # 언어 키워드의 기본 역할색.
+function = "slate" # 함수명 토큰의 기본 역할색.
+number = "ochre" # 숫자 리터럴의 기본 역할색.
+syntax_declaration = "syntax_declaration" # 선언 키워드.
+syntax_escape = "syntax_escape" # 이스케이프·보간 경계.
+syntax_builtin = "syntax_builtin" # 내장 리터럴.
+syntax_macro = "syntax_macro" # 매크로·특수 호출.
+syntax_type = "syntax_type" # 자료형.
+syntax_parameter = "syntax_parameter" # 매개변수.
+syntax_property = "syntax_property" # 속성·키.
+syntax_operator = "syntax_operator" # 연산자.
+syntax_attribute = "syntax_attribute" # 어노테이션·속성명.
+syntax_punctuation = "syntax_punctuation" # 구분 기호.
+error = "clay" # 오류 상태 및 오류 토큰에 사용할 색.
+warning = "ochre" # 경고 상태·진단에 사용할 색.
+success = "pine" # 성공 상태에 사용할 색.
+terminal_foreground = "ink" # 터미널의 기본 글자색.
+terminal_background = "paper" # 터미널의 기본 배경색.
+terminal_cursor = "accent" # 터미널 커서색.
+
+[light.ansi] # 라이트 터미널의 필수 ANSI 16색. 오른쪽은 light.palette 키.
+0 = "ansi_black" # 일반 검정.
+1 = "clay" # 일반 빨강.
+2 = "pine" # 일반 초록.
+3 = "ochre" # 일반 노랑.
+4 = "ansi_blue" # 일반 파랑. 같은 모드의 palette.ansi_blue 참조.
+5 = "ansi_magenta" # 일반 마젠타. 같은 모드의 palette.ansi_magenta 참조.
+6 = "ansi_cyan" # 일반 시안.
+7 = "ansi_white" # 일반 흰색.
+8 = "ansi_bright_black" # 밝은 검정.
+9 = "ansi_bright_red" # 밝은 빨강.
+10 = "ansi_bright_green" # 밝은 초록.
+11 = "ansi_bright_yellow" # 밝은 노랑.
+12 = "ansi_bright_blue" # 밝은 파랑.
+13 = "ansi_bright_magenta" # 밝은 마젠타.
+14 = "ansi_bright_cyan" # 밝은 시안.
+15 = "ansi_bright_white" # 밝은 흰색.
+
+[dark.palette] # 다크 실제 색상. 각 값은 #RRGGBB 문자열.
+accent = "#9CD2D6" # 스타일 주 강조·링크·포커스 색(불투명 sRGB #RRGGBB).
+paper = "#242B2D" # 문서·편집기·터미널 기본 배경(불투명 sRGB #RRGGBB).
+ink = "#E8E6DD" # 본문·편집기·터미널 기본 글자색(불투명 sRGB #RRGGBB).
+pine = "#84C7AC" # 성공 상태·ANSI 초록의 밝은 의미색. UI 강조와 분리.
+muted = "#B8BCAF" # 보조 글자·주석·줄 번호 색(불투명 sRGB #RRGGBB).
+slate = "#DDB58C" # 스타일 보조 강조·문자열 색(불투명 sRGB #RRGGBB).
+plum = "#9CD2D6" # 키워드·인라인 코드 색(불투명 sRGB #RRGGBB).
+ochre = "#D6B378" # 숫자·경고 등에 쓰는 밝은 황토색.
+clay = "#E59E91" # 오류 등에 쓰는 옅은 적갈색.
+surface = "#303B3D" # 패널·사이드바·코드 블록 배경(불투명 sRGB #RRGGBB).
+syntax_declaration = "#9CD2D6" # 구문 토큰 색(불투명 sRGB #RRGGBB).
+syntax_escape = "#DDB58C" # 구문 토큰 색(불투명 sRGB #RRGGBB).
+syntax_builtin = "#E2C080" # 구문 토큰 색(불투명 sRGB #RRGGBB).
+syntax_macro = "#9CD2D6" # 구문 토큰 색(불투명 sRGB #RRGGBB).
+syntax_type = "#DDB58C" # 구문 토큰 색(불투명 sRGB #RRGGBB).
+syntax_parameter = "#DDB58C" # 구문 토큰 색(불투명 sRGB #RRGGBB).
+syntax_property = "#DDB58C" # 구문 토큰 색(불투명 sRGB #RRGGBB).
+syntax_operator = "#B8BCAF" # 구문 토큰 색(불투명 sRGB #RRGGBB).
+syntax_attribute = "#DDB58C" # 구문 토큰 색(불투명 sRGB #RRGGBB).
+syntax_punctuation = "#B8BCAF" # 구문 토큰 색(불투명 sRGB #RRGGBB).
+selection = "#365356" # 코드·UI 선택 배경(불투명 sRGB #RRGGBB).
+prose_selection = "#514535" # 일반 본문 선택 배경(불투명 sRGB #RRGGBB).
+ansi_blue = "#B4D9F5" # ANSI 4 파랑 전경. 스타일 보조 강조와 분리.
+ansi_magenta = "#D5A6CD" # ANSI 5 마젠타 전경. 스타일 키워드와 분리.
+ansi_black = "#B8BCAF" # 터미널 ANSI 전경색(불투명 sRGB #RRGGBB).
+ansi_cyan = "#7DC5C9" # 일반 ANSI 시안.
+ansi_white = "#E8E6DD" # 터미널 ANSI 전경색(불투명 sRGB #RRGGBB).
+ansi_bright_black = "#B8BCAF" # 터미널 ANSI 전경색(불투명 sRGB #RRGGBB).
+ansi_bright_red = "#F8B4A7" # 밝은 ANSI 빨강.
+ansi_bright_green = "#A2E3C6" # 밝은 ANSI 초록.
+ansi_bright_yellow = "#F0CC90" # 밝은 ANSI 노랑.
+ansi_bright_blue = "#B1D0EE" # 밝은 ANSI 파랑.
+ansi_bright_magenta = "#EABED5" # 밝은 ANSI 마젠타.
+ansi_bright_cyan = "#A0E2E5" # 밝은 ANSI 시안.
+ansi_bright_white = "#E8E6DD" # 터미널 ANSI 전경색(불투명 sRGB #RRGGBB).
+
+[dark.roles] # 다크의 용도별 색상. 오른쪽은 dark.palette 키.
+syntax_declaration = "syntax_declaration" # 선언 키워드.
+syntax_escape = "syntax_escape" # 이스케이프·보간 경계.
+syntax_builtin = "syntax_builtin" # 내장 리터럴.
+syntax_macro = "syntax_macro" # 매크로·특수 호출.
+syntax_type = "syntax_type" # 자료형.
+syntax_parameter = "syntax_parameter" # 매개변수.
+syntax_property = "syntax_property" # 속성·키.
+syntax_operator = "syntax_operator" # 연산자.
+syntax_attribute = "syntax_attribute" # 어노테이션·속성명.
+syntax_punctuation = "syntax_punctuation" # 구분 기호.
+background = "paper" # 문서·편집기의 기본 배경.
+code_block_background = "surface" # Typora·Obsidian의 여러 줄 코드 블록 바탕. 인라인 코드와 편집기 전체 배경은 제외.
+surface = "surface" # 패널·사이드바 등의 보조 배경.
+text = "ink" # 본문·편집기의 기본 글자색.
+accent = "accent" # 앱 UI의 기본 강조색.
+muted = "muted" # 보조 텍스트·줄 번호 등에 쓰는 색.
+focus = "accent" # 포커스 경계 등의 강조색.
+selection_text = "ink" # 선택 영역 안의 글자색.
+selection_background = "selection" # 선택 영역의 배경색.
+prose_selection_background = "prose_selection" # Typora·Obsidian 일반 본문 선택 배경. 코드 선택에는 적용하지 않음.
+heading = "ink" # 문서 제목·헤딩 색.
+link = "accent" # 링크 글자색.
+quote = "muted" # 인용문 글자색.
+inline_code = "plum" # 문단 안 인라인 코드 글자색.
+comment = "muted" # 코드 주석의 기본 역할색.
+string = "slate" # 문자열 리터럴의 스타일 보조 강조색.
+keyword = "plum" # 언어 키워드의 기본 역할색.
+function = "slate" # 함수명 토큰의 기본 역할색.
+number = "ochre" # 숫자 리터럴의 기본 역할색.
+error = "clay" # 오류 상태 및 오류 토큰에 사용할 색.
+warning = "ochre" # 경고 상태·진단에 사용할 색.
+success = "pine" # 성공 상태에 사용할 색.
+terminal_foreground = "ink" # 터미널의 기본 글자색.
+terminal_background = "paper" # 터미널의 기본 배경색.
+terminal_cursor = "accent" # 터미널 커서색.
+
+[dark.ansi] # 다크 터미널의 필수 ANSI 16색. 오른쪽은 dark.palette 키.
+0 = "ansi_black" # 일반 검정.
+1 = "clay" # 일반 빨강.
+2 = "pine" # 일반 초록.
+3 = "ochre" # 일반 노랑.
+4 = "ansi_blue" # 일반 파랑. 같은 모드의 palette.ansi_blue 참조.
+5 = "ansi_magenta" # 일반 마젠타. 같은 모드의 palette.ansi_magenta 참조.
+6 = "ansi_cyan" # 일반 시안.
+7 = "ansi_white" # 일반 흰색.
+8 = "ansi_bright_black" # 밝은 검정.
+9 = "ansi_bright_red" # 밝은 빨강.
+10 = "ansi_bright_green" # 밝은 초록.
+11 = "ansi_bright_yellow" # 밝은 노랑.
+12 = "ansi_bright_blue" # 밝은 파랑.
+13 = "ansi_bright_magenta" # 밝은 마젠타.
+14 = "ansi_bright_cyan" # 밝은 시안.
+15 = "ansi_bright_white" # 밝은 흰색.

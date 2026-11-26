@@ -1,0 +1,5 @@
+# Log: 호스트가 구분한 레벨·시간만 강조한다. 임의의 문자열 검색은 하지 않는다.
+[tokens]
+error = "error" # 오류·치명 로그 레벨.
+attribute = "warning" # 경고 레벨.
+number = "number" # 인식된 타임스탬프·숫자.

@@ -1,0 +1,6 @@
+# XML: 요소명·네임스페이스·속성을 구분한다. CDATA 본문을 XML 태그로 분류하지 않는다.
+[tokens]
+"keyword.declaration" = "syntax_declaration" # 요소 및 구분된 네임스페이스 이름.
+attribute = "syntax_attribute" # 속성 이름.
+string = "string" # 인용 속성 값.
+"string.escape" = "syntax_escape" # 문자 엔티티.

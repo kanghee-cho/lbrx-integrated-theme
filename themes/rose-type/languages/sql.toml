@@ -1,0 +1,6 @@
+# SQL: 쿼리 구조와 스키마 선언을 구분한다. 인용 규칙은 SQL 방언을 따른다.
+[tokens]
+"keyword.control" = "keyword" # SELECT 등 쿼리 절.
+"keyword.declaration" = "syntax_declaration" # CREATE 등 스키마 선언.
+"constant.builtin" = "syntax_builtin" # 문법이 인식한 NULL·불리언.
+string = "string" # 문자열. 인용된 식별자를 강제로 문자열로 칠하지 않음.

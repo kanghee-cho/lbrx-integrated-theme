@@ -9,7 +9,7 @@ cargo run --locked -- check
 cargo run --locked -- build --app lbrx-studio
 ```
 
-출력은 `dist\orange-type\lbrx\lbrx-studio\theme.css`와 이 설치 안내다. 입력은 [공통 원본](../themes/orange-type/lbrx.toml), [Studio 전용 설정](../themes/orange-type/editors/lbrx-studio.toml), 공통·언어별 `languages` 설정이다. 생성본의 변수 이름은 Studio의 `src\app\theme.css`와 호환된다.
+출력은 `dist\lavender-type\lbrx\lbrx-studio\theme.css`와 이 설치 안내다. 입력은 [공통 원본](../themes/lavender-type/lbrx.toml), [Studio 전용 설정](../themes/lavender-type/editors/lbrx-studio.toml), 공통·언어별 `languages` 설정이다. 생성본의 변수 이름은 Studio의 `src\app\theme.css`와 호환된다.
 
 Studio 쪽에서 기존 `src\app\theme.css`를 백업한 뒤 생성된 CSS로 교체하고 앱 진입점에서 한 번만 import한다. 기존 하드코딩 색상 CSS와 다크 미디어 규칙이 남아 있으면 함께 검토한다. 이 저장소의 빌드가 해당 파일을 자동 교체하지는 않는다. 생성본을 편집하지 말고 TOML을 수정해 다시 생성한다.
 
@@ -17,7 +17,7 @@ Studio 쪽에서 기존 `src\app\theme.css`를 백업한 뒤 생성된 CSS로 �
 
 | 항목 | 계약 |
 |---|---|
-| 입력 형식 | `themes\orange-type\editors\lbrx-studio.toml`의 `[colors]`. 값은 공통 `roles` 이름. 알 수 없는 키·역할은 오류 |
+| 입력 형식 | `themes\lavender-type\editors\lbrx-studio.toml`의 `[colors]`. 값은 공통 `roles` 이름. 알 수 없는 키·역할은 오류 |
 | 출력 형식 | 두 모드와 시스템 선택을 담은 단일 `theme.css` + `README.md`. JSON·자동 설치·설정 저장은 제외 |
 | 테마 선택 | `<html data-theme="light">`는 라이트, `dark`는 다크를 고정. 속성이 없거나 `system`이면 OS `prefers-color-scheme`을 따름. Studio가 선택값을 적용·저장 |
 | 앱 UI | 기존 변수 11종과 `--focus`, `--link` 생성. 컨트롤 모양·레이아웃은 앱 CSS 책임 |

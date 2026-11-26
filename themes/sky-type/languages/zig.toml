@@ -1,0 +1,5 @@
+# Zig: @ 내장 호출과 comptime 구문은 호스트가 분류할 때만 구분한다.
+[tokens]
+"function.macro" = "syntax_macro" # 분류 가능한 @ 내장 호출.
+"keyword.declaration" = "syntax_declaration" # comptime 등 선언 문맥.
+type = "syntax_type" # 내장·사용자 타입.

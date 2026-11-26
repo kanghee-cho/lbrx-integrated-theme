@@ -1,0 +1,5 @@
+# PHP: $ 변수와 문자열 보간은 문법이 구분하는 범위까지 적용한다.
+[tokens]
+variable = "text" # $를 포함한 변수 참조.
+"string.escape" = "syntax_escape" # 이스케이프 및 보간 경계.
+attribute = "syntax_attribute" # PHP 8 이상 어트리뷰트.

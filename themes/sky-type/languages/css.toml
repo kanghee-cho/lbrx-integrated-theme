@@ -1,0 +1,6 @@
+# CSS: 선택자와 선언 프로퍼티, 사용자 지정 프로퍼티, 값을 구분한다.
+[tokens]
+attribute = "syntax_attribute" # 클래스·ID·의사 클래스 및 속성 선택자.
+property = "syntax_property" # 선언 속성 및 사용자 지정 프로퍼티.
+"keyword.declaration" = "syntax_declaration" # @ 규칙.
+number = "number" # 숫자 및 문법이 같은 토큰으로 묶는 단위.
