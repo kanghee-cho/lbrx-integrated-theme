@@ -1,6 +1,6 @@
 # Vim 색 구성표 옵션 대장
 
-[적용 가이드](12-vim.md) · [공통 원본](../themes/lbrx.toml) · [Helix 대장](17-helix-options.md)
+[적용 가이드](12-vim.md) · [공통 원본](../themes/orange-type/lbrx.toml) · [Helix 대장](17-helix-options.md)
 
 언어별 토큰이 어느 그룹에 연결되는지와 RGB·cterm별 적용 상태는 [Vim 언어별 코드 구문 강조](23-vim-language-highlighting.md)에서 추적한다.
 
@@ -8,7 +8,7 @@
 
 **구현 상태:** `[x]`는 기본 생성, `[x] 선택 생성`은 설정한 항목만 생성, `—`는 Vim 기본 유지 또는 대상 밖을 뜻한다. 실제 화면 검증과는 별개다.
 
-**Vim 전용 40개 그룹:** [vim.toml](../themes/editors/vim.toml)의 `[highlights]`에서 주석을 해제한 그룹만 라이트·다크에 생성한다. 표의 값은 TOML의 권장 예시이며 기본 빌드에서는 비활성이다. 모든 예시를 활성화한 두 테마를 Vim 9.2에서 로딩했고 실제 터미널 화면은 미검증이다.
+**Vim 전용 40개 그룹:** [vim.toml](../themes/orange-type/editors/vim.toml)의 `[highlights]`에서 주석을 해제한 그룹만 라이트·다크에 생성한다. 표의 값은 TOML의 권장 예시이며 기본 빌드에서는 비활성이다. 모든 예시를 활성화한 두 테마를 Vim 9.2에서 로딩했고 실제 터미널 화면은 미검증이다.
 
 | 독립 필드 | 값·경계 |
 |---|---|

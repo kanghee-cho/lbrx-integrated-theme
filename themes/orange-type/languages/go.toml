@@ -1,0 +1,6 @@
+# Go: 선언·내장 타입·내장 리터럴을 구분한다. raw 문자열은 보간하지 않는다.
+[tokens]
+"keyword.declaration" = "syntax_declaration" # func·type·var 등 선언.
+type = "syntax_type" # 내장 타입·타입 이름.
+"constant.builtin" = "syntax_builtin" # nil·true·false·iota.
+string = "string" # 문자열·백틱 raw 문자열.

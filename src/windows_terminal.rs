@@ -5,7 +5,8 @@ pub const DIRECTORY: &str = "windows-terminal";
 pub const SCHEMES: &str = "schemes.json";
 pub const FONT: &str = "profile-font.json";
 pub const GUIDE: &str = "README.md";
-pub const FILES: [&str; 3] = [SCHEMES, FONT, GUIDE];
+pub const POWERSHELL: &str = "powershell-colors.ps1";
+pub const FILES: [&str; 4] = [SCHEMES, FONT, POWERSHELL, GUIDE];
 
 const ANSI_FIELDS: [&str; 16] = [
     "black",
@@ -26,7 +27,7 @@ const ANSI_FIELDS: [&str; 16] = [
     "brightWhite",
 ];
 
-pub fn render(theme: &ResolvedTheme) -> Result<[(&'static str, String); 3], String> {
+pub fn render(theme: &ResolvedTheme) -> Result<[(&'static str, String); 4], String> {
     let schemes = json!({
         "schemes": [
             scheme(theme, "LBRX Light", &theme.light),
@@ -45,6 +46,7 @@ pub fn render(theme: &ResolvedTheme) -> Result<[(&'static str, String); 3], Stri
     Ok([
         (SCHEMES, encode(SCHEMES, &schemes)?),
         (FONT, encode(FONT, &font)?),
+        (POWERSHELL, include_str!("powershell-colors.ps1").into()),
         (GUIDE, INCLUDE_GUIDE.into()),
     ])
 }

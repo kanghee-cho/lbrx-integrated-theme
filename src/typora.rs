@@ -594,6 +594,46 @@ fn write_diagram_alignment(css: &mut String, diagrams: &TyporaDiagrams) {
 }
 
 fn write_sidebar(css: &mut String, sidebar: &TyporaSidebar, mode: &ResolvedMode) {
+    if let Some(role) = &sidebar.background {
+        writeln!(
+            css,
+            "#typora-sidebar {{ --side-bar-bg-color: {}; --active-file-bg-color: {}; --active-file-text-color: {}; --item-hover-bg-color: {}; --item-hover-text-color: {}; --primary-color: {}; }}",
+            mode.roles[role],
+            mode.roles["selection_background"],
+            mode.roles["selection_text"],
+            mode.roles["selection_background"],
+            mode.roles["selection_text"],
+            mode.roles["focus"],
+        )
+        .unwrap();
+    }
+    if let Some(role) = &sidebar.text {
+        writeln!(
+            css,
+            "#typora-sidebar {{ color: {}; }}\n\
+             #typora-sidebar :is(.sidebar-tab, .file-list-item) {{ color: {}; opacity: 1; }}\n\
+             #typora-sidebar .sidebar-tab.active {{ color: {}; }}\n\
+             #typora-sidebar .file-list-item.active {{ color: {}; }}",
+            mode.roles[role], mode.roles[role], mode.roles["focus"], mode.roles["selection_text"],
+        )
+        .unwrap();
+    }
+    if let Some(role) = &sidebar.muted {
+        writeln!(
+            css,
+            "#typora-sidebar :is(.file-list-item-summary, .file-list-item-parent-loc, .file-list-item-time, .file-list-item-file-ext-part) {{ color: {}; opacity: 1; }}\n\
+             #typora-sidebar .file-list-item.active :is(.file-list-item-summary, .file-list-item-parent-loc, .file-list-item-time, .file-list-item-file-ext-part) {{ color: {}; }}",
+            mode.roles[role],
+            mode.roles["selection_text"],
+        )
+        .unwrap();
+    }
+    if sidebar.background.is_some() {
+        css.push_str(
+            "#typora-sidebar .file-list-item:hover:not(.active) { background-color: var(--item-hover-bg-color); color: var(--item-hover-text-color); }\n\
+             #typora-sidebar .file-list-item:hover:not(.active) :is(.file-list-item-summary, .file-list-item-parent-loc, .file-list-item-time, .file-list-item-file-ext-part) { color: var(--item-hover-text-color); }\n",
+        );
+    }
     for &(key, suffix, property) in TYPORA_SIDEBAR_COLORS {
         if let Some(role) = sidebar.color(key) {
             writeln!(

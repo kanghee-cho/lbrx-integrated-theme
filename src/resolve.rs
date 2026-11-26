@@ -372,6 +372,16 @@ fn check_mode(name: &str, mode: &Mode) -> Result<(), String> {
             return Err(format!("{name}.ansi.{slot}: 필수 ANSI 슬롯 누락"));
         }
     }
+    for slot in ANSI_SLOTS {
+        check_contrast(
+            name,
+            &format!("ansi.{slot}"),
+            "terminal_background",
+            palette[mode.ansi[slot].as_str()],
+            roles["terminal_background"],
+            4.5,
+        )?;
+    }
 
     check_contrast(
         name,
@@ -507,7 +517,7 @@ mod tests {
     fn sample() -> Theme {
         toml::from_str(include_str!(concat!(
             env!("CARGO_MANIFEST_DIR"),
-            "/themes/lbrx.toml"
+            "/themes/orange-type/lbrx.toml"
         )))
         .unwrap()
     }
@@ -515,6 +525,18 @@ mod tests {
     #[test]
     fn sample_passes() {
         assert!(check(&sample()).is_ok());
+    }
+
+    #[test]
+    fn rejects_ansi_foregrounds_hidden_on_default_background() {
+        let mut theme = sample();
+        theme.light.ansi.insert("15".into(), "paper".into());
+        let error = check(&theme).unwrap_err();
+        assert!(error.contains("ansi.15"));
+        assert!(error.contains("최소 4.5"));
+        let mut theme = sample();
+        theme.dark.ansi.insert("0".into(), "paper".into());
+        assert!(check(&theme).unwrap_err().contains("ansi.0"));
     }
 
     #[test]

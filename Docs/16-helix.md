@@ -1,6 +1,6 @@
 # Helix에 LBRX 적용
 
-라이트·다크 테마와 편집기·언어 설정을 생성한다. 색상은 저장소의 `themes/lbrx.toml`에서 수정한다. 테마 스코프는 저장소의 `Docs/17-helix-options.md`에서 확인한다.
+라이트·다크 테마와 편집기·언어 설정을 생성한다. 색상은 저장소의 `themes/orange-type/lbrx.toml`에서 수정한다. 테마 스코프는 저장소의 `Docs/17-helix-options.md`에서 확인한다.
 
 ```powershell
 cargo run --locked -- build --app helix
@@ -8,15 +8,15 @@ cargo run --locked -- build --app helix
 
 ## 설치·복구
 
-1. `dist\lbrx\helix`의 `lbrx_light.toml`, `lbrx_dark.toml`을 사용자 Helix 설정 디렉터리의 `themes`에 복사한다. 기본 위치는 Unix `~/.config/helix/themes`(사용자 지정 시 `$XDG_CONFIG_HOME/helix/themes`), Windows `%APPDATA%\helix\themes`다.
+1. `dist\orange-type\lbrx\helix`의 `lbrx_light.toml`, `lbrx_dark.toml`을 사용자 Helix 설정 디렉터리의 `themes`에 복사한다. 기본 위치는 Unix `~/.config/helix/themes`(사용자 지정 시 `$XDG_CONFIG_HOME/helix/themes`), Windows `%APPDATA%\helix\themes`다.
 2. Helix에서 확장자 없이 `:theme lbrx_dark` 또는 `:theme lbrx_light`로 현재 세션에서 시험한다. 지속 적용하려면 기존 `config.toml`의 **최상위** `theme` 값만 바꾼다. `[editor]` 안에 넣거나 전체 설정을 교체하지 않는다.
 3. 갱신하려면 두 테마 파일을 교체하고 다시 선택한다. 복구하려면 `:theme`에 기존 테마 이름을 주고, 영구 설정도 바꿨다면 원래 값으로 복원한다.
 
 ## 편집기·언어 설정 내보내기
 
-저장소의 `themes/editors/helix.toml`에서 원하는 예시의 표 제목과 값의 주석을 해제하거나, 다음 규칙대로 Helix 설정을 추가한 뒤 다시 빌드한다.
+저장소의 `themes/orange-type/editors/helix.toml`에서 원하는 예시의 표 제목과 값의 주석을 해제하거나, 다음 규칙대로 Helix 설정을 추가한 뒤 다시 빌드한다.
 
-| 원본 | 출력 (`dist\lbrx\helix`) | 예시 |
+| 원본 | 출력 (`dist\orange-type\lbrx\helix`) | 예시 |
 |---|---|---|
 | `[config]` 아래 | `config.toml` | `theme`, `[config.editor]`, `[config.keys.normal]` |
 | `[languages]` 아래 | `languages.toml` | `[[languages.language]]`, `[languages.language-server.rust-analyzer.config]` |
@@ -25,7 +25,7 @@ cargo run --locked -- build --app helix
 
 `config.toml` 예시에는 스크롤 여백·눈금자·커서 모양·자동 저장·줄바꿈·공백 표시·상태줄·LSP·키맵 설정이 포함되어 있다. Helix 25.07에서 `color-modes`는 상태줄의 모드 색을 바꾸며, 자동 저장은 `[editor.auto-save]`의 `focus-lost`와 `[editor.auto-save.after-delay]`로 설정한다.
 
-`languages.toml`은 `themes/languages`에 등록한 언어 중 Helix 25.07에 해당 기본값이 있는 언어의 **들여쓰기와 줄·블록 주석 기호**를 자동으로 포함한다. `csharp`는 `c-sharp`, `shell`과 `bash`는 하나의 `bash` 항목으로 대응한다. `mdx`·`text`처럼 대응하는 Helix 이름이 없는 항목과 `csv`·`log`·`regex`처럼 이 범위에 내보낼 값이 없는 항목은 자동 생성하지 않는다. 구문색, 파일 확장자, 언어 서버, 포매터는 자동으로 복사하지 않는다.
+`languages.toml`은 `themes/<style>/languages`에 등록한 언어 중 Helix 25.07에 해당 기본값이 있는 언어의 **들여쓰기와 줄·블록 주석 기호**를 자동으로 포함한다. `csharp`는 `c-sharp`, `shell`과 `bash`는 하나의 `bash` 항목으로 대응한다. `mdx`·`text`처럼 대응하는 Helix 이름이 없는 항목과 `csv`·`log`·`regex`처럼 이 범위에 내보낼 값이 없는 항목은 자동 생성하지 않는다. 구문색, 파일 확장자, 언어 서버, 포매터는 자동으로 복사하지 않는다.
 
 `[[languages.language]]`에서 Helix 이름을 `name`으로 지정하면 같은 언어의 자동값을 덮어쓴다. `indent`는 지정한 하위 키만 바꾸고 나머지는 유지한다. 자동 생성 대상이 아닌 언어도 수동으로 추가할 수 있다. TOML 문법은 빌드에서 확인하지만 버전별 키·값은 Helix에서 확인한다. 생성기는 언어 서버나 포매터를 설치하거나 실행하지 않는다. 비밀값은 저장소나 배포 파일에 넣지 않는다.
 
@@ -35,7 +35,7 @@ cargo run --locked -- build --app helix
 
 ### 공통·합일·Helix 전용 옵션 조정
 
-저장소의 `themes/editors/helix.toml`에서 `[styles]`에 옵션 대장의 스코프를 지정한다. 모드별 커서·상태줄, 버퍼줄, 가상 문자, 디버거, 진단 등 전용 항목은 주석 처리된 예시로 제공한다. 원하는 줄 앞의 `#`를 제거하고 `cargo run --locked -- build --app helix`로 두 테마를 다시 생성한다.
+저장소의 `themes/orange-type/editors/helix.toml`에서 `[styles]`에 옵션 대장의 스코프를 지정한다. 모드별 커서·상태줄, 버퍼줄, 가상 문자, 디버거, 진단 등 전용 항목은 주석 처리된 예시로 제공한다. 원하는 줄 앞의 `#`를 제거하고 `cargo run --locked -- build --app helix`로 두 테마를 다시 생성한다.
 
 ```toml
 [styles]

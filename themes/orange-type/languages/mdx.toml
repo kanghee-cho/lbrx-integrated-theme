@@ -1,0 +1,5 @@
+# MDX: 확장이 문법을 제공할 때만 적용. JSX와 임베디드 JS를 일반 문장으로 재분류하지 않는다.
+[tokens]
+"keyword.declaration" = "syntax_declaration" # 문서 제목·내장 태그.
+function = "function" # JSX 컴포넌트로 식별된 이름.
+attribute = "syntax_attribute" # JSX 속성.

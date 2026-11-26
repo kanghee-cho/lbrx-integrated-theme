@@ -618,7 +618,8 @@ mod tests {
     #[test]
     fn vsix_exports_both_modes_and_keeps_dark_changes_isolated() {
         let mut theme =
-            resolve(&toml::from_str(include_str!("../themes/lbrx.toml")).unwrap()).unwrap();
+            resolve(&toml::from_str(include_str!("../themes/orange-type/lbrx.toml")).unwrap())
+                .unwrap();
         let [(.., vsix), (.., css), (.., settings), ..] = render(&theme).unwrap();
         validate(&vsix).unwrap();
         assert_eq!(vsix, render(&theme).unwrap()[0].1);

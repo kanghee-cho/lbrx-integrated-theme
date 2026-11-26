@@ -56,8 +56,10 @@
 
 # T08: 문서 탐색 사이드바 전용. 필요한 표와 설정 줄만 주석 해제.
 # 색 값은 양쪽 모드에 있는 roles 이름. 생략하면 기존 스타일 유지.
-# [sidebar]
-# background = "surface" # 사이드바 공통 바탕색.
+[sidebar]
+background = "surface" # 사이드바 바탕색·선택·호버·포커스 변수를 공통 역할에 연결.
+text = "text" # 탭·파일 목록 기본 글자색. 활성 탭은 focus, 선택 파일은 selection_text 사용.
+muted = "muted" # 파일 요약·폴더·시간·확장자 글자색. 중첩 투명도를 제거해 대비 확보.
 
 # [sidebar.outline]
 # indent_step_px = 12 # 제목 단계당 추가 들여쓰기(px). H1은 0, H2는 12, … H6은 60.
@@ -80,10 +82,10 @@
 # expander = "muted" # 앱이 표시하는 폴더 펼치기·접기 화살표 색.
 
 # T09: 편집 보조 영역별 색. 필요한 표와 줄만 주석 해제. 값은 양쪽 모드에 있는 roles 이름.
-# [editing_aids.yaml] # 문서 첫머리 YAML 메타데이터 블록. 구문 분석이나 표시 여부는 바꾸지 않음.
-# background = "surface" # YAML 블록의 배경.
-# text = "text" # YAML 블록의 일반 글자색.
-# placeholder = "muted" # 앱이 빈 YAML 블록에 표시하는 안내 문구 색.
+[editing_aids.yaml] # 문서 첫머리 YAML 속성. 문법·표시 여부는 유지.
+background = "surface" # YAML 속성과 내부 편집기·거터의 모드별 배경.
+text = "text" # YAML 속성과 내부 편집기의 일반 글자색.
+placeholder = "muted" # 빈 YAML 속성 안내 글자색.
 
 # [editing_aids.search] # 문서 편집 화면에서 찾기 결과에만 적용. 일반 드래그 선택과 별개.
 # match_background = "prose_selection_background" # 현재 선택하지 않은 검색 결과의 배경 역할 예시.

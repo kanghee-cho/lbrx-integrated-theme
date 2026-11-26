@@ -1,6 +1,6 @@
 # VS Code 언어별 구문 강조와 동반 CSS
 
-**공통·언어별 토큰 생성 구현.** [언어 설정](../themes/languages/)에서 VS Code 테마와 동반 CSS의 색 역할과 일반·굵게·기울임 스타일을 선택한다. 공통 구문 팔레트와 연결된 TextMate scope, semantic 선택자, 언어별 예외를 출력한다. 작업 화면의 `colors`는 [VS Code 옵션 대장](19-vscode-options.md)에서 별도로 관리한다.
+**공통·언어별 토큰 생성 구현.** [언어 설정](../themes/orange-type/languages/)에서 VS Code 테마와 동반 CSS의 색 역할과 일반·굵게·기울임 스타일을 선택한다. 공통 구문 팔레트와 연결된 TextMate scope, semantic 선택자, 언어별 예외를 출력한다. 작업 화면의 `colors`는 [VS Code 옵션 대장](19-vscode-options.md)에서 별도로 관리한다.
 
 | 보는 곳 | 생성 파일 | 토큰을 구별하는 주체 |
 |---|---|---|
@@ -24,15 +24,15 @@
 
 ### 같은 함수색을 두 형식으로 제공하는 예
 
-다음은 현재 라이트 `function` 역할(`#43617B`)을 사용한 **출력 예시**다. 생성 시 상수를 복사하지 않고 각 모드의 역할을 해석한다.
+다음은 현재 라이트 `function` 역할(`#245E8A`)을 사용한 **출력 예시**다. 생성 시 상수를 복사하지 않고 각 모드의 역할을 해석한다.
 
 ```json
 {
   "tokenColors": [
-    { "scope": "entity.name.function", "settings": { "foreground": "#43617B" } }
+    { "scope": "entity.name.function", "settings": { "foreground": "#245E8A" } }
   ],
   "semanticHighlighting": true,
-  "semanticTokenColors": { "function": "#43617B" }
+  "semanticTokenColors": { "function": "#245E8A" }
 }
 ```
 
@@ -41,7 +41,7 @@
 ```
 
 ```css
-.lbrx-code[data-theme="light"] { --lbrx-code-function: #43617B; }
+.lbrx-code[data-theme="light"] { --lbrx-code-function: #245E8A; }
 .lbrx-code .tok-function { color: var(--lbrx-code-function); }
 ```
 
@@ -49,7 +49,7 @@
 
 ## 언어별 지원 대장
 
-언어 TOML은 공통 파일을 제외하면 39개다. 전체 ID와 적용 경로는 빌드할 때 `dist/lbrx/vscode/README.md`에 자동으로 기록된다. 규칙 생성은 문법 설치나 토큰 확인과 별개다.
+언어 TOML은 공통 파일을 제외하면 39개다. 전체 ID와 적용 경로는 빌드할 때 `dist/orange-type/lbrx/vscode/README.md`에 자동으로 기록된다. 규칙 생성은 문법 설치나 토큰 확인과 별개다.
 
 | 언어 | VS Code 1.147.0 내장 TextMate 확인 범위와 한계 |
 |---|---|

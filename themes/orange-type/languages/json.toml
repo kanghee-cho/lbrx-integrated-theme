@@ -1,0 +1,6 @@
+# JSON: 객체 키를 문자열 값과 구별한다.
+[tokens]
+property = "syntax_property" # 객체 키.
+string = "string" # 문자열 값.
+number = "number" # 숫자 리터럴.
+"constant.builtin" = "syntax_builtin" # true·false·null.

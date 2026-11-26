@@ -1,0 +1,10 @@
+# Common Lisp: 호출 및 리더 구문에 공통 역할을 사용한다.
+[tokens]
+function = "function" # 문법이 호출로 분류한 목록의 첫 심볼.
+"keyword.control" = "keyword" # 구분 가능한 쿼트·백쿼트·언쿼트.
+"constant.builtin" = "syntax_builtin" # 키워드 심볼.
+variable = "text" # 기호를 포함하는 일반 심볼.
+punctuation = "syntax_punctuation" # 괄호 기본색. 깊이 순환은 호스트 기능.
+
+[styles]
+function = "bold" # 호출 위치만 강조. 인용된 목록은 제외.

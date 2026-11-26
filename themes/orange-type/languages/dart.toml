@@ -1,0 +1,5 @@
+# Dart: 런타임 표현식은 보간 문자열 색으로 덮지 않는다.
+[tokens]
+attribute = "syntax_attribute" # 어노테이션.
+"string.escape" = "syntax_escape" # 보간 경계와 이스케이프.
+type = "syntax_type" # 타입과 제네릭 인자.

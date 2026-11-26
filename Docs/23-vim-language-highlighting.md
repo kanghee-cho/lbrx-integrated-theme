@@ -1,6 +1,6 @@
 # Vim 언어별 코드 구문 강조
 
-**상태: 공통 그룹과 일부 언어 전용 그룹 생성 구현.** Vim은 CSS를 읽지 않는다. 문법 파일이 토큰을 **구문 그룹**으로 식별하고 색 구성표가 그룹의 색을 지정한다. [언어 파일](../themes/languages/)에 선언된 예외는 어댑터가 매핑한 그룹에만 RGB와 `cterm`으로 출력한다. Neovim Tree-sitter와 플러그인 그룹은 포함하지 않는다.
+**상태: 공통 그룹과 일부 언어 전용 그룹 생성 구현.** Vim은 CSS를 읽지 않는다. 문법 파일이 토큰을 **구문 그룹**으로 식별하고 색 구성표가 그룹의 색을 지정한다. [언어 파일](../themes/orange-type/languages/)에 선언된 예외는 어댑터가 매핑한 그룹에만 RGB와 `cterm`으로 출력한다. Neovim Tree-sitter와 플러그인 그룹은 포함하지 않는다.
 
 ## 공통 역할 → Vim 하이라이트 그룹
 
@@ -20,14 +20,14 @@
 
 ```vim
 " 라이트 RGB 매핑의 일부
-highlight Function guifg=#43617B
+highlight Function guifg=#245E8A
 ```
 
-실제 생성 시 색은 고정하지 않고 [테마 원본](../themes/lbrx.toml)의 모드별 `function`을 해석한다. RGB 경로는 `termguicolors`와 호스트 지원이 필요하다. 비활성일 때 쓸 `ctermfg`는 지원 색 수·호스트 팔레트에 맞춘 근사값으로 별도 검증한다. 편집기 간에 **역할**을 공유하는 것이지, 저색상 터미널에서도 같은 RGB가 보인다는 뜻은 아니다.
+실제 생성 시 색은 고정하지 않고 [테마 원본](../themes/orange-type/lbrx.toml)의 모드별 `function`을 해석한다. RGB 경로는 `termguicolors`와 호스트 지원이 필요하다. 비활성일 때 쓸 `ctermfg`는 지원 색 수·호스트 팔레트에 맞춘 근사값으로 별도 검증한다. 편집기 간에 **역할**을 공유하는 것이지, 저색상 터미널에서도 같은 RGB가 보인다는 뜻은 아니다.
 
 ## 언어별 지원 대장
 
-[언어 설정 폴더](../themes/languages/)에는 공통 `common.toml`을 제외하고 **39개 ID**가 있다. 이는 Vim 내장·플러그인 문법 전체의 수가 아니다. 다음은 저장소 기본 TOML로 빌드한 결과이며, 전체 ID와 적용 경로는 매 빌드의 Vim 설치 안내 `dist/lbrx/vim/colors/README.md`에 자동으로 표시된다.
+[언어 설정 폴더](../themes/orange-type/languages/)에는 공통 `common.toml`을 제외하고 **39개 ID**가 있다. 이는 Vim 내장·플러그인 문법 전체의 수가 아니다. 다음은 저장소 기본 TOML로 빌드한 결과이며, 전체 ID와 적용 경로는 매 빌드의 Vim 설치 안내 `dist/orange-type/lbrx/vim/colors/README.md`에 자동으로 표시된다.
 
 | 적용 경로 | 개수 | 언어 ID |
 |---|---:|---|

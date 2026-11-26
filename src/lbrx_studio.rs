@@ -24,7 +24,7 @@ pub const COLOR_KEYS: &[&str] = &[
 
 pub fn render(theme: &ResolvedTheme) -> [(&'static str, String); 2] {
     let mut css = format!(
-        "/* LBRX Studio - generated; edit themes/editors/lbrx-studio.toml instead.\n{}*/\n",
+        "/* LBRX Studio - generated; edit themes/<style>/editors/lbrx-studio.toml instead.\n{}*/\n",
         include_str!("../LICENSE")
     );
     css.push_str(":root {\n");

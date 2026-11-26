@@ -1,8 +1,8 @@
 # Helix 테마 옵션 대장
 
-[적용 가이드](16-helix.md) · [Vim 옵션 대장](13-vim-options.md) · [공통 원본](../themes/lbrx.toml)
+[적용 가이드](16-helix.md) · [Vim 옵션 대장](13-vim-options.md) · [공통 원본](../themes/orange-type/lbrx.toml)
 
-**범위:** [Helix 25.07 공식 테마 규격](https://github.com/helix-editor/helix/blob/25.07/book/src/themes.md)의 구문·문서·UI·진단 스코프. `공통`, `합일 후보`, `Helix 전용`은 [helix.toml](../themes/editors/helix.toml)의 `[styles]`에서 선택 설정할 수 있다. `[x]`는 기본 생성, `[x] 선택 생성`은 설정할 때만 직접 생성이다. 상위 스코프에서 색을 상속하는 것과 직접 생성은 구분한다. Helix 전용 예시는 모두 기본 비활성이다.
+**범위:** [Helix 25.07 공식 테마 규격](https://github.com/helix-editor/helix/blob/25.07/book/src/themes.md)의 구문·문서·UI·진단 스코프. `공통`, `합일 후보`, `Helix 전용`은 [helix.toml](../themes/orange-type/editors/helix.toml)의 `[styles]`에서 선택 설정할 수 있다. `[x]`는 기본 생성, `[x] 선택 생성`은 설정할 때만 직접 생성이다. 상위 스코프에서 색을 상속하는 것과 직접 생성은 구분한다. Helix 전용 예시는 모두 기본 비활성이다.
 
 | 스코프마다 조절할 필드 | 허용 값·경계 |
 |---|---|

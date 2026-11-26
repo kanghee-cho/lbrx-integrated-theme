@@ -1,6 +1,6 @@
 # Windows Terminal에 LBRX 적용
 
-저장소 루트에서 `cargo run --locked -- build --app windows-terminal`을 실행하면 `dist\lbrx\windows-terminal`에 배색표와 선택 적용용 글꼴 설정 조각이 생성된다.
+저장소 루트에서 `cargo run --locked -- build --app windows-terminal`을 실행하면 `dist\orange-type\lbrx\windows-terminal`에 배색표와 선택 적용용 글꼴 설정 조각이 생성된다.
 
 ## 설치·복구
 
@@ -10,6 +10,18 @@
 4. 글꼴도 변경하려면 `profile-font.json`의 `font.face`와 `font.size`만 같은 프로필의 `font`에 병합합니다. 기존 굵기·OpenType 설정은 유지합니다. 글꼴은 설치되어 있어야 하며, 원본의 첫 번째 고정폭 글꼴을 사용합니다. 크기는 CSS px × 0.75로 pt로 환산합니다(기본 14px → 10.5pt). 줄 높이와 글꼴 후보 목록은 이 조각에 넣지 않습니다.
 
 테마를 갱신하려면 다시 생성한 후 같은 이름의 배색표를 교체합니다. 되돌리려면 이전 배색표를 다시 선택하고, 변경한 글꼴 필드를 복원합니다. 필요하면 백업한 설정 파일로 돌아갈 수 있습니다. 프로필에 전경·배경·커서·선택 색상이 직접 지정되어 있으면 배색표보다 우선할 수 있습니다.
+
+## ANSI·SSH와 PowerShell 디렉터리 색
+
+각 스타일의 ANSI 16색 전경은 라이트·다크 기본 터미널 배경에서 **4.5:1 이상**으로 검사한다. 라이트의 white 슬롯은 흰 배경에서 읽히도록 짙은 중성색을 사용한다. 앱별 배경 재정의, 임의의 ANSI 배경·반전·dim, 256색·True Color는 이 보장의 대상이 아니다.
+
+PowerShell 기본 디렉터리 표시는 파랑 **배경**(`44;1m`)을 지정하므로 파스텔 파랑 위의 밝은 기본 글자가 안 보일 수 있다. 생성되는 `powershell-colors.ps1`을 원하는 PowerShell 7.2 이상 세션에서 명시적으로 dot-source하면 디렉터리에 밝은 시안 **전경만** 지정한다. 프로필이나 다른 FileInfo 설정은 수정하지 않는다.
+
+```powershell
+. .\dist\orange-type\lbrx\windows-terminal\powershell-colors.ps1
+```
+
+SSH의 ANSI 색은 접속에 사용한 로컬 터미널 배색표로 표시된다. 반면 원격 셸의 `$PSStyle`, `LS_COLORS`, 프롬프트·TUI 색 설정은 원격에서 관리한다. 로컬 스니펫은 SSH로 전파되지 않는다. 배색표 적용 후에도 특정 출력만 흐리면 해당 프로그램의 배경·dim·직접 RGB 지정도 확인한다.
 
 ## 개발용 Portable 미리보기
 
@@ -29,6 +41,7 @@
 ```powershell
 .\scripts\dev-windows-terminal.ps1 -Mode Light
 .\scripts\dev-windows-terminal.ps1 -Mode Dark
+.\scripts\dev-windows-terminal.ps1 -Style green-type -Mode Dark
 ```
 
 스크립트는 테마를 빌드하고 Portable의 `settings\settings.json`을 `LBRX Light (dev)`와 `LBRX Dark (dev)` 두 프로필로 다시 작성한 뒤, 위에 표시된 `WindowsTerminal.exe`로 선택한 프로필의 새 창을 엽니다. 두 프로필은 같은 Portable 복사본을 사용하며, 평소 사용하는 Windows Terminal 설정은 건드리지 않습니다. `-NoLaunch`를 지정하면 설정까지만 생성합니다. 두 모드에서 한글·영문 글꼴, 커서, 마우스 선택 영역, ANSI 16색 견본을 비교합니다. 기본 글꼴인 `D2Coding ligature`가 없다면 글꼴 대체 동작만 확인할 수 있습니다.

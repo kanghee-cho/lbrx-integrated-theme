@@ -104,10 +104,20 @@ const SEARCH_ACTIVE_TARGETS: &[&str] = &[
 pub const TYPORA_EDITING_AID_COLORS: &[(&str, &[&str], &str)] = &[
     (
         "yaml.background",
-        &["#write > pre.md-meta-block"],
+        &[
+            "#write > pre.md-meta-block",
+            "#write > pre.md-meta-block :is(.CodeMirror, .CodeMirror-gutters)",
+        ],
         "background-color",
     ),
-    ("yaml.text", &["#write > pre.md-meta-block"], "color"),
+    (
+        "yaml.text",
+        &[
+            "#write > pre.md-meta-block",
+            "#write > pre.md-meta-block .CodeMirror",
+        ],
+        "color",
+    ),
     (
         "yaml.placeholder",
         &["#write > pre.md-meta-block:empty::before"],
@@ -538,6 +548,8 @@ impl TyporaEditingAids {
 #[serde(deny_unknown_fields)]
 pub struct TyporaSidebar {
     pub background: Option<String>,
+    pub text: Option<String>,
+    pub muted: Option<String>,
     pub outline: Option<TyporaSidebarOutline>,
     #[serde(default, skip_serializing_if = "Mapping::is_empty")]
     pub file_tree: Mapping,
@@ -568,6 +580,11 @@ impl TyporaSidebar {
     fn validate(&self, path: &Path, theme: &Theme) -> Result<(), String> {
         if let Some(role) = &self.background {
             validate_role(path, "sidebar.background", role, theme)?;
+        }
+        for (key, role) in [("text", &self.text), ("muted", &self.muted)] {
+            if let Some(role) = role {
+                validate_role(path, &format!("sidebar.{key}"), role, theme)?;
+            }
         }
         for (prefix, colors) in [("file_tree.", &self.file_tree)].into_iter().chain(
             self.outline
@@ -1685,7 +1702,7 @@ mod tests {
         let path = tmp.path().join("theme.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        let source = include_str!("../themes/lbrx.toml");
+        let source = include_str!("../themes/orange-type/lbrx.toml");
         let config = editors.join("obsidian.toml");
         let render = || crate::obsidian::render(&resolve::resolve(&load(&path).unwrap()).unwrap());
         fs::write(&path, source).unwrap();
@@ -1694,7 +1711,11 @@ mod tests {
         fs::write(&config, "[prose]\nuse_shared_line_height = false\n").unwrap();
         assert_eq!(render()[1], baseline[1]);
 
-        fs::write(&config, include_str!("../themes/editors/obsidian.toml")).unwrap();
+        fs::write(
+            &config,
+            include_str!("../themes/orange-type/editors/obsidian.toml"),
+        )
+        .unwrap();
         let output = render();
         assert!(output[1].1.contains(".markdown-rendered p,"));
         assert!(output[1].1.contains(
@@ -1715,7 +1736,7 @@ mod tests {
     fn obsidian_number_and_error_use_common_live_colors_and_rendered_language_overrides() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("lbrx.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let languages = tmp.path().join("languages");
         fs::create_dir(&languages).unwrap();
         fs::write(
@@ -1762,9 +1783,9 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
             let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
@@ -1796,7 +1817,7 @@ mod tests {
         let path = tmp.path().join("theme.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        let source = include_str!("../themes/lbrx.toml");
+        let source = include_str!("../themes/orange-type/lbrx.toml");
         let config = editors.join("obsidian.toml");
         let css = || {
             crate::obsidian::render(&resolve::resolve(&load(&path).unwrap()).unwrap())[1]
@@ -1845,7 +1866,7 @@ mod tests {
         let path = tmp.path().join("theme.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
         let css = || {
             crate::obsidian::render(&resolve::resolve(&load(&path).unwrap()).unwrap())[1]
@@ -1886,7 +1907,7 @@ mod tests {
         let path = tmp.path().join("theme.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
         let render = || {
             let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
@@ -1913,7 +1934,7 @@ mod tests {
         let path = tmp.path().join("theme.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
         let render = || {
             let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
@@ -1950,9 +1971,9 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
             let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
@@ -1991,7 +2012,7 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
@@ -1999,7 +2020,7 @@ mod tests {
             let [_, (_, css), _] = crate::obsidian::render(&theme);
             css
         };
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         let css = render(stock);
         let configured_padding = css
             .split_once("--lbrx-file-padding-inline: clamp(")
@@ -2053,7 +2074,7 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
@@ -2061,7 +2082,7 @@ mod tests {
             let [_, (_, css), _] = crate::obsidian::render(&theme);
             css
         };
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         let base = render(stock);
         for (setting, scope) in [
             ("style_ribbon", ".workspace-ribbon .side-dock-ribbon-action"),
@@ -2116,7 +2137,7 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
@@ -2149,9 +2170,9 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
             let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
@@ -2202,9 +2223,9 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
             let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
@@ -2277,7 +2298,7 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
@@ -2285,7 +2306,7 @@ mod tests {
             let [_, (_, css), _] = crate::obsidian::render(&theme);
             (theme, css)
         };
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         let (theme, css) = render(stock);
         let mut without_graph = css.clone();
         for (scheme, mode) in [("light", &theme.light), ("dark", &theme.dark)] {
@@ -2315,7 +2336,7 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
@@ -2383,9 +2404,9 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
             let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
@@ -2449,9 +2470,9 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
             let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
@@ -2504,9 +2525,9 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
             let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
@@ -2551,9 +2572,9 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
             let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
@@ -2589,9 +2610,9 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
             let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
@@ -2638,9 +2659,9 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
             let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
@@ -2673,9 +2694,9 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
             let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
@@ -2717,7 +2738,7 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
@@ -2725,7 +2746,7 @@ mod tests {
             let [_, (_, css), _] = crate::obsidian::render(&theme);
             (theme, css)
         };
-        let (theme, css) = render(include_str!("../themes/editors/obsidian.toml"));
+        let (theme, css) = render(include_str!("../themes/orange-type/editors/obsidian.toml"));
         for (scheme, mode) in [("light", &theme.light), ("dark", &theme.dark)] {
             let scope = format!(
                 ".theme-{scheme} :is(.markdown-reading-view .markdown-rendered, .markdown-source-view.is-live-preview)"
@@ -2774,9 +2795,9 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         let (before, remainder) = stock.split_once("[math]").unwrap();
         let (_, after) = remainder.split_once("[images]").unwrap();
         let disabled = format!("{before}[images]{after}");
@@ -2816,7 +2837,7 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
@@ -2824,7 +2845,7 @@ mod tests {
             let [_, (_, css), _] = crate::obsidian::render(&theme);
             css
         };
-        let stock = render(include_str!("../themes/editors/obsidian.toml"));
+        let stock = render(include_str!("../themes/orange-type/editors/obsidian.toml"));
         let scope = ".markdown-reading-view .markdown-rendered";
         assert!(stock.contains(&format!(
             "{scope} .el-p > p > .image-embed:only-child > img,"
@@ -2854,7 +2875,7 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
@@ -2893,7 +2914,7 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
@@ -2903,7 +2924,7 @@ mod tests {
         };
         let scope = ".markdown-reading-view .markdown-rendered :is(.el-ul, .el-ol)";
         let item = "li:not(:where(.task-list-item, .task-list-item *, .footnotes *))";
-        let stock = render(include_str!("../themes/editors/obsidian.toml"));
+        let stock = render(include_str!("../themes/orange-type/editors/obsidian.toml"));
         assert!(stock.contains(&format!(
             "{scope} :is(ol, ul) > {item} {{ margin-inline-start: 24px; }}"
         )));
@@ -2939,9 +2960,9 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         let (without_table, _) = stock.split_once("[table]").unwrap();
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
@@ -2976,7 +2997,7 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = dir.join("obsidian.toml");
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
@@ -2984,7 +3005,7 @@ mod tests {
             let [_, (_, css), _] = crate::obsidian::render(&theme);
             (theme, css)
         };
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         let (theme, css) = render(stock);
         for (class, mode) in [("light", &theme.light), ("dark", &theme.dark)] {
             let scope = format!(".theme-{class} .markdown-reading-view .markdown-rendered");
@@ -3023,15 +3044,15 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         fs::write(&config, stock).unwrap();
         let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
         let [_, (_, css), _] = crate::obsidian::render(&theme);
         for (class, strong, italic, strike, highlight) in [
-            ("light", "#8B404B", "#684882", "#555A63", "#F4E7A3"),
-            ("dark", "#F2B9BE", "#D8C2F1", "#C5C8CF", "#51451D"),
+            ("light", "#A84B16", "#245E8A", "#6D5A4B", "#FFE8CB"),
+            ("dark", "#FFC695", "#B4D9F5", "#C0AC9B", "#503927"),
         ] {
             let rules: Vec<_> = css
                 .lines()
@@ -3059,7 +3080,7 @@ mod tests {
         let [_, (_, css), _] = crate::obsidian::render(&theme);
         assert!(!css.contains(".cm-strikethrough") && !css.contains("mark:not([data-highlight])"));
 
-        fs::write(&config, stock.replacen("#F4E7A3", "#8B404B", 1)).unwrap();
+        fs::write(&config, stock.replacen("#FFE8CB", "#A84B16", 1)).unwrap();
         let Err(error) = resolve::check(&load(&path).unwrap()) else {
             panic!(
                 "highlight background matching an emphasis color should fail contrast validation"
@@ -3075,9 +3096,9 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         let active = r#""--lbrx-inline-code-color" = "inline_code""#;
         let render = |source: &str| {
             fs::write(&config, source).unwrap();
@@ -3125,9 +3146,9 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         let (before, quote_section) = stock.split_once("[blockquote]").unwrap();
         let (_, after) = quote_section.split_once("[colors]").unwrap();
         let without_quote = format!("{before}[colors]{after}");
@@ -3178,9 +3199,9 @@ mod tests {
         let path = tmp.path().join("lbrx.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         let render = || {
             let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
             let [_, (_, css), _] = crate::obsidian::render(&theme);
@@ -3215,9 +3236,13 @@ mod tests {
         let path = tmp.path().join("theme.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
-        fs::write(&config, include_str!("../themes/editors/obsidian.toml")).unwrap();
+        fs::write(
+            &config,
+            include_str!("../themes/orange-type/editors/obsidian.toml"),
+        )
+        .unwrap();
         let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
         let [_, (_, css), _] = crate::obsidian::render(&theme);
         for key in [
@@ -3293,7 +3318,7 @@ external_hover_underline = true
         let path = tmp.path().join("theme.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
         let render = || {
             let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
@@ -3301,7 +3326,7 @@ external_hover_underline = true
             css
         };
         assert!(!render().contains("--h1-size:"));
-        let stock = include_str!("../themes/editors/obsidian.toml");
+        let stock = include_str!("../themes/orange-type/editors/obsidian.toml");
         fs::write(&config, stock).unwrap();
         let css = render();
         for (i, size) in [180, 150, 130, 115, 105, 100].into_iter().enumerate() {
@@ -3335,13 +3360,13 @@ external_hover_underline = true
         let path = tmp.path().join("theme.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
         for overrides in [false, true] {
             let settings = if overrides {
                 "[colors]\n\"--h3-color\" = \"accent\"\n\"--inline-title-color\" = \"muted\"\n"
             } else {
-                include_str!("../themes/editors/obsidian.toml")
+                include_str!("../themes/orange-type/editors/obsidian.toml")
             };
             fs::write(&config, settings).unwrap();
             let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
@@ -3374,14 +3399,14 @@ external_hover_underline = true
         let path = tmp.path().join("theme.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("obsidian.toml");
         let render = || {
             let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
             let [_, (_, css), _] = crate::obsidian::render(&theme);
             css
         };
-        let shipped = include_str!("../themes/editors/obsidian.toml");
+        let shipped = include_str!("../themes/orange-type/editors/obsidian.toml");
         fs::write(&config, shipped).unwrap();
         let baseline = render();
         assert!(!baseline.contains("font-variant-"));
@@ -3429,13 +3454,17 @@ external_hover_underline = true
         let path = tmp.path().join("theme.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("helix.toml");
         let render =
             || crate::helix::render(&resolve::resolve(&load(&path).unwrap()).unwrap()).unwrap();
         fs::write(&config, "[colors]\n\"ui.linenr.selected\" = \"text\"").unwrap();
         let baseline = render();
-        fs::write(&config, include_str!("../themes/editors/helix.toml")).unwrap();
+        fs::write(
+            &config,
+            include_str!("../themes/orange-type/editors/helix.toml"),
+        )
+        .unwrap();
         assert_eq!(render()[..2], baseline[..2]);
 
         fs::write(
@@ -3491,7 +3520,7 @@ external_hover_underline = true
         let path = tmp.path().join("theme.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("helix.toml");
         for (setting, expected) in [
             (
@@ -3519,9 +3548,9 @@ external_hover_underline = true
         let path = tmp.path().join("theme.toml");
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let config = editors.join("helix.toml");
-        let source = include_str!("../themes/editors/helix.toml");
+        let source = include_str!("../themes/orange-type/editors/helix.toml");
         let settings = source
             .lines()
             .skip_while(|line| *line != "# Helix 전용 예시")
@@ -3571,7 +3600,7 @@ external_hover_underline = true
     fn vscode_workbench_colors_are_opt_in_and_preserve_overlay_alpha() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("theme.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
         let config = editors.join("vscode.toml");
@@ -3645,7 +3674,7 @@ external_hover_underline = true
     fn mac_terminal_overrides_stay_app_specific_and_archive_mode_colors() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("theme.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let editors = tmp.path().join("editors");
         fs::create_dir(&editors).unwrap();
         fs::write(
@@ -3722,13 +3751,13 @@ external_hover_underline = true
         let tmp = tempfile::tempdir().unwrap();
         let root = tmp.path();
         let path = root.join("theme.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         fs::create_dir(root.join("editors")).unwrap();
         let vim_path = root.join("editors/vim.toml");
         let render = || crate::vim::render(&resolve::resolve(&load(&path).unwrap()).unwrap());
         fs::write(&vim_path, "[colors]\nLineNr = 'muted'").unwrap();
         let before = render();
-        let template = include_str!("../themes/editors/vim.toml");
+        let template = include_str!("../themes/orange-type/editors/vim.toml");
         fs::write(&vim_path, template).unwrap();
         assert_eq!(render(), before);
 
@@ -3770,7 +3799,7 @@ external_hover_underline = true
         let tmp = tempfile::tempdir().unwrap();
         let root = tmp.path();
         let path = root.join("theme.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         fs::create_dir(root.join("editors")).unwrap();
         let vim_path = root.join("editors/vim.toml");
         for (line, expected) in [
@@ -3793,7 +3822,7 @@ external_hover_underline = true
         let tmp = tempfile::tempdir().unwrap();
         let root = tmp.path();
         let source = root.join("theme.toml");
-        fs::write(&source, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&source, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         fs::create_dir(root.join("editors")).unwrap();
         let config = root.join("editors/lbrx-studio.toml");
         fs::write(&config, "[colors]\n'--accent' = 'function'\n").unwrap();
@@ -3824,7 +3853,7 @@ external_hover_underline = true
         let tmp = tempfile::tempdir().unwrap();
         let root = tmp.path();
         let path = root.join("theme.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         fs::create_dir(root.join("languages")).unwrap();
         fs::create_dir(root.join("editors")).unwrap();
         let original = resolve::resolve(&load(&path).unwrap()).unwrap();
@@ -3920,7 +3949,7 @@ external_hover_underline = true
     fn typora_layout_controls_both_stylesheets_and_rejects_invalid_padding() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let sidecar = dir.join("typora.toml");
@@ -3940,7 +3969,7 @@ external_hover_underline = true
     fn typora_paragraph_gap_styles_only_adjacent_top_level_paragraphs() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let render = || {
@@ -3959,7 +3988,7 @@ external_hover_underline = true
     fn typora_paragraph_alignment_is_independent_of_gap() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let sidecar = dir.join("typora.toml");
@@ -3979,7 +4008,7 @@ external_hover_underline = true
     fn typora_headings_render_configured_levels_and_validate_weight() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let sidecar = dir.join("typora.toml");
@@ -4012,17 +4041,17 @@ external_hover_underline = true
     fn typora_emphasis_uses_each_mode_and_rejects_low_highlight_contrast() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let sidecar = dir.join("typora.toml");
-        let config = include_str!("../themes/editors/typora.toml");
+        let config = include_str!("../themes/orange-type/editors/typora.toml");
         fs::write(&sidecar, config).unwrap();
         let theme = resolve::resolve(&load(&path).unwrap()).unwrap();
         let [(_, light), (_, dark), _] = crate::typora::render(&theme);
         for (css, strong, italic, strike, highlight) in [
-            (light, "#8B404B", "#684882", "#555A63", "#F4E7A3"),
-            (dark, "#F2B9BE", "#D8C2F1", "#C5C8CF", "#51451D"),
+            (light, "#A84B16", "#245E8A", "#6D5A4B", "#FFE8CB"),
+            (dark, "#FFC695", "#B4D9F5", "#C0AC9B", "#503927"),
         ] {
             assert!(css.contains(&format!("font-weight: 700; color: {strong};")));
             assert!(css.contains(&format!("font-style: italic; color: {italic};")));
@@ -4031,7 +4060,7 @@ external_hover_underline = true
             )));
             assert!(css.contains(&format!("background-color: {highlight}; color: inherit;")));
         }
-        fs::write(&sidecar, config.replace("#555A63", "#696969")).unwrap();
+        fs::write(&sidecar, config.replace("#6D5A4B", "#707070")).unwrap();
         let error = resolve::resolve(&load(&path).unwrap()).unwrap_err();
         assert!(error.contains("emphasis.strikethrough"));
         assert!(error.contains("emphasis.highlight_background"));
@@ -4041,7 +4070,7 @@ external_hover_underline = true
     fn typora_footnotes_and_rule_render_only_when_configured() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let render = || crate::typora::render(&resolve::resolve(&load(&path).unwrap()).unwrap());
@@ -4056,7 +4085,7 @@ external_hover_underline = true
         let sidecar = dir.join("typora.toml");
         fs::write(&sidecar, config).unwrap();
         let [(_, light), (_, dark), _] = render();
-        for (css, blue) in [(light, "#43617B"), (dark, "#97BBD6")] {
+        for (css, blue) in [(light, "#245E8A"), (dark, "#B4D9F5")] {
             assert!(css.contains(&format!("#write sup.md-footnote {{ color: {blue};")));
             assert!(css.contains("#write :is(.md-def-footnote, .footnote-line) { font-size: 85%;"));
             assert!(css.contains("#write hr:not(.footnotes-area hr) {"));
@@ -4075,7 +4104,7 @@ external_hover_underline = true
     fn typora_table_emits_custom_spacing_and_screen_only_scrolling() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let render = || crate::typora::render(&resolve::resolve(&load(&path).unwrap()).unwrap());
@@ -4086,7 +4115,7 @@ external_hover_underline = true
         )
         .unwrap();
         let [(_, light), (_, dark), _] = render();
-        for (css, surface) in [(light, "#E8EDE4"), (dark, "#25332C")] {
+        for (css, surface) in [(light, "#FFEAD6"), (dark, "#38313A")] {
             assert!(css.contains(&format!("--lbrx-surface: {surface};")));
             assert!(css.contains("padding: 6px 10px;\n  border: 0;\n  border-block-end: 2px"));
             assert!(css.contains("thead th {\n  background-color: var(--lbrx-surface);"));
@@ -4100,7 +4129,7 @@ external_hover_underline = true
     fn typora_lists_render_custom_spacing_and_preserve_task_item_markers() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let render = || crate::typora::render(&resolve::resolve(&load(&path).unwrap()).unwrap());
@@ -4159,7 +4188,7 @@ external_hover_underline = true
     fn typora_task_lists_can_omit_the_completed_strike() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let render = || crate::typora::render(&resolve::resolve(&load(&path).unwrap()).unwrap());
@@ -4172,7 +4201,7 @@ external_hover_underline = true
             )
             .unwrap();
             let [(_, light), (_, dark), _] = render();
-            for (css, accent) in [(light, "#246958"), (dark, "#84C7AC")] {
+            for (css, accent) in [(light, "#A84B16"), (dark, "#FFC695")] {
                 assert!(css.contains(&format!("accent-color: {accent};")));
                 let rule = css
                     .lines()
@@ -4188,7 +4217,7 @@ external_hover_underline = true
     fn typora_checkbox_color_changes_only_the_task_checkbox_accent() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let sidecar = dir.join("typora.toml");
@@ -4200,7 +4229,7 @@ external_hover_underline = true
         for (((_, before), (_, after)), (default, custom)) in baseline
             .iter()
             .zip(render().iter())
-            .zip([("#246958", "#815919"), ("#84C7AC", "#D6B378")])
+            .zip([("#A84B16", "#795814"), ("#FFC695", "#E2C080")])
         {
             let original = format!("accent-color: {default};");
             assert!(before.contains(&original));
@@ -4222,7 +4251,7 @@ external_hover_underline = true
     fn typora_images_style_explicit_captions_only_when_configured() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let render = || crate::typora::render(&resolve::resolve(&load(&path).unwrap()).unwrap());
@@ -4258,7 +4287,7 @@ external_hover_underline = true
     fn typora_math_applies_only_configured_block_styles() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let render = || crate::typora::render(&resolve::resolve(&load(&path).unwrap()).unwrap());
@@ -4291,7 +4320,7 @@ external_hover_underline = true
     fn typora_alerts_emit_type_colors_without_replacing_native_labels() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let render = || crate::typora::render(&resolve::resolve(&load(&path).unwrap()).unwrap());
@@ -4300,7 +4329,7 @@ external_hover_underline = true
         for shaded in [true, false] {
             fs::write(&sidecar, format!("[alerts]\nshaded_background = {shaded}")).unwrap();
             let [(_, light), (_, dark), _] = render();
-            for (css, note) in [(light, "#43617B"), (dark, "#97BBD6")] {
+            for (css, note) in [(light, "#245E8A"), (dark, "#B4D9F5")] {
                 assert!(css.contains(&format!(".md-alert-note {{ border-left-color: {note}; }}")));
                 assert!(css.contains(&format!(".md-alert-text-note {{ color: {note}; }}")));
                 for kind in ["tip", "important", "warning", "caution"] {
@@ -4319,7 +4348,7 @@ external_hover_underline = true
     fn typora_alert_color_override_changes_only_the_named_alert() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let sidecar = dir.join("typora.toml");
@@ -4335,7 +4364,7 @@ external_hover_underline = true
         for (((_, base), (_, css)), (original, accent)) in baseline
             .iter()
             .zip(render().iter())
-            .zip([("#43617B", "#246958"), ("#97BBD6", "#84C7AC")])
+            .zip([("#245E8A", "#A84B16"), ("#B4D9F5", "#FFC695")])
         {
             let original_rule = format!(
                 "#write .md-alert.md-alert-note {{ border-left-color: {original}; }}\n\
@@ -4366,7 +4395,7 @@ external_hover_underline = true
     fn typora_focus_mode_only_emits_a_color_when_overridden() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let sidecar = dir.join("typora.toml");
@@ -4375,7 +4404,7 @@ external_hover_underline = true
         fs::write(&sidecar, "[colors]\n'--blur-text-color' = 'muted'").unwrap();
         let custom = render();
         for (((_, before), (_, after)), muted) in
-            baseline.iter().zip(&custom).zip(["#52655B", "#A3B5A9"])
+            baseline.iter().zip(&custom).zip(["#6D5A4B", "#C0AC9B"])
         {
             assert!(!before.contains("--blur-text-color:"));
             let declaration = format!("  --blur-text-color: {muted};\n");
@@ -4391,7 +4420,7 @@ external_hover_underline = true
     fn typora_live_edit_colors_are_optional_and_keep_url_separate_from_markers() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let sidecar = dir.join("typora.toml");
@@ -4413,7 +4442,7 @@ external_hover_underline = true
         )
         .unwrap();
         let [(_, light), (_, dark), _] = render();
-        for (css, text, url) in [(light, "#246958", "#43617B"), (dark, "#84C7AC", "#97BBD6")] {
+        for (css, text, url) in [(light, "#A84B16", "#245E8A"), (dark, "#FFC695", "#B4D9F5")] {
             assert!(css.contains(&format!("[md-inline=\"link\"]:is(.md-expand, .md-expand-on-selection) > a {{ color: {text}; }}")));
             assert!(css.contains(&format!("[md-inline=\"link\"]:is(.md-expand, .md-expand-on-selection) > .md-meta > .md-url {{ color: {url}; }}")));
             assert!(!css.contains("var(--md-char-color, #BBB)"));
@@ -4432,7 +4461,7 @@ external_hover_underline = true
     fn typora_code_editing_overrides_are_independent_and_scoped_to_fences() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let sidecar = dir.join("typora.toml");
@@ -4498,7 +4527,7 @@ external_hover_underline = true
     fn typora_source_mode_only_changes_the_source_editor() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let sidecar = dir.join("typora.toml");
@@ -4552,7 +4581,7 @@ external_hover_underline = true
     fn typora_source_mode_rejects_invalid_settings() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let sidecar = dir.join("typora.toml");
@@ -4580,7 +4609,7 @@ external_hover_underline = true
     fn typora_toc_overrides_only_target_the_document_toc() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let sidecar = dir.join("typora.toml");
@@ -4635,7 +4664,7 @@ external_hover_underline = true
     fn typora_toc_rejects_invalid_depth_roles_and_levels() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let sidecar = dir.join("typora.toml");
@@ -4657,7 +4686,7 @@ external_hover_underline = true
     fn typora_sidebar_keeps_outline_state_separate_from_file_tree_state() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let sidecar = dir.join("typora.toml");
@@ -4717,15 +4746,56 @@ external_hover_underline = true
     }
 
     #[test]
+    fn typora_sidebar_file_list_uses_mode_colors_and_removes_nested_opacity() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("input.toml");
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
+        fs::create_dir(tmp.path().join("editors")).unwrap();
+        let config = tmp.path().join("editors/typora.toml");
+        let resolve = || resolve::resolve(&load(&path).unwrap()).unwrap();
+        let baseline = crate::typora::render(&resolve());
+        fs::write(
+            &config,
+            "[sidebar]\nbackground = 'surface'\ntext = 'text'\nmuted = 'muted'",
+        )
+        .unwrap();
+        let theme = resolve();
+        let output = crate::typora::render(&theme);
+        for (index, mode) in [&theme.light, &theme.dark].into_iter().enumerate() {
+            let css = &output[index].1;
+            assert!(css.contains(&format!(
+                "#typora-sidebar {{ --side-bar-bg-color: {}; --active-file-bg-color: {}; --active-file-text-color: {};",
+                mode.roles["surface"], mode.roles["selection_background"], mode.roles["selection_text"]
+            )));
+            assert!(css.contains(&format!(
+                ".file-list-item) {{ color: {}; opacity: 1; }}",
+                mode.roles["text"]
+            )));
+            assert!(css.contains(&format!(
+                ".file-list-item-file-ext-part) {{ color: {}; opacity: 1; }}",
+                mode.roles["muted"]
+            )));
+            assert!(css.contains(".file-list-item:hover:not(.active)"));
+            let without_sidebar = css
+                .split_inclusive('\n')
+                .filter(|line| !line.starts_with("#typora-sidebar"))
+                .collect::<String>();
+            assert_eq!(without_sidebar, baseline[index].1);
+        }
+    }
+
+    #[test]
     fn typora_sidebar_rejects_unknown_roles_and_panel_options() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let sidecar = dir.join("typora.toml");
         for (config, field) in [
             ("[sidebar]\nbackground = 'unknown'", "sidebar.background"),
+            ("[sidebar]\ntext = 'unknown'", "sidebar.text"),
+            ("[sidebar]\nmuted = 'unknown'", "sidebar.muted"),
             (
                 "[sidebar.file_tree]\nnumbered = 'text'",
                 "sidebar.file_tree.numbered",
@@ -4746,7 +4816,7 @@ external_hover_underline = true
     fn typora_editing_aids_only_add_rules_for_enabled_targets() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let sidecar = dir.join("typora.toml");
@@ -4757,7 +4827,7 @@ external_hover_underline = true
         assert_eq!(crate::typora::render(&resolve()), baseline);
         fs::write(
             &sidecar,
-            "[editing_aids.yaml]\nplaceholder = 'muted'\n\
+            "[editing_aids.yaml]\nbackground = 'surface'\ntext = 'text'\nplaceholder = 'muted'\n\
              [editing_aids.search]\nmatch_background = 'prose_selection_background'\n\
              active_text = 'selection_text'\n\
              [editing_aids.link]\ndestination_background = 'surface'",
@@ -4768,6 +4838,14 @@ external_hover_underline = true
         for (index, mode) in [&theme.light, &theme.dark].into_iter().enumerate() {
             let mut unchanged = css[index].1.clone();
             for (selector, property, role) in [
+                ("#write > pre.md-meta-block", "background-color", "surface"),
+                (
+                    "#write > pre.md-meta-block :is(.CodeMirror, .CodeMirror-gutters)",
+                    "background-color",
+                    "surface",
+                ),
+                ("#write > pre.md-meta-block", "color", "text"),
+                ("#write > pre.md-meta-block .CodeMirror", "color", "text"),
                 ("#write > pre.md-meta-block:empty::before", "color", "muted"),
                 (
                     "#write .md-search-hit:not(.md-search-select)",
@@ -4813,7 +4891,7 @@ external_hover_underline = true
     fn typora_editing_aids_reject_unknown_roles_and_options() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let sidecar = dir.join("typora.toml");
@@ -4838,7 +4916,7 @@ external_hover_underline = true
     fn typora_diagram_options_emit_native_values_and_scope_preview_alignment() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let sidecar = dir.join("typora.toml");
@@ -4901,7 +4979,7 @@ external_hover_underline = true
     fn typora_diagram_options_reject_values_the_renderer_does_not_support() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let sidecar = dir.join("typora.toml");
@@ -4921,7 +4999,7 @@ external_hover_underline = true
     fn typora_print_uses_light_colors_and_only_changes_print_media() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let sidecar = dir.join("typora.toml");
@@ -4965,7 +5043,7 @@ external_hover_underline = true
     fn typora_print_rejects_invalid_colors() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         let sidecar = dir.join("typora.toml");
@@ -4981,7 +5059,7 @@ external_hover_underline = true
     fn invalid_sidecar_reports_its_file_and_key() {
         let tmp = tempfile::tempdir().unwrap();
         let path = tmp.path().join("input.toml");
-        fs::write(&path, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&path, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let dir = tmp.path().join("editors");
         fs::create_dir(&dir).unwrap();
         for (key, role) in [("unknown", "text"), ("LineNr", "typo")] {

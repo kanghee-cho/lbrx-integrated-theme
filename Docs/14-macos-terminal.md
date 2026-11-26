@@ -6,11 +6,11 @@ Apple 기본 터미널용이며 iTerm2나 Windows Terminal 설정 파일이 아�
 cargo run --locked -- build --app macos-terminal
 ```
 
-저장소의 `themes/editors/macos-terminal.toml`에서 원하는 `[colors]` 항목을 주석 해제하고 공통 역할 이름을 지정한다. 기본 네 색과 ANSI 16색은 공통 원본에서 가져오며, `TextBoldColor`는 지정할 때만 생성한다. 글꼴·간격·창·탭은 앱에서 수동 설정한다.
+저장소의 `themes/orange-type/editors/macos-terminal.toml`에서 원하는 `[colors]` 항목을 주석 해제하고 공통 역할 이름을 지정한다. 기본 네 색과 ANSI 16색은 공통 원본에서 가져오며, `TextBoldColor`는 지정할 때만 생성한다. 글꼴·간격·창·탭은 앱에서 수동 설정한다.
 
 ## 설치·복구
 
-1. `dist/lbrx/macos-terminal/`의 `LBRX Light.terminal`, `LBRX Dark.terminal`을 사용한다. 먼저 **터미널 → 설정 → 프로파일**에서 기존 기본 프로파일 이름을 기록한다. 기존 프로파일을 편집할 계획이라면 동작 메뉴에서 **내보내기**로 백업한다.
+1. `dist/orange-type/lbrx/macos-terminal/`의 `LBRX Light.terminal`, `LBRX Dark.terminal`을 사용한다. 먼저 **터미널 → 설정 → 프로파일**에서 기존 기본 프로파일 이름을 기록한다. 기존 프로파일을 편집할 계획이라면 동작 메뉴에서 **내보내기**로 백업한다.
 2. 프로파일 목록의 동작 메뉴 → **가져오기**에서 두 파일을 선택하거나 Finder에서 목록으로 끌어온다. **셸 → 새로운 윈도우**에서 가져온 프로파일로 시험한다. 가져오기와 기본값 변경은 별개다.
 3. 마음에 들면 원하는 프로파일을 **기본값**으로 정한다. 시작 시 열리는 창이나 새 탭이 다른 프로파일을 쓰면 **설정 → 일반**의 시작/새 창·탭 설정을 확인한다. 기존 창을 일괄 변경하지 않는다.
 4. 갱신은 새 버전을 가져와 비교한 뒤 구버전만 정리한다. 같은 이름을 다시 가져와도 덮어쓰기를 가정하지 않는다. 복구하려면 원래 프로파일을 기본으로 되돌리고 새 창을 연다.

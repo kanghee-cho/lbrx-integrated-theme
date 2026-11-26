@@ -495,7 +495,7 @@ mod tests {
         let terminal = snapshot(App::WindowsTerminal);
         let typora = snapshot(App::Typora);
         let obsidian = snapshot(App::Obsidian);
-        theme.dark.palette.insert("pine".into(), "#93D1B9".into());
+        theme.dark.palette.insert("orange".into(), "#FFD1A3".into());
         super::build(&theme, &workspace.0, &[App::Obsidian]).unwrap();
         assert_eq!(snapshot(App::WindowsTerminal), terminal);
         assert_eq!(snapshot(App::Typora), typora);
@@ -503,7 +503,7 @@ mod tests {
         assert!(
             fs::read_to_string(workspace.output())
                 .unwrap()
-                .contains("#93D1B9")
+                .contains("#FFD1A3")
         );
 
         super::build(&theme, &workspace.0, &[App::WindowsTerminal, App::Typora]).unwrap();
@@ -542,7 +542,7 @@ mod tests {
     fn sample() -> Theme {
         toml::from_str(include_str!(concat!(
             env!("CARGO_MANIFEST_DIR"),
-            "/themes/lbrx.toml"
+            "/themes/orange-type/lbrx.toml"
         )))
         .unwrap()
     }
@@ -557,7 +557,7 @@ mod tests {
         let adapter_contents =
             windows_terminal::FILES.map(|file| fs::read(terminal.join(file)).unwrap());
         let tokens: ResolvedTheme = toml::from_str(std::str::from_utf8(&first).unwrap()).unwrap();
-        assert_eq!(tokens.light.roles["link"], theme.light.palette["pine"]);
+        assert_eq!(tokens.light.roles["link"], theme.light.palette["orange"]);
         for (index, color) in tokens.dark.ansi.iter().enumerate() {
             assert_eq!(
                 color,
@@ -605,17 +605,17 @@ mod tests {
         let studio_dir = App::LbrxStudio.output_path(&workspace.0);
         let read = || fs::read_to_string(studio_dir.join("theme.css")).unwrap();
         let baseline = read();
-        assert!(baseline.contains("--border: #52655B40;"));
-        assert!(baseline.contains("--border: #A3B5A940;"));
+        assert!(baseline.contains("--border: #6D5A4B40;"));
+        assert!(baseline.contains("--border: #C0AC9B40;"));
         assert!(baseline.contains("--font-prose-size: 18px;"));
         assert!(baseline.contains("--font-mono-line-height: 1.6;"));
         assert!(baseline.contains("--font-mono: \"D2Coding ligature\", monospace;"));
-        assert!(baseline.contains("--lbrx-code-function: #80516A;"));
+        assert!(baseline.contains("--lbrx-code-function: #344F85;"));
         assert!(baseline.contains(
-            ":root .lbrx-code.language-python { --lbrx-code-function: #24362F; --lbrx-code-function-weight: normal; --lbrx-code-function-style: italic; }"
+            ":root .lbrx-code.language-python { --lbrx-code-function: #38291F; --lbrx-code-function-weight: normal; --lbrx-code-function-style: italic; }"
         ));
         assert!(baseline.contains(
-            ":root[data-theme=\"dark\"] .lbrx-code.language-python { --lbrx-code-function: #DCE6DB;"
+            ":root[data-theme=\"dark\"] .lbrx-code.language-python { --lbrx-code-function: #F4E6D8;"
         ));
         assert!(baseline.contains(
             "@media (prefers-color-scheme: dark) {\n:root:not([data-theme=\"light\"]):not([data-theme=\"dark\"])"
@@ -626,8 +626,8 @@ mod tests {
         );
         super::build(&theme, &workspace.0, &[App::LbrxStudio]).unwrap();
         let customized = read();
-        assert!(customized.contains("--accent: #43617B;"));
-        assert!(customized.contains("--accent: #97BBD6;"));
+        assert!(customized.contains("--accent: #245E8A;"));
+        assert!(customized.contains("--accent: #B4D9F5;"));
         assert_eq!(
             vscode_before,
             vscode::FILES
@@ -690,7 +690,7 @@ mod tests {
         let source = input.path().join("lbrx.toml");
         let editors = input.path().join("editors");
         fs::create_dir(&editors).unwrap();
-        fs::write(&source, include_str!("../themes/lbrx.toml")).unwrap();
+        fs::write(&source, include_str!("../themes/orange-type/lbrx.toml")).unwrap();
         let settings = editors.join("helix.toml");
         let stock = r#"
 [colors]
@@ -797,7 +797,7 @@ command = "clippy"
         assert!(
             changed[0]
                 .1
-                .starts_with("highlight Function guifg=#DCE6DB guibg=NONE ctermfg=253 ")
+                .starts_with("highlight Function guifg=#F4E6D8 guibg=NONE ctermfg=224 ")
         );
     }
 
@@ -914,12 +914,12 @@ command = "clippy"
     }
 
     #[test]
-    fn document_selection_keeps_code_green_and_checks_prose_contrast() {
+    fn document_selection_keeps_code_blue_and_checks_prose_contrast() {
         let mut theme = sample();
         let resolved = resolve::resolve(&theme).unwrap();
         let typora = typora::render(&resolved);
         let [_, (_, obsidian), ..] = obsidian::render(&resolved);
-        for ((_, css), expected) in typora.iter().zip(["#F3D3AB", "#60402A"]) {
+        for ((_, css), expected) in typora.iter().zip(["#FFE0BE", "#62452F"]) {
             let css = css.replace("\r\n", "\n");
             let prose = format!("--lbrx-prose-selection-background: {expected};");
             assert!(css.contains(&prose));
@@ -929,8 +929,8 @@ command = "clippy"
             ));
             assert!(css.contains("#write :is(code, .md-fences) *::selection {\n  background-color: var(--lbrx-selection-background);"));
         }
-        assert!(obsidian.contains("--text-selection: #D8E6DA;"));
-        assert!(obsidian.contains("--text-selection: #304138;"));
+        assert!(obsidian.contains("--text-selection: #E0EDFC;"));
+        assert!(obsidian.contains("--text-selection: #3C4A61;"));
         assert!(obsidian.contains(".markdown-rendered :is(pre, code) *::selection,"));
         theme
             .dark
@@ -950,14 +950,14 @@ command = "clippy"
         for ((_, css), hex) in typora::render(&resolved)
             .iter()
             .take(2)
-            .zip(["#E8EDE4", "#25332C"])
+            .zip(["#FFEAD6", "#38313A"])
         {
             assert!(css.contains(&format!("--lbrx-code-block-background: {hex};")));
             assert!(css.replace("\r\n", "\n").contains(".md-fences .CodeMirror-gutters) {\n  background-color: var(--lbrx-code-block-background);"));
         }
         let [_, (_, css), ..] = obsidian::render(&resolved);
-        assert!(css.contains("--code-background: #F3F4EC;"));
-        assert!(css.contains("--code-background: #19231F;"));
+        assert!(css.contains("--code-background: #FFF8F0;"));
+        assert!(css.contains("--code-background: #28242A;"));
         assert!(css.contains(".markdown-rendered pre,\n.markdown-source-view.is-live-preview .HyperMD-codeblock {\n  --code-background: var(--lbrx-code-block-background);"));
 
         theme
@@ -976,7 +976,7 @@ command = "clippy"
                 .unwrap()
                 .light
                 .code_block_background(),
-            "#F3F4EC"
+            "#FFF8F0"
         );
     }
 
@@ -1034,12 +1034,12 @@ command = "clippy"
         };
         let before = render(&theme);
         let (light, dark) = before.split_once(".theme-dark {").unwrap();
-        assert!(light.contains("--accent-h: 165.21739130;"));
-        assert!(light.contains("--accent-s: 48.93617021%;"));
-        assert!(light.contains("--accent-l: 27.64705882%;"));
-        assert!(dark.contains("--accent-h: 155.82089552;"));
-        assert!(dark.contains("--accent-s: 37.43016760%;"));
-        assert!(dark.contains("--accent-l: 64.90196078%;"));
+        assert!(light.contains("--accent-h: 21.78082192;"));
+        assert!(light.contains("--accent-s: 76.84210526%;"));
+        assert!(light.contains("--accent-l: 37.25490196%;"));
+        assert!(dark.contains("--accent-h: 27.73584906;"));
+        assert!(dark.contains("--accent-s: 100.00000000%;"));
+        assert!(dark.contains("--accent-l: 79.21568627%;"));
 
         theme
             .dark
@@ -1055,9 +1055,9 @@ command = "clippy"
             .insert("accent".into(), "test_accent".into());
         let after = render(&theme);
         let expected = dark
-            .replace("--accent-h: 155.82089552;", "--accent-h: 0.00000000;")
-            .replace("--accent-s: 37.43016760%;", "--accent-s: 0.00000000%;")
-            .replace("--accent-l: 64.90196078%;", "--accent-l: 50.19607843%;");
+            .replace("--accent-h: 27.73584906;", "--accent-h: 0.00000000;")
+            .replace("--accent-s: 100.00000000%;", "--accent-s: 0.00000000%;")
+            .replace("--accent-l: 79.21568627%;", "--accent-l: 50.19607843%;");
         assert_eq!(after, format!("{light}.theme-dark {{{expected}"));
     }
 
@@ -1087,7 +1087,7 @@ command = "clippy"
         let windows = fs::read(terminal.join(windows_terminal::SCHEMES)).unwrap();
         theme.dark.roles.insert("link".into(), "ink".into());
         let expected = dark.replace(
-            &format!("--lbrx-link: {};", theme.dark.palette["pine"]),
+            &format!("--lbrx-link: {};", theme.dark.palette["orange"]),
             &format!("--lbrx-link: {};", theme.dark.palette["ink"]),
         );
         assert_ne!(dark, expected);
@@ -1214,7 +1214,6 @@ command = "clippy"
         build(&theme, &workspace.0).unwrap();
         let after = read_json(windows_terminal::SCHEMES);
         let mut expected = before;
-        expected["schemes"][1]["cursorColor"] = "#A2E3C6".into();
         expected["schemes"][1]["green"] = "#A2E3C6".into();
         assert_eq!(after, expected);
         assert_eq!(read_json(windows_terminal::FONT), font);

@@ -1,0 +1,5 @@
+# MD: 편집기의 Markdown 문법에만 적용. 문서 제목 조판이나 펜스 내부 언어를 덮어쓰지 않는다.
+[tokens]
+"keyword.declaration" = "syntax_declaration" # 제목 경계와 제목 텍스트.
+punctuation = "syntax_punctuation" # 목록·인용 등 문법 구분자.
+string = "string" # 인라인 코드로 분류되는 리터럴.

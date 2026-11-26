@@ -17,7 +17,7 @@
 
 ### ANSI 팔레트
 
-기본 색상 재지정과 굵은 글자색은 [macos-terminal.toml](../themes/editors/macos-terminal.toml)에서 지정한다. `[x]`는 파일 생성 검증이며 Mac 앱에서의 가져오기 검증은 아니다.
+기본 색상 재지정과 굵은 글자색은 [macos-terminal.toml](../themes/orange-type/editors/macos-terminal.toml)에서 지정한다. `[x]`는 파일 생성 검증이며 Mac 앱에서의 가져오기 검증은 아니다.
 
 일반색과 밝은색은 독립 슬롯이다. 아래 각 칸의 체크는 Mac 출력 기준이며 WT 필드는 이미 생성된다. ANSI를 쓰지 않고 프로그램이 직접 지정한 RGB까지 바꾸지는 않는다.
 

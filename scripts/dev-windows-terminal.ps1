@@ -1,5 +1,7 @@
 #Requires -Version 7.0
 param(
+    [ValidatePattern('^[a-z][a-z0-9-]*$')]
+    [string] $Style = 'orange-type',
     [ValidateSet('Light', 'Dark')]
     [string] $Mode = 'Light',
     [switch] $NoLaunch
@@ -37,13 +39,13 @@ if ($null -eq $cargo) {
 }
 Push-Location -LiteralPath $root
 try {
-    & $cargo.Source run --locked -- build
+    & $cargo.Source run --locked -- build (Join-Path 'themes' $Style) --app windows-terminal
     if ($LASTEXITCODE -ne 0) { throw "Theme build failed (exit $LASTEXITCODE)." }
 } finally {
     Pop-Location
 }
 
-$output = Join-Path $root 'dist\lbrx\windows-terminal'
+$output = Join-Path $root "dist\$Style\lbrx\windows-terminal"
 $schemes = (Get-Content -LiteralPath (Join-Path $output 'schemes.json') -Raw | ConvertFrom-Json).schemes
 $font = (Get-Content -LiteralPath (Join-Path $output 'profile-font.json') -Raw | ConvertFrom-Json).font
 $sample = Join-Path $PSScriptRoot 'windows-terminal-sample.ps1'
