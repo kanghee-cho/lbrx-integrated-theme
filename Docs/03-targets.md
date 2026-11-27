@@ -13,6 +13,9 @@
 | iTerm2 | [라이트·다크 `.itermcolors` 프리셋](20-iterm2.md)을 기존 프로필에 가져와 선택한다. | 글꼴과 프로필 설정은 수동이다. |
 | macOS Terminal.app | [라이트·다크 `.terminal` 프로파일](14-macos-terminal.md)을 가져와 새 창에서 선택. iTerm2 프리셋과 호환되지 않는다. | 글꼴·크기·행 간격은 프로필에서 수동 설정한다. |
 | LBRX Studio | [단일 `theme.css`와 적용 안내](25-lbrx-studio.md)를 생성. Studio에서 import하고 루트 `data-theme`로 모드 선택. HTML 토큰 클래스를 쓰는 구문 렌더러는 앱에서 구현 | 본문·고정폭 글꼴·px 크기·줄 높이 변수를 제공. 패널 크기·배치·사용자 설정은 앱 소유 |
+| Google Antigravity IDE | [전용 VSIX](26-antigravity.md)를 Install from VSIX로 설치. VS Code 매핑을 공유하지만 전용 색 재정의는 분리 | 글꼴 설정 조각을 수동 병합. 실행 코드 없음 |
+| Antigravity CLI (agy) | [terminal preset 설정 조각](28-agy-cli.md)과 터미널 배색표. `agy --settings`로 세션 전용 사용 또는 /config에서 선택 | 자체 HEX 테마를 만들지 않으며 글꼴·ANSI는 호스트 터미널에서 설정 |
+| Claude Code CLI | [light/dark JSON](27-claude-code.md)을 `~/.claude/themes`에 복사하고 /theme에서 선택 | CLI 색 토큰을 변경. 기본 터미널 배경·ANSI·글꼴은 호스트에서 별도 적용 |
 
 **검증 기준**
 

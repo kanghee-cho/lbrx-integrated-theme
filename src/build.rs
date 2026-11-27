@@ -1,5 +1,5 @@
 use crate::{
-    helix, iterm2, lbrx_studio, macos_terminal,
+    agy_cli, antigravity, claude_code, helix, iterm2, lbrx_studio, macos_terminal,
     model::Theme,
     obsidian,
     resolve::{self, ResolvedTheme},
@@ -32,10 +32,13 @@ pub enum App {
     VsCode,
     Helix,
     LbrxStudio,
+    Antigravity,
+    ClaudeCode,
+    AgyCli,
 }
 
 impl App {
-    pub const ALL: [Self; 9] = [
+    pub const ALL: [Self; 12] = [
         Self::WindowsTerminal,
         Self::MacosTerminal,
         Self::Typora,
@@ -45,6 +48,9 @@ impl App {
         Self::VsCode,
         Self::Helix,
         Self::LbrxStudio,
+        Self::Antigravity,
+        Self::ClaudeCode,
+        Self::AgyCli,
     ];
 
     pub fn label(self) -> &'static str {
@@ -58,6 +64,9 @@ impl App {
             Self::VsCode => "VS Code",
             Self::Helix => "Helix",
             Self::LbrxStudio => "LBRX Studio",
+            Self::Antigravity => "Google Antigravity",
+            Self::ClaudeCode => "Claude Code",
+            Self::AgyCli => "Antigravity CLI (agy)",
         }
     }
 
@@ -86,6 +95,9 @@ impl App {
             Self::VsCode => (vscode::DIRECTORY, vscode::FILES),
             Self::Helix => (helix::DIRECTORY, helix::FILES),
             Self::LbrxStudio => (lbrx_studio::DIRECTORY, lbrx_studio::FILES),
+            Self::Antigravity => (antigravity::DIRECTORY, antigravity::FILES),
+            Self::ClaudeCode => (claude_code::DIRECTORY, claude_code::FILES),
+            Self::AgyCli => (agy_cli::DIRECTORY, agy_cli::FILES),
         }
     }
 
@@ -97,8 +109,12 @@ impl App {
             Self::Obsidian => obsidian::render(theme).into(),
             Self::Iterm2 => iterm2::render(theme)?.into(),
             Self::Vim => vim::render(theme).into(),
-            Self::VsCode => {
-                let mut files = vscode::render(theme)?;
+            Self::VsCode | Self::Antigravity => {
+                let mut files = if self == Self::Antigravity {
+                    antigravity::render(theme)?
+                } else {
+                    vscode::render(theme)?
+                };
                 if let Some((_, text)) = files.iter_mut().find(|(name, _)| *name == GUIDE) {
                     text.extend_from_slice(self.language_guide(theme).as_bytes());
                 }
@@ -106,6 +122,8 @@ impl App {
             }
             Self::Helix => helix::render(theme)?.into(),
             Self::LbrxStudio => lbrx_studio::render(theme).into(),
+            Self::ClaudeCode => claude_code::render(theme)?,
+            Self::AgyCli => agy_cli::render(theme)?,
         };
         Ok((
             self,
@@ -124,7 +142,11 @@ impl App {
     fn language_guide(self, theme: &ResolvedTheme) -> String {
         if matches!(
             self,
-            Self::WindowsTerminal | Self::MacosTerminal | Self::Iterm2
+            Self::WindowsTerminal
+                | Self::MacosTerminal
+                | Self::Iterm2
+                | Self::ClaudeCode
+                | Self::AgyCli
         ) || theme.layers.languages.is_empty()
         {
             return String::new();
@@ -137,16 +159,24 @@ impl App {
                 "일반 전경색, 별도 구문 없음"
             } else {
                 match self {
-                    Self::VsCode if !vscode::grammar_roots(id).is_empty() => "언어별 TextMate 규칙",
-                    Self::VsCode if id == "bash" => "`shell` 공유 문법",
-                    Self::VsCode => "공통 scope만 적용 가능; 문법 확장 필요 시 별도 설치",
+                    Self::VsCode | Self::Antigravity if !vscode::grammar_roots(id).is_empty() => {
+                        "언어별 TextMate 규칙"
+                    }
+                    Self::VsCode | Self::Antigravity if id == "bash" => "`shell` 공유 문법",
+                    Self::VsCode | Self::Antigravity => {
+                        "공통 scope만 적용 가능; 문법 확장 필요 시 별도 설치"
+                    }
                     Self::Vim if vim::has_language_groups(id, theme) => "언어별 Vim 문법 그룹",
                     Self::Vim => "공통 Vim 문법 그룹",
                     Self::Helix => "공통 Tree-sitter 캡처; 언어별 색 재정의 미적용",
                     Self::LbrxStudio => "HTML 토큰 클래스; Studio 렌더러의 토큰 분류 필요",
                     Self::Typora => "코드 펜스 CodeMirror 클래스가 있는 경우만",
                     Self::Obsidian => "읽기 뷰 Prism 클래스가 있는 경우만",
-                    Self::WindowsTerminal | Self::MacosTerminal | Self::Iterm2 => unreachable!(),
+                    Self::WindowsTerminal
+                    | Self::MacosTerminal
+                    | Self::Iterm2
+                    | Self::ClaudeCode
+                    | Self::AgyCli => unreachable!(),
                 }
             };
             text.push_str(&format!("| `{id}` | {route} |\n"));
@@ -536,6 +566,131 @@ mod tests {
     impl Drop for Workspace {
         fn drop(&mut self) {
             fs::remove_dir_all(&self.0).unwrap();
+        }
+    }
+
+    #[test]
+    fn agent_app_outputs_use_native_formats_and_isolate_overrides() {
+        let input = tempfile::tempdir().unwrap();
+        let source = input.path().join("lbrx.toml");
+        fs::write(&source, include_str!("../tests/fixtures/lbrx.toml")).unwrap();
+        let editors = input.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        let original = crate::layers::load(&source).unwrap();
+        let baseline = resolve::resolve(&original).unwrap();
+        let vscode = crate::vscode::render(&baseline).unwrap();
+        let terminal = windows_terminal::render(&baseline).unwrap();
+        for (file, contents) in [
+            (
+                "antigravity.toml",
+                "[colors]\n\"editorCursor.foreground\" = 'text'\n\"editor.selectionBackground\" = 'surface@25'\n",
+            ),
+            ("claude-code.toml", "[colors]\nclaude = 'function'\n"),
+            ("agy-cli.toml", "[colors]\ncursorColor = 'text'\n"),
+        ] {
+            fs::write(editors.join(file), contents).unwrap();
+        }
+        let theme = crate::layers::load(&source).unwrap();
+        let resolved = resolve::resolve(&theme).unwrap();
+        assert_eq!(vscode, crate::vscode::render(&resolved).unwrap());
+        assert_eq!(terminal, windows_terminal::render(&resolved).unwrap());
+        let workspace = Workspace::new();
+        super::build(
+            &theme,
+            &workspace.0,
+            &[App::Antigravity, App::ClaudeCode, App::AgyCli],
+        )
+        .unwrap();
+        let antigravity = fs::read(
+            App::Antigravity
+                .output_path(&workspace.0)
+                .join(crate::vscode::VSIX),
+        )
+        .unwrap();
+        crate::vscode::validate(&antigravity).unwrap();
+        let mut archive = zip::ZipArchive::new(std::io::Cursor::new(antigravity)).unwrap();
+        let package: serde_json::Value =
+            serde_json::from_reader(archive.by_name("extension/package.json").unwrap()).unwrap();
+        assert_eq!(package["engines"]["vscode"], "^1.90.0");
+        let mut manifest = String::new();
+        io::Read::read_to_string(
+            &mut archive.by_name("extension.vsixmanifest").unwrap(),
+            &mut manifest,
+        )
+        .unwrap();
+        assert!(manifest.contains("Value=\"^1.90.0\""));
+        for (file, mode) in [
+            ("lbrx-light.json", &resolved.light),
+            ("lbrx-dark.json", &resolved.dark),
+        ] {
+            let colors: serde_json::Value = serde_json::from_reader(
+                archive
+                    .by_name(&format!("extension/themes/{file}"))
+                    .unwrap(),
+            )
+            .unwrap();
+            assert_eq!(
+                colors["colors"]["editorCursor.foreground"],
+                mode.roles["text"]
+            );
+            assert_eq!(
+                colors["colors"]["editor.selectionBackground"],
+                format!("{}40", mode.roles["surface"])
+            );
+        }
+        let claude = App::ClaudeCode.output_path(&workspace.0);
+        for (file, base, mode) in [
+            ("lbrx-light.json", "light", &resolved.light),
+            ("lbrx-dark.json", "dark", &resolved.dark),
+        ] {
+            let json: serde_json::Value =
+                serde_json::from_slice(&fs::read(claude.join(file)).unwrap()).unwrap();
+            assert_eq!(json["base"], base);
+            assert_eq!(json["overrides"]["claude"], mode.roles["function"]);
+            assert_eq!(
+                json["overrides"]["userMessageBackground"],
+                mode.roles["surface"]
+            );
+            assert!(json["overrides"].get("diffAdded").is_none());
+            assert!(
+                !fs::read_to_string(claude.join(GUIDE))
+                    .unwrap()
+                    .contains("구문 강조 설정 목록")
+            );
+        }
+        let agy = App::AgyCli.output_path(&workspace.0);
+        let settings: serde_json::Value =
+            serde_json::from_slice(&fs::read(agy.join("settings-theme.json")).unwrap()).unwrap();
+        assert_eq!(settings, serde_json::json!({"colorScheme": "terminal"}));
+        let schemes: serde_json::Value =
+            serde_json::from_slice(&fs::read(agy.join("schemes.json")).unwrap()).unwrap();
+        assert_eq!(
+            schemes["schemes"][0]["cursorColor"],
+            resolved.light.roles["text"]
+        );
+        let previous = fs::read(agy.join("schemes.json")).unwrap();
+        super::build(&theme, &workspace.0, &[App::ClaudeCode]).unwrap();
+        assert_eq!(previous, fs::read(agy.join("schemes.json")).unwrap());
+    }
+
+    #[test]
+    fn agent_sidecars_reject_unknown_tokens_and_roles() {
+        let input = tempfile::tempdir().unwrap();
+        let source = input.path().join("lbrx.toml");
+        fs::write(&source, include_str!("../tests/fixtures/lbrx.toml")).unwrap();
+        let editors = input.path().join("editors");
+        fs::create_dir(&editors).unwrap();
+        for (file, key, role) in [
+            ("claude-code.toml", "invented", "text"),
+            ("claude-code.toml", "claude", "missing"),
+            ("antigravity.toml", "editorCursor.foreground", "missing"),
+            ("agy-cli.toml", "cursorColor", "missing"),
+        ] {
+            let path = editors.join(file);
+            fs::write(&path, format!("[colors]\n\"{key}\" = '{role}'\n")).unwrap();
+            let error = crate::layers::load(&source).err().unwrap();
+            assert!(error.contains(file) && error.contains(key), "{error}");
+            fs::remove_file(path).unwrap();
         }
     }
 

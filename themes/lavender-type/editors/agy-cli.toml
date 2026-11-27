@@ -1,0 +1,4 @@
+# Antigravity CLI(agy)용 터미널 배색. 앱은 settings-theme.json의 colorScheme=terminal 사용.
+[colors] # 출력 schemes.json에만 적용. 오른쪽은 양쪽 모드의 공통 roles 이름.
+# cursorColor = "focus" # Windows Terminal 커서색. 공통 focus 역할 참조.
+# selectionBackground = "selection_background" # Windows Terminal 드래그 선택 배경색.

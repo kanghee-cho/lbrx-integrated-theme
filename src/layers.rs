@@ -218,6 +218,9 @@ const EDITORS: &[(&str, &[&str])] = &[
     ("iterm2", crate::iterm2::COLOR_KEYS),
     ("macos-terminal", crate::macos_terminal::COLOR_KEYS),
     ("vscode", &["editorCursor.foreground", "sideBar.background"]),
+    ("antigravity", &[]),
+    ("claude-code", &[]),
+    ("agy-cli", &["cursorColor", "selectionBackground"]),
     ("vim", &["LineNr", "Comment"]),
     ("helix", &["ui.linenr", "ui.linenr.selected"]),
     (
@@ -1660,9 +1663,10 @@ pub fn load(path: &Path) -> Result<Theme, String> {
                 (colors, *keys)
             };
             for (key, role) in &map {
-                let workbench = !language && id == "vscode";
+                let workbench = !language && matches!(id, "vscode" | "antigravity");
                 if !(allowed.contains(&key.as_str())
-                    || workbench && crate::vscode::is_workbench_color(key))
+                    || workbench && crate::vscode::is_workbench_color(key)
+                    || !language && id == "claude-code" && crate::claude_code::is_color(key))
                 {
                     return Err(format!("{}: 지원하지 않는 키 '{key}'", file.display()));
                 }

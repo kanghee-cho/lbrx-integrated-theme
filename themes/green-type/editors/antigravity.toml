@@ -1,0 +1,5 @@
+# Google Antigravity IDE 전용 색 연결. 공통 팔레트·언어 토큰은 ../lbrx.toml과 ../languages 참조.
+# VS Code 표준 색 ID를 사용하며 vscode.toml의 전용 재정의는 상속하지 않는다.
+[colors] # 오른쪽은 양쪽 모드에 존재하는 공통 roles 이름. 생략하면 기본 매핑 유지.
+# "editorCursor.foreground" = "focus" # 편집기 커서색. 공통 focus 역할 참조.
+# "sideBar.background" = "surface" # 사이드바 배경색. 공통 surface 역할 참조.

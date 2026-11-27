@@ -1,6 +1,6 @@
 # LBRX 통합 테마
 
-스타일별 TOML 원본에서 9개 앱의 라이트·다크 테마를 생성한다. 생성기는 설치된 앱이나 사용자 설정을 수정하지 않는다. V1.1 배포 파일은 5개 스타일과 9개 앱을 포함한다.
+스타일별 TOML 원본에서 12개 대상(앱·CLI)의 라이트·다크 테마와 적용 조각을 생성한다. 생성기는 설치된 앱이나 사용자 설정을 수정하지 않는다. V1.1 배포 파일은 5개 스타일과 9개 앱을 포함한다.
 
 ## V1.1 정식 배포
 
@@ -13,6 +13,8 @@ V1.1에는 Green, Lavender Mint, Sky Rose, Rose Slate, Sand Petrol이 포함된�
 배포 파일에는 글꼴과 앱 실행 파일이 포함되지 않는다. 글꼴은 아래 안내에 따라 별도로 준비한다. 테마 파일 생성과 실제 앱 화면 검증의 범위는 [검증 버전과 범위](05-languages-and-dependencies.md#대상-앱과-외부-도구-버전)를 따른다.
 
 ## 시작하기
+
+현재 원본에는 V1.1 이후 추가한 Google Antigravity IDE, Antigravity CLI(agy), Claude Code CLI 출력도 포함된다. 기존 V1.1 릴리스의 9개 앱 배포 파일은 변경하지 않으며 새 대상은 원본에서 빌드한다.
 
 `rustup`으로 [고정 Rust 도구체인](../rust-toolchain.toml)을 사용한다. Windows MSVC에서는 Visual Studio Build Tools의 C++ 빌드 도구와 Windows SDK도 필요하다. 저장소 루트에서 실행한다.
 
@@ -65,6 +67,9 @@ cargo run --locked -- build .\themes\lavender-type\lbrx.toml --app windows-termi
 | VS Code | [설치·복구](18-vscode.md) | [작업 화면 색](19-vscode-options.md) | [언어별 토큰·HTML CSS](22-vscode-language-highlighting.md) |
 | Helix | [설치·복구·설정 내보내기](16-helix.md) | [테마 스코프](17-helix-options.md) | — |
 | LBRX Studio | [출력·적용·결정사항](25-lbrx-studio.md) | [전용 TOML](../themes/lavender-type/editors/lbrx-studio.toml) | [HTML 토큰 계약](25-lbrx-studio.md#공통언어별-구문-토큰) |
+| Google Antigravity IDE | [VSIX·설치](26-antigravity.md) | [전용 TOML](../themes/lavender-type/editors/antigravity.toml) | VS Code 표준 TextMate/semantic 토큰 |
+| Antigravity CLI (agy) | [terminal preset·설정 조각](28-agy-cli.md) | [전용 TOML](../themes/lavender-type/editors/agy-cli.toml) | 앱 기본 분류 유지 |
+| Claude Code CLI | [사용자 정의 테마 JSON](27-claude-code.md) | [전용 TOML](../themes/lavender-type/editors/claude-code.toml) | 앱 기본 분류 유지 |
 
 옵션 대장에서 `생성`은 빌드 결과를, `선택 생성`은 설정했을 때만 출력하는 항목을 뜻한다. 둘 다 실제 앱에서 표시가 확인됐다는 뜻은 아니다. [검증 버전과 범위](05-languages-and-dependencies.md#대상-앱과-외부-도구-버전)를 별도로 관리한다.
 

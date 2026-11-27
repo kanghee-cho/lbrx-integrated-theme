@@ -310,7 +310,16 @@ const ANSI_COLORS: [&str; 16] = [
 ];
 
 pub fn render(theme: &ResolvedTheme) -> Result<[(&'static str, Vec<u8>); 4], String> {
-    let archive = make_vsix(theme).map_err(|error| format!("VS Code VSIX: {error}"))?;
+    render_for(theme, DIRECTORY, ENGINE)
+}
+
+pub(crate) fn render_for(
+    theme: &ResolvedTheme,
+    app: &str,
+    engine: &str,
+) -> Result<[(&'static str, Vec<u8>); 4], String> {
+    let archive =
+        make_vsix(theme, app, engine).map_err(|error| format!("VS Code VSIX: {error}"))?;
     let mono = &theme.typography.mono;
     let settings = json!({
         "editor.fontFamily": font_stack(mono),
@@ -336,13 +345,17 @@ fn json_bytes(value: &Value) -> Vec<u8> {
     bytes
 }
 
-fn make_vsix(theme: &ResolvedTheme) -> Result<Vec<u8>, zip::result::ZipError> {
+fn make_vsix(
+    theme: &ResolvedTheme,
+    app: &str,
+    engine: &str,
+) -> Result<Vec<u8>, zip::result::ZipError> {
     let package = json!({
         "name": "lbrx-theme",
         "displayName": "LBRX",
         "publisher": "lbrx",
         "version": VERSION,
-        "engines": { "vscode": ENGINE },
+        "engines": { "vscode": engine },
         "categories": ["Themes"],
         "contributes": { "themes": [
             { "label": "LBRX Light", "uiTheme": "vs", "path": format!("./{LIGHT}") },
@@ -356,7 +369,7 @@ fn make_vsix(theme: &ResolvedTheme) -> Result<Vec<u8>, zip::result::ZipError> {
     <Identity Id="lbrx-theme" Version="{VERSION}" Language="en-US" Publisher="lbrx"/>
     <DisplayName>LBRX</DisplayName>
     <Categories>Themes</Categories>
-    <Properties><Property Id="Microsoft.VisualStudio.Code.Engine" Value="{ENGINE}"/></Properties>
+    <Properties><Property Id="Microsoft.VisualStudio.Code.Engine" Value="{engine}"/></Properties>
   </Metadata>
   <Installation><InstallationTarget Id="Microsoft.VisualStudio.Code"/></Installation>
   <Assets><Asset Type="Microsoft.VisualStudio.Code.Manifest" Path="{PACKAGE}" Addressable="true"/></Assets>
@@ -371,11 +384,17 @@ fn make_vsix(theme: &ResolvedTheme) -> Result<Vec<u8>, zip::result::ZipError> {
         (PACKAGE.into(), json_bytes(&package)),
         (
             format!("extension/{LIGHT}"),
-            json_bytes(&color_theme(theme, "LBRX Light", "light", &theme.light)),
+            json_bytes(&color_theme(
+                theme,
+                app,
+                "LBRX Light",
+                "light",
+                &theme.light,
+            )),
         ),
         (
             format!("extension/{DARK}"),
-            json_bytes(&color_theme(theme, "LBRX Dark", "dark", &theme.dark)),
+            json_bytes(&color_theme(theme, app, "LBRX Dark", "dark", &theme.dark)),
         ),
     ] {
         zip.start_file(path, options)?;
@@ -468,7 +487,13 @@ pub(crate) fn workbench_color_value(value: &str) -> Result<(&str, Option<u8>), &
     Ok((value, None))
 }
 
-fn color_theme(theme: &ResolvedTheme, name: &str, kind: &str, mode: &ResolvedMode) -> Value {
+fn color_theme(
+    theme: &ResolvedTheme,
+    app: &str,
+    name: &str,
+    kind: &str,
+    mode: &ResolvedMode,
+) -> Value {
     let mut colors: Map<String, Value> = COLORS
         .iter()
         .map(|&(id, role)| (id.into(), json!(mode.roles[role])))
@@ -476,7 +501,7 @@ fn color_theme(theme: &ResolvedTheme, name: &str, kind: &str, mode: &ResolvedMod
     for (name, color) in ANSI_COLORS.into_iter().zip(&mode.ansi) {
         colors.insert(format!("terminal.ansi{name}"), json!(color));
     }
-    if let Some(overrides) = theme.layers.editors.get(DIRECTORY) {
+    if let Some(overrides) = theme.layers.editors.get(app) {
         for (id, value) in overrides {
             let (role, percent) = workbench_color_value(value).expect("validated workbench color");
             let hex = &mode.roles[role];

@@ -1,4 +1,7 @@
+mod agy_cli;
+mod antigravity;
 mod build;
+mod claude_code;
 mod css;
 mod helix;
 mod iterm2;

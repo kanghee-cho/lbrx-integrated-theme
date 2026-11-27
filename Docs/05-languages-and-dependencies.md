@@ -52,6 +52,9 @@ Rust 의존성은 [Cargo.toml](../Cargo.toml)의 버전 요구식과 [Cargo.lock
 | 대상 | 검증 버전 / 환경 | 특히 확인할 항목 |
 |---|---|---|
 | Typora | 미검증 | 문서 CSS, 본문·코드 서체 |
+| Google Antigravity IDE | 미검증; VSIX 엔진 `^1.90.0`, 표준 색 테마 구조 검사 | 실제 설치 및 에이전트 독자적 웹뷰의 색 상속은 별도 확인 |
+| Antigravity CLI (agy) | Windows agy 1.5.18 버전·도움말 확인(2026-11-27), 대화 TUI 미검증 | 공식 colorScheme=terminal 스키마, --settings 세션 전용 플래그 |
+| Claude Code CLI | 공식 사용자 정의 테마 문서 확인(2026-11-27), 실제 CLI 미검증 | ~/.claude/themes JSON, base·overrides 토큰과 터미널 배색 경계 |
 | Obsidian | 초기 테마 가독성 사용자 확인(2026-11-23), 앱 버전 미기록 | [확인 범위](10-obsidian-options.md#검증-기록). 이후 기능별 화면·모바일·PDF 검증과는 별개 |
 | VS Code | 1.147.0 (Windows, 임시 프로필) | VSIX 설치와 확장 등록 확인. 실제 화면 및 서체 적용은 미검증 |
 | Helix | 25.07 규격·기본 언어 카탈로그 기준, 화면 미검증 | 스코프, 설정 병합, 호스트 터미널 |
